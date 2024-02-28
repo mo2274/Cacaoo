@@ -1,0 +1,56 @@
+=========================================================================
+Date Time : 21-Jan-2024 5:13:25 PM
+-------------------------------------------------------------------------
+Order Request:{"Remarks":"want extra sweet chocolate","App_User_Id":"47e9c03e-595e-476f-8c99-1c0e6fc830eb","Payment_Type_Id":1,"Address_Id":1,"Cust_Name":"Yusuf Jaorawala","Email":"yusuf.9116@gmail.com","Mobile":"+96551533409","Delivery_Type":1,"Channel_Id":1,"Promo_Code":"","Branch_Id":3,"Gift_Msg":"Happy Birthday Gift","Recepient_Name":"Abdullah","Recepient_Mobile":"+96554545454","Video_File":"","Video_Link":"https://www.youtube.com/watch?v=ngrMaT9gUfc","Show_Sender_Name":true,"OrderDetails":[{"Prod_Id":5,"Prod_Name":"","Qty":2,"Promo_Code":"","Product_AddOn_Ids":[],"Remarks":"","Rate":0.0,"Amount":0.0,"Gross_Amount":0.0}]}
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 5:13:42 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:62
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 5:13:44 PM
+-------------------------------------------------------------------------
+Notification Payload :{ "message": { "topic": "driver", "notification": { "title": "New Order Received", "body": "Please accept Order # ORD_000051 for delivery" }, "data": { "story_id": "story_12345" }, "android": { "notification": { "click_action": "FLUTTER_NOTIFICATION_CLICK" } }, "apns": { "payload": { "aps": { "category" : "NEW_MESSAGE_CATEGORY" } } } } }
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 5:13:45 PM
+-------------------------------------------------------------------------
+{
+  "name": "projects/cacaoo-409514/messages/7641155943345073527"
+}
+
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 6:57:57 PM
+-------------------------------------------------------------------------
+Order Request:{"Remarks":"want extra sweet chocolate","App_User_Id":"47e9c03e-595e-476f-8c99-1c0e6fc830eb","Payment_Type_Id":1,"Address_Id":1,"Cust_Name":"Yusuf Jaorawala","Email":"yusuf.9116@gmail.com","Mobile":"+96551533409","Delivery_Type":1,"Channel_Id":1,"Promo_Code":"","Branch_Id":3,"Gift_Msg":"Happy Birthday Gift","Recepient_Name":"Abdullah","Recepient_Mobile":"+96554545454","Video_File":"","Video_Link":"https://www.youtube.com/watch?v=ngrMaT9gUfc","Show_Sender_Name":true,"OrderDetails":[{"Prod_Id":5,"Prod_Name":"","Qty":2,"Promo_Code":"","Product_AddOn_Ids":[],"Remarks":"","Rate":0.0,"Amount":0.0,"Gross_Amount":0.0}]}
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 6:58:15 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:71
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 7:02:01 PM
+-------------------------------------------------------------------------
+Order Request:{"Remarks":"want extra sweet chocolate","App_User_Id":"47e9c03e-595e-476f-8c99-1c0e6fc830eb","Payment_Type_Id":1,"Address_Id":1,"Cust_Name":"Yusuf Jaorawala","Email":"yusuf.9116@gmail.com","Mobile":"+96551533409","Delivery_Type":1,"Channel_Id":1,"Promo_Code":"","Branch_Id":3,"Gift_Msg":"Happy Birthday Gift","Recepient_Name":"Abdullah","Recepient_Mobile":"+96554545454","Video_File":"","Video_Link":"https://www.youtube.com/watch?v=ngrMaT9gUfc","Show_Sender_Name":true,"OrderDetails":[{"Prod_Id":5,"Prod_Name":"","Qty":2,"Promo_Code":"","Product_AddOn_Ids":[],"Remarks":"","Rate":0.0,"Amount":0.0,"Gross_Amount":0.0}]}
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 7:02:13 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:72
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 7:02:33 PM
+-------------------------------------------------------------------------
+Notification Payload :{ "message": { "topic": "driver", "notification": { "title": "New Order Received", "body": "Please accept Order # ORD_000060 for delivery" }, "data": { "story_id": "story_12345" }, "android": { "notification": { "click_action": "FLUTTER_NOTIFICATION_CLICK" } }, "apns": { "payload": { "aps": { "category" : "NEW_MESSAGE_CATEGORY" } } } } }
+=========================================================================
+=========================================================================
+Date Time : 21-Jan-2024 7:02:34 PM
+-------------------------------------------------------------------------
+{
+  "name": "projects/cacaoo-409514/messages/1839544657246196423"
+}
+
+=========================================================================

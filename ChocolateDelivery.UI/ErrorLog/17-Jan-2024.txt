@@ -1,0 +1,30 @@
+=========================================================================
+Date Time : 17-Jan-2024 2:43:32 PM
+-------------------------------------------------------------------------
+System.Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ChocolateDelivery.BLL.OrderBC.GetCustomerOrders(String lang, Int64 app_user_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 560
+   at ChocolateDelivery.BLL.OrderBC.GetCustomerOrders(String lang, Int64 app_user_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 593
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetCustomerOrders(String app_user_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 3284
+=========================================================================
+=========================================================================
+Date Time : 17-Jan-2024 6:54:25 PM
+-------------------------------------------------------------------------
+System.InvalidOperationException: Connection must be Open; current state is Closed
+   at MySqlConnector.MySqlConnection.get_Session() in /_/src/MySqlConnector/MySqlConnection.cs:line 745
+   at MySqlConnector.Core.ICancellableCommandExtensions.ResetCommandTimeout(ICancellableCommand command) in /_/src/MySqlConnector/Core/ICancellableCommand.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 342
+   at MySqlConnector.MySqlCommand.ExecuteReader() in /_/src/MySqlConnector/MySqlCommand.cs:line 112
+   at ChocolateDelivery.UI.Controllers.WebAPIController.RateProduct(RatingRequest ratingRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 3379
+=========================================================================
+=========================================================================
+Date Time : 17-Jan-2024 7:01:23 PM
+-------------------------------------------------------------------------
+System.ArgumentException: Parameter 'Prod_Id' not found in the collection.
+   at MySqlConnector.Core.CachedProcedure.AlignParamsWithDb(MySqlParameterCollection parameterCollection) in /_/src/MySqlConnector/Core/CachedProcedure.cs:line 124
+   at MySqlConnector.Core.SingleCommandPayloadCreator.WriteStoredProcedure(IMySqlCommand command, IDictionary`2 cachedProcedures, ByteBufferWriter writer) in /_/src/MySqlConnector/Core/SingleCommandPayloadCreator.cs:line 188
+   at MySqlConnector.Core.SingleCommandPayloadCreator.WriteQueryCommand(CommandListPosition& commandListPosition, IDictionary`2 cachedProcedures, ByteBufferWriter writer, Boolean appendSemicolon) in /_/src/MySqlConnector/Core/SingleCommandPayloadCreator.cs:line 47
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 43
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteReader() in /_/src/MySqlConnector/MySqlCommand.cs:line 112
+   at ChocolateDelivery.UI.Controllers.WebAPIController.RateProduct(RatingRequest ratingRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 3380
+=========================================================================

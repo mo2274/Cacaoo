@@ -1,0 +1,44 @@
+=========================================================================
+Date Time : 15-Feb-2024 11:28:04 AM
+-------------------------------------------------------------------------
+System.Exception: MySqlConnector.MySqlException (0x80004005): Table 'cacaoo.txn_cart_catering_products' doesn't exist
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.Enumerator.InitializeReader(Enumerator enumerator)
+   at Pomelo.EntityFrameworkCore.MySql.Storage.Internal.MySqlExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.Enumerator.MoveNext()
+   at System.Linq.Enumerable.TryGetSingle[TSource](IEnumerable`1 source, Boolean& found)
+   at lambda_method394(Closure , QueryContext )
+   at System.Linq.Queryable.FirstOrDefault[TSource](IQueryable`1 source)
+   at ChocolateDelivery.BLL.CartBC.CreateCartCateringProduct(TXN_Cart_Catering_Products invoiceDM) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\CartBC.cs:line 352
+   at ChocolateDelivery.BLL.CartBC.CreateCartCateringProduct(TXN_Cart_Catering_Products invoiceDM) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\CartBC.cs:line 369
+   at ChocolateDelivery.UI.Controllers.WebAPIController.AddToCart(CartRequest cartRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 1250
+=========================================================================
+=========================================================================
+Date Time : 15-Feb-2024 12:15:02 PM
+-------------------------------------------------------------------------
+Order Request:{"Remarks":"want extra sweet chocolate","App_User_Id":"47e9c03e-595e-476f-8c99-1c0e6fc830eb","Payment_Type_Id":1,"Address_Id":1,"Cust_Name":"Yusuf Jaorawala","Email":"yusuf.9116@gmail.com","Mobile":"+96551533409","Delivery_Type":1,"Channel_Id":1,"Promo_Code":"","Branch_Id":2,"Gift_Msg":"","Recepient_Name":"","Recepient_Mobile":"","Video_File":"","Video_Link":"","Show_Sender_Name":null,"Redeem_Points":0.0,"Redeem_Amount":0.000,"Pickup_Datetime":null,"OrderDetails":[{"Prod_Id":17,"Prod_Name":"","Qty":1,"Promo_Code":"","Product_AddOn_Ids":[],"Remarks":"","Rate":0.0,"Amount":0.0,"Gross_Amount":0.0,"Catering_Products":[{"Catering_Product_Id":1,"Catering_Product":"","Qty":2},{"Catering_Product_Id":3,"Catering_Product":"","Qty":1},{"Catering_Product_Id":4,"Catering_Product":"","Qty":1},{"Catering_Product_Id":5,"Catering_Product":"","Qty":2},{"Catering_Product_Id":7,"Catering_Product":"","Qty":1},{"Catering_Product_Id":8,"Catering_Product":"","Qty":1}]}]}
+=========================================================================
+=========================================================================
+Date Time : 15-Feb-2024 12:15:27 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:116
+=========================================================================
+=========================================================================
+Date Time : 15-Feb-2024 12:15:28 PM
+-------------------------------------------------------------------------
+Notification Payload :{ "message": { "topic": "driver", "notification": { "title": "New Order Received", "body": "Please accept Order # ORD_000004 for delivery" }, "data": { "story_id": "story_12345" }, "android": { "notification": { "click_action": "FLUTTER_NOTIFICATION_CLICK" } }, "apns": { "payload": { "aps": { "category" : "NEW_MESSAGE_CATEGORY" } } } } }
+=========================================================================
+=========================================================================
+Date Time : 15-Feb-2024 12:15:29 PM
+-------------------------------------------------------------------------
+{
+  "name": "projects/cacaoo-409514/messages/1284406120086380085"
+}
+
+=========================================================================

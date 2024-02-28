@@ -1,0 +1,81 @@
+﻿@using System.Data
+@using System.Net
+@using System.Linq;
+@model DataTable
+
+@if (ViewBag.Is_Required)
+{
+    <select name="@ViewBag.Name" id="@ViewBag.Id" class="form-control form-select select2" data-placeholder="@ViewBag.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage" @if(ViewBag.Multiple){
+<text> multiple="multiple"</text>
+}>
+            <option></option>
+
+        @for (int i = 0; i < Model.Rows.Count; i++)
+        {
+            @if (ViewBag.Multiple)
+            {
+                string[] values = ViewBag.Value.Split(',');
+                if (values.Contains(Model.Rows[i][0].ToString()))
+                {
+                                <option value="@Model.Rows[i][0].ToString()" selected>@Model.Rows[i][1].ToString()</option>
+                }
+                else
+                {
+                                                      <option value="@Model.Rows[i][0].ToString()">@Model.Rows[i][1].ToString()</option>
+                }
+            }
+            else
+            {
+                if (ViewBag.Value == Model.Rows[i][0].ToString())
+                {
+                                                    <option value="@Model.Rows[i][0].ToString()" selected>@Model.Rows[i][1].ToString()</option>
+                }
+                else
+                {
+                                                                <option value="@Model.Rows[i][0].ToString()">@Model.Rows[i][1].ToString()</option>
+                }
+            }
+
+        }
+        </select>
+    <span class="field-validation-valid" data-valmsg-for="@ViewBag.Id" data-valmsg-replace="true"></span>
+}
+else
+{
+    <select name="@ViewBag.Name" id="@ViewBag.Id" class="form-control form-select select2" data-placeholder="@ViewBag.Placeholder" @if(ViewBag.Multiple){
+<text> multiple="multiple"</text>
+}>
+            <option></option>
+
+        @for (int i = 0; i < Model.Rows.Count; i++)
+        {
+            @if (ViewBag.Multiple)
+            {
+                string[] values = ViewBag.Value.Split(',');
+                if (values.Contains(Model.Rows[i][0].ToString()))
+                {
+                <option value="@Model.Rows[i][0].ToString()" selected>@Model.Rows[i][1].ToString()</option>
+                }
+                else
+                {
+                                      <option value="@Model.Rows[i][0].ToString()">@Model.Rows[i][1].ToString()</option>
+                }
+            }
+            else
+            {
+                if (ViewBag.Value == Model.Rows[i][0].ToString())
+                {
+                                    <option value="@Model.Rows[i][0].ToString()" selected>@Model.Rows[i][1].ToString()</option>
+                }
+                else
+                {
+                                                <option value="@Model.Rows[i][0].ToString()">@Model.Rows[i][1].ToString()</option>
+                }
+            }
+
+
+        }
+        </select>
+}
+
+

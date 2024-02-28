@@ -1,0 +1,72 @@
+=========================================================================
+Date Time : 24-Jan-2024 12:38:39 PM
+-------------------------------------------------------------------------
+MySqlConnector.MySqlException (0x80004005): Unknown column 'p.resturant_id' in 'on clause'
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at ChocolateDelivery.UI.Areas.Admin.Controllers.ListController.Index(Int64 Id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Areas\Admin\Controllers\ListController.cs:line 289
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 12:39:37 PM
+-------------------------------------------------------------------------
+MySqlConnector.MySqlException (0x80004005): Unknown column 'p.resturant_id' in 'on clause'
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at ChocolateDelivery.UI.Areas.Admin.Controllers.ListController.Index(Int64 Id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Areas\Admin\Controllers\ListController.cs:line 289
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 1:11:06 PM
+-------------------------------------------------------------------------
+Getting vendor id null while creating product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 1:12:18 PM
+-------------------------------------------------------------------------
+Getting vendor id null while creating product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 1:31:49 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 1:32:46 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 3:47:31 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 3:50:15 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 5:04:42 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================
+=========================================================================
+Date Time : 24-Jan-2024 5:13:37 PM
+-------------------------------------------------------------------------
+Getting vendor id null for list :Product
+=========================================================================

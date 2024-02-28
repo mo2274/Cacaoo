@@ -1,0 +1,114 @@
+﻿@model UCProperties
+@if (Model.Is_Required)
+{
+    if (Model.Element_Type != Form_Element_Types.MultiLine)
+    {
+        if (Model.Max_Length == null)
+        {
+            if (Model.Min_Length == null)
+            {
+
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+<text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+<text> readonly</text>
+} />
+            }
+            else
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage" minlength="@Model.Min_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+<text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+<text> readonly</text>
+} >
+            }
+        }
+        else
+        {
+            if (Model.Min_Length == null)
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage" maxlength="@Model.Max_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+<text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+<text> readonly</text>
+} >
+            }
+            else
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage" maxlength="@Model.Max_Length" minlength="@Model.Min_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+<text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+<text> readonly</text>
+} >
+            }
+        }
+    }
+    else
+    {
+        <textarea id="@Model.Id" name="@Model.Id" class="@Model.CSSClass" placeholder="@Model.Placeholder" rows="3" data-val="true" data-val-required="@ViewBag.ErrorMessage" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >@Model.Value</textarea>
+    }
+
+
+    <span class="field-validation-valid" data-valmsg-for="@Model.Id" data-valmsg-replace="true"></span>
+}
+else
+{
+    if (Model.Element_Type != Form_Element_Types.MultiLine)
+    {
+        if (Model.Max_Length == null)
+        {
+            if (Model.Min_Length == null)
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >
+            }
+            else
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" minlength="@Model.Min_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >
+            }
+
+        }
+
+        else
+        {
+            if (Model.Min_Length == null)
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" maxlength="@Model.Max_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >
+            }
+            else
+            {
+                <input type="@Model.Element_Type" id="@Model.Id" name="@Model.Id" value="@Model.Value" class="@Model.CSSClass" placeholder="@Model.Placeholder" maxlength="@Model.Max_Length" minlength="@Model.Min_Length" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >
+            }
+
+        }
+
+    }
+    else
+    {
+        <textarea id="@Model.Id" name="@Model.Id" class="@Model.CSSClass" placeholder="@Model.Placeholder" rows="3" @if(!string.IsNullOrEmpty(Model.OnKeyup)){
+ <text> onkeyup="@Model.OnKeyup"</text>
+} @if(Model.Read_Only){
+ <text> readonly</text>
+} >@Model.Value</textarea>
+    }
+
+}

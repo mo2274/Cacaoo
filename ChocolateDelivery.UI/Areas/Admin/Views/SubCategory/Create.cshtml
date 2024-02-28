@@ -1,0 +1,151 @@
+﻿@model SM_Sub_Categories
+
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Sub Category</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Sub_Category_Name_E",CSSClass="form-control",Placeholder="Enter Sub Category Name",Value=Model != null ?Model.Sub_Category_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Sub_Category_Name_A",CSSClass="form-control",Placeholder="Enter Sub Category Name(Ar)",Value=Model != null ?Model.Sub_Category_Name_A != null?Model.Sub_Category_Name_A.ToString():"" :"",
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 34})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Category_Id",Placeholder="Select Category",Value=Model != null ?Model.Category_Id.ToString():"",Is_Required=true,Error_Label_Id=35,List_Id=3
+                                    })
+
+                                </div>
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 192})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Sub_Category_Desc_E",CSSClass="form-control",Placeholder="Enter Desc",Value=Model != null ?Model.Sub_Category_Desc_E != null?Model.Sub_Category_Desc_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 193})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Sub_Category_Desc_A",CSSClass="form-control",Placeholder="Enter Desc(Ar)",Value=Model != null ?Model.Sub_Category_Desc_A != null?Model.Sub_Category_Desc_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+
+                            </div>
+
+
+                            <!-- row -->
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div>
+                                                <h6 class="card-title mb-1">Image Upload</h6>
+
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col-sm-12 col-md-4">
+                                                    @if (Model != null && !string.IsNullOrEmpty(Model.Image_URL))
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" data-default-file="/@Model.Image_URL" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 82})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Background_Color",CSSClass="form-control colorTextHeight",Placeholder="Select Background Color",Value=Model != null ?Model.Background_Color != null?Model.Background_Color.ToString():"" :"",Element_Type=Form_Element_Types.Color
+                                    })
+                                </div>
+                            </div>
+                            <!-- row closed -->
+                            <div class="">
+                                <div class="">
+                                    @Html.CheckBox("Show",true)
+                                    @*  @Html.CheckBox("Show", true)*@
+                                    @*  <input type="checkbox" asp-for="Show">*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+        });
+    </script>
+
+}

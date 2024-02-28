@@ -1,0 +1,111 @@
+﻿@model SM_Product_Types
+
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Product Types</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Type_Name_E",CSSClass="form-control",Placeholder="Enter Type Name",Value=Model != null ?Model.Type_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Type_Name_A",CSSClass="form-control",Placeholder="Enter Type Name(Ar)",Value=Model != null ?Model.Type_Name_A != null?Model.Type_Name_A.ToString():"" :"",
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 192})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Type_Desc_E",CSSClass="form-control",Placeholder="Enter Desc",Value=Model != null ?Model.Type_Desc_E != null?Model.Type_Desc_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 193})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Type_Desc_A",CSSClass="form-control",Placeholder="Enter Desc(Ar)",Value=Model != null ?Model.Type_Desc_A != null?Model.Type_Desc_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="">
+                                <div class="">
+                                    @Html.CheckBox("Show",true)
+                                    @*  @Html.CheckBox("Show", true)*@
+                                    @*  <input type="checkbox" asp-for="Show">*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+        });
+    </script>
+
+}

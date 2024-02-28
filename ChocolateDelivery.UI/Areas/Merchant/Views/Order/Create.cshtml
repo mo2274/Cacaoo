@@ -1,0 +1,360 @@
+﻿@model TXN_Orders
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    int user_cd = 0;
+    if (HttpContextAccessor.HttpContext != null)
+    {
+        user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("VendorId") ?? 0;
+
+    }
+    bool Is_Gift_Order = Model != null && Model.Order_Type == OrderTypes.GIFT;
+}
+@section CSS{
+    <style type="text/css">
+        @@media print {
+            body {
+                visibility: hidden;
+            }
+
+            #qrCodeDiv {
+                visibility: visible;
+               /* position: absolute;*/
+                height:400px;
+                left: 200px;
+                top: -400px;
+            }
+        }
+    </style>
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Order</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 67})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Order_Serial",CSSClass="form-control",Value=Model != null ?Model.Order_Serial.ToString() :"",Is_Required=true,Error_Label_Id=56,Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 68})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Order_Datetime",CSSClass="form-control",Value=Model != null ?Model.Order_Datetime.ToString():"",Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-lg-4">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 69})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Branch_Id",Placeholder="Select Branch",Value=Model != null ?Model.Branch_Id != null?Model.Branch_Id.ToString():"":"",Is_Required=true,Error_Label_Id=70,List_Id=12
+                                    })
+                                </div>
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 71})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Cust_Name",CSSClass="form-control",Value=Model != null ?Model.Cust_Name != null?Model.Cust_Name.ToString():"" :"",Read_Only=true
+                                    })
+                                </div>
+                                @* <div class="col-sm-4">
+
+                                @await Component.InvokeAsync("UCLabel",new{labelId = 211})
+                                @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                Id="Email",CSSClass="form-control",Value=Model != null ?Model.Email != null?Model.Email.ToString():"" :"",Read_Only=true
+                                })
+                                </div>
+                                <div class="col-sm-4">
+
+                                @await Component.InvokeAsync("UCLabel",new{labelId = 100})
+                                @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                Id="Mobile",CSSClass="form-control",Value=Model != null ?Model.Mobile != null?Model.Mobile.ToString():"" :"",Read_Only=true
+                                })
+                                </div>*@
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 72})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Delivery_Type_Name",CSSClass="form-control",Value=Model != null ?Model.Delivery_Type_Name != null?Model.Delivery_Type_Name.ToString():"" :"",Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 73})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Payment_Type_Name",CSSClass="form-control",Value=Model != null ?Model.Payment_Type_Name != null?Model.Payment_Type_Name.ToString():"" :"",Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 74})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Status_Name",CSSClass="form-control",Value=Model != null ?Model.Status_Name != null?Model.Status_Name.ToString():"" :"",Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 264})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Pickup_Datetime",CSSClass="form-control",Value=Model != null ?Model.Pickup_Datetime != null?Convert.ToDateTime(Model.Pickup_Datetime).ToString("dd-MMM-yyyy hh:mm tt"):"" :"",Read_Only=true
+                                    })
+                                </div>
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 90})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Order_Type_Name",CSSClass="form-control",Value=Model != null ?Model.Order_Type_Name.ToString():"" ,Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 10})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Gross_Amount",CSSClass="form-control",Value=Model != null ?Model.Gross_Amount.ToString():"" ,Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 209})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Delivery_Charges",CSSClass="form-control",Value=Model != null ?Model.Delivery_Charges.ToString():"" ,Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-sm-3">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 12})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Net_Amount",CSSClass="form-control",Value=Model != null ?Model.Net_Amount.ToString():"" ,Read_Only=true
+                                    })
+                                </div>
+                            </div>
+
+                            <!-- row -->
+                            <div class="row row-sm mb-3">
+                                <div class="col-lg-6">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 26})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Full_Address",CSSClass="form-control",Value=Model != null ?Model.Full_Address != null?Model.Full_Address.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine,Read_Only=true
+                                    })
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 27})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Comments",CSSClass="form-control",Placeholder="Enter Comments",Value=Model != null ?Model.Comments != null?Model.Comments.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine,Read_Only=true
+                                    })
+                                </div>
+                            </div>
+
+
+                            <div class="row row-sm mb-3">
+
+                                <div class="col-xl-12">
+                                    <!-- div -->
+                                    <div class="card mg-b-20" id="tabs-style2">
+                                        <div class="text-wrap">
+                                            <div class="example">
+                                                <div class="panel panel-primary tabs-style-2">
+                                                    <div class=" tab-menu-heading">
+                                                        <div class="tabs-menu1">
+                                                            <!-- Tabs -->
+                                                            <ul class="nav panel-tabs main-nav-line">
+                                                                <li class="nav-item"><a href="#tabAddOn" class="nav-link active" data-bs-toggle="tab">Order Detail</a></li>
+                                                                @if (Is_Gift_Order)
+                                                                {
+                                                                    <li class="nav-item"><a href="#tabGiftOrder" class="nav-link" data-bs-toggle="tab">Gift Order</a></li>
+                                                                }
+                                                                @*<li>
+                                                                <a href="#tab5" class="nav-link" data-bs-toggle="tab">
+                                                                Tab
+                                                                02
+                                                                </a>
+                                                                </li>
+                                                                <li>
+                                                                <a href="#tab6" class="nav-link active" data-bs-toggle="tab">
+                                                                Tab
+                                                                03
+                                                                </a>
+                                                                </li>*@
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body tabs-menu-body main-content-body-right border">
+                                                        <div class="tab-content">
+                                                            <div class="tab-pane active" id="tabAddOn">
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered border text-nowrap mb-0" id="tblAddOn">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Line No</th>
+                                                                                <th>Product</th>
+                                                                                <th>Qty </th>
+                                                                                <th>Rate</th>
+                                                                                <th>Amount</th>
+                                                                                <th>Add On Amount</th>
+                                                                                <th>Net Amount</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @if (Model != null)
+                                                                            {
+                                                                                for (int i = 0; i < Model.TXN_Order_Details.Count; i++)
+                                                                                {
+                                                                                    var current_line_no = i + 1;
+                                                                                    <tr>
+
+                                                                                        <td> <label>@current_line_no</label></td>
+                                                                                        <td style="white-space:pre-line;"> @Model.TXN_Order_Details[i].Full_Product_Name</td>
+                                                                                        <td> @Model.TXN_Order_Details[i].Qty</td>
+                                                                                        <td> @Model.TXN_Order_Details[i].Rate</td>
+                                                                                        <td> @Model.TXN_Order_Details[i].Amount</td>
+                                                                                        <td> @Model.TXN_Order_Details[i].AddOn_Amount</td>
+                                                                                        <td> @Model.TXN_Order_Details[i].Gross_Amount</td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            @if (Is_Gift_Order)
+                                                            {
+                                                                <div class="tab-pane" id="tabGiftOrder">
+                                                                    <div class="row row-sm mb-3">
+                                                                        <div class="col-sm-4" style="text-align:center;">
+                                                                            <div id="qrCodeDiv" class="img-thumbnail" style="text-align:center;">
+                                                                                @if (ViewBag.QrCodeUri != null)
+                                                                                {
+                                                                                    <img src="@ViewBag.QrCodeUri" class="" />
+                                                                                }
+                                                                                @if (Model != null)
+                                                                                {
+                                                                                    <text>@Model.Gift_Msg</text>
+                                                                                    <br>
+                                                                                    if (Model.Show_Sender_Name)
+                                                                                    {
+                                                                                        <text>Sent By : @Model.Cust_Name</text>
+                                                                                    }
+                                                                                }
+                                                                            </div>
+                                                                            <div>
+                                                                                <button type="button" class="btn btn-primary mt-3 mb-0" onclick="window.print()">Print QR</button>
+                                                                                </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /div -->
+
+
+
+
+                            </div>
+                        </div>
+                        @if (Model != null && ((Model.Status_Id == OrderStatus.ORDER_RECEIVED && Model.Payment_Type_Id == PaymentTypes.Cash) || (Model.Status_Id == OrderStatus.ORDER_PAID && (Model.Payment_Type_Id == PaymentTypes.KNET || Model.Payment_Type_Id == PaymentTypes.CreditCard))))
+                        {
+                            @await Component.InvokeAsync("UCLabel",new{labelId = 75,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button",value="accept_order"})
+                        }
+
+                        @if (Model != null && Model.Status_Id == OrderStatus.ORDER_PREPARING)
+                        {
+                            @await Component.InvokeAsync("UCLabel",new{labelId = 76,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button",value="out_for_delivery"})
+                        }
+                        @if (Model != null && Model.Status_Id == OrderStatus.OUT_FOR_DELIVERY)
+                        {
+                            @await Component.InvokeAsync("UCLabel",new{labelId = 77,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button",value="delivered"})
+                        }
+                        <a href="/Merchant/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        var serviceArr = [];
+        let gridServiceArr = [];
+        let Product_AddOns = [];
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+
+        });
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+        }
+        //function printDiv(divName) {
+        //    var divContents = document.getElementById(divName).innerHTML;
+        //    var a = window.open('', '', 'height=500, width=500'); 
+        //        a.document.write('<html>'); 
+        //        a.document.write('<body>'); 
+        //        a.document.write(divContents); 
+        //        a.document.write('</body></html>'); 
+        //        a.document.close(); 
+        //        a.print(); 
+        //    } 
+    </script>
+
+}

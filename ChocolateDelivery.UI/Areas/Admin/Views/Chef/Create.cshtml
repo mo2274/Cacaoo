@@ -1,0 +1,382 @@
+﻿@model SM_Chefs
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    string placeholder = "Enter Chef Name";
+    string placeholder_ar = "Enter Chef Name(Ar)";
+    if (ViewBag.Type == Chef_Types.BOUTIQUE)
+    {
+        placeholder = "Enter Boutique Name";
+        placeholder_ar = "Enter Boutique Name(Ar)";
+    }
+    int user_cd = 0;
+    if (HttpContextAccessor.HttpContext != null)
+    {
+        user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("UserCd") ?? 0;
+
+    }
+}
+
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/@ViewBag.TypeName</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Chef_Name_E",CSSClass="form-control",Placeholder=  placeholder,Value=Model != null ?Model.Chef_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Chef_Name_A",CSSClass="form-control",Placeholder= placeholder_ar,Value=Model != null ?Model.Chef_Name_A != null?Model.Chef_Name_A.ToString():"" :"",
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 192})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Chef_Desc_E",CSSClass="form-control",Placeholder="Enter Desc",Value=Model != null ?Model.Chef_Desc_E != null?Model.Chef_Desc_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 193})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Chef_Desc_A",CSSClass="form-control",Placeholder="Enter Desc(Ar)",Value=Model != null ?Model.Chef_Desc_A != null?Model.Chef_Desc_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+
+                            </div>
+
+
+                            <!-- row -->
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div>
+                                                <h6 class="card-title mb-1">Image Upload</h6>
+
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col-sm-12 col-md-4">
+                                                    @if (Model != null && !string.IsNullOrEmpty(Model.Image_URL))
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" data-default-file="/@Model.Image_URL" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- row closed -->
+                            <div class="">
+                                <div class="">
+                                    @Html.CheckBox("Show",true)
+                                    @*  @Html.CheckBox("Show", true)*@
+                                    @*  <input type="checkbox" asp-for="Show">*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+
+                            <div class="row row-sm">
+
+                                <div class="col-xl-12">
+                                    <!-- div -->
+                                    <div class="card mg-b-20" id="tabs-style2">
+                                        <div class="text-wrap">
+                                            <div class="example">
+                                                <div class="panel panel-primary tabs-style-2">
+                                                    <div class=" tab-menu-heading">
+                                                        <div class="tabs-menu1">
+                                                            <!-- Tabs -->
+                                                            <ul class="nav panel-tabs main-nav-line">
+                                                                <li class="nav-item"><a href="#tabAddOn" class="nav-link active" data-bs-toggle="tab">Products</a></li>
+                                                                @*<li>
+                                                                <a href="#tab5" class="nav-link" data-bs-toggle="tab">
+                                                                Tab
+                                                                02
+                                                                </a>
+                                                                </li>
+                                                                <li>
+                                                                <a href="#tab6" class="nav-link active" data-bs-toggle="tab">
+                                                                Tab
+                                                                03
+                                                                </a>
+                                                                </li>*@
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body tabs-menu-body main-content-body-right border">
+                                                        <div class="tab-content">
+                                                            <div class="tab-pane active" id="tabAddOn">
+                                                                <div class="row row-sm mb-3">
+                                                                    <div class="col-lg-3">
+                                                                       @* @await Component.InvokeAsync("UCLabel",new{labelId = 65})*@
+                                                                        @await Component.InvokeAsync("UCDropDown",new UCProperties{
+                                                                        Id="Product_Id",Placeholder="Select Product",List_Id=15,
+                                                                        })
+                                                                    </div>
+
+
+
+                                                                    <div class="col-lg-1">
+                                                                        <button id="table2-new-row-button" type="button" class="btn btn-primary" onclick="AddRow();" style="margin-top:20px;"> Add</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered border text-nowrap mb-0" id="tblProduct">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Line No</th>
+                                                                                <th>Product Name</th>
+                                                                                <th>Sequence</th>
+                                                                                <th name="bstable-actions">Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @if (Model != null)
+                                                                            {
+                                                                                for (int i = 0; i < Model.SM_Chef_Products.Count; i++)
+                                                                                {
+                                                                                    var detail_id = "SM_Chef_Products[" + i + "].Id";
+                                                                                    var id = "SM_Chef_Products[" + i + "].Product_Id";
+                                                                                    var current_line_no = i + 1;
+                                                                                    <tr>
+                                                                                        <input type="hidden" id="@detail_id" name="@detail_id" value="@Model.SM_Chef_Products[i].Id" />
+                                                                                        <input type="hidden" id="@id" name="@id" value="@Model.SM_Chef_Products[i].Product_Id" />
+                                                                                        <td> <label>@current_line_no</label></td>
+                                                                                        <td> @Model.SM_Chef_Products[i].Product_Name</td>
+                                                                                        <td> @Html.TextBox("SM_Chef_Products[" + @i + "].Sequence",Model.SM_Chef_Products[i].Sequence,new {@class= "price number",})</td>
+                                                                                        <td name="bstable-actions">
+                                                                                            <div class="btn-list">
+
+                                                                                                <button id="bDel" type="button" onclick='deleteRow(this,@Model.SM_Chef_Products[i].Id)' class="btn  btn-sm btn-danger">
+                                                                                                    <span class="fe fe-trash-2"> </span>
+                                                                                                </button>
+
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /div -->
+
+
+
+
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        let Chef_Products = [];
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+        @if (Model != null)
+        {
+
+            int product_line_add_on = 1;
+            foreach (SM_Chef_Products detail in Model.SM_Chef_Products)
+            {
+                <text>
+
+                        Chef_Products.push({
+                            "Id": @detail.Id,
+                            "Product_Id": @detail.Product_Id,
+                            "Product_Name": '@detail.Product_Name',
+                            "Sequence": @detail.Sequence,
+                            "Line_No": @product_line_add_on
+                                                                                        });
+
+                </text>
+                product_line_add_on++;
+            }
+        }
+
+
+                        });
+        function AddRow() {
+            var rowCount = $('#tblProduct > tbody > tr').length;
+            console.log("table Row Count: " + rowCount);
+            if ($("#Product_Id").val() == "") {
+                alert("Please Select Product");
+                $('#Product_Id').focus();
+                return false;
+            }
+            else {
+                var prod_id = $("#Product_Id").val();
+                const itemExists = Chef_Products.some(el => el.Product_Id === prod_id*1);
+                if(itemExists){
+                    alert("This Product is already added");
+                    return false;
+                }
+                var data = $('#Product_Id').select2('data');
+                //alert(data[0].text);
+               
+                var prod_name = data[0].text;
+                var sequence = 0;
+                var appendRow = "<tr><input type='hidden' id='SM_Chef_Products[" + rowCount + "].Id' name='SM_Chef_Products[" + rowCount + "].Id' value='0' /><input type='hidden' id='SM_Chef_Products[" + rowCount + "].Product_Id' name='SM_Chef_Products[" + rowCount + "].Product_Id' value='" + prod_id + "' /><td><label>" + (rowCount * 1 + 1) + "</label></td><td>" + prod_name + "</td><td><input type='text' name='SM_Chef_Products[" + rowCount + "].Sequence' class='price number' value='" + sequence + "'/></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this,0)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+                console.log("Append Row:" + appendRow);
+                $("#tblProduct > tbody").append(appendRow);
+                $("#Product_Id").val("").trigger('change');
+
+
+                let row = {
+                    "Id": 0,
+                    "Product_Id": prod_id * 1,
+                    "Product_Name": prod_name,
+                    "Sequence": sequence * 1,
+                    "Line_No": rowCount + 1
+                }
+                Chef_Products.push(row);
+                console.log(JSON.stringify(Chef_Products));
+
+
+            }
+        }
+
+        function deleteRow(element, delete_detail_id) {
+            if (confirm('Are you sure you want to delete this Product?')) {
+                if (delete_detail_id != 0) {
+                    $("#global-loader").show();
+
+                    var formdata = {
+                        Detail_Id: delete_detail_id,
+                        Deleted_By: @user_cd
+                                                                                                }
+
+                    console.log(JSON.stringify(formdata));
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/Chef/DeleteChefProduct",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: formdata,
+                        dataType: "json",
+                        success: function (response) {
+                            $("#global-loader").hide();
+                            console.log("response:" + JSON.stringify(response));
+                            if (response.status == 0) {
+                                ProcessDelete(element);
+                            }
+
+                        },
+                        failure: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        }
+                    });
+                } else {
+                    ProcessDelete(element);
+                }
+
+            }
+        }
+
+        function ProcessDelete(element) {
+            var delete_line_no = $(element).closest('tr').find('label').text();
+            console.log("line no deleting:" + delete_line_no);
+            $(element).closest('tr').remove();
+            removeByAttr(Chef_Products, 'Line_No', delete_line_no * 1);
+            var appendRow = "";
+
+            for (var i = 0; i < Chef_Products.length; i++) {
+                var line_detail = Chef_Products[i];
+                line_detail.Line_No = i + 1;
+                var id = line_detail.Id;
+                var prod_id = line_detail.Product_Id;
+                var prod_name = line_detail.Product_Name;
+                var sequence = line_detail.Sequence;
+
+                appendRow += "<tr><input type='hidden' id='SM_Chef_Products[" + i + "].Id' name='SM_Chef_Products[" + i + "].Id' value='" + id + "' /><input type='hidden' id='SM_Chef_Products[" + i + "].Product_Id' name='SM_Chef_Products[" + i + "].Product_Id' value='" + prod_id + "' /><td><label>" + (i * 1 + 1) + "</label></td><td>" + prod_name + "</td><td><input type='text' name='SM_Chef_Products[" + i + "].Price' class='price number' value='" + sequence + "'/></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this," + id + ")' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+            }
+            $("#tblProduct > tbody").html(appendRow);
+            console.log(JSON.stringify(Chef_Products));
+
+
+        }
+    </script>
+
+}

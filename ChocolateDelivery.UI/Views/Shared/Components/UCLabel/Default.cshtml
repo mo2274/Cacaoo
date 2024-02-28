@@ -1,0 +1,18 @@
+﻿
+@if (ViewBag.UserControlType == "Button")
+{
+    if (!string.IsNullOrEmpty(ViewBag.ClickFunction))
+    {
+        <button type="submit" id="@ViewBag.Id" name="button" value="@ViewBag.Value" onclick="@ViewBag.ClickFunction;" class="@ViewBag.CssClass" @if(!string.IsNullOrEmpty(ViewBag.Style)){ <text> style="@ViewBag.Style"</text>}>@ViewBag.LabelName </button>
+    }
+    else
+    {
+        <button type="submit" id="@ViewBag.Id" name="button" value="@ViewBag.Value" class="@ViewBag.CssClass" @if(!string.IsNullOrEmpty(ViewBag.Style)){ <text> style="@ViewBag.Style"</text>}>@ViewBag.LabelName </button>
+    }
+    
+
+}
+else
+{
+    <label class="@ViewBag.CssClass">@ViewBag.LabelName</label>
+}

@@ -1,0 +1,371 @@
+﻿@model SM_Home_Groups
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+
+@{
+    int user_cd = 0;
+    if (HttpContextAccessor.HttpContext != null)
+    {
+        user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("UserCd") ?? 0;
+
+    }
+    List<UCManualDropdownModel> displayTypes = new List<UCManualDropdownModel>
+            {
+                new UCManualDropdownModel{ Text="Small Horizontal List",Value=DisplayTypes.Small_Horizontal_List.ToString()},
+                new UCManualDropdownModel{ Text="Square Horizontal List",Value=DisplayTypes.Square_Plus_Horizontal_List.ToString()},
+                 new UCManualDropdownModel{ Text="Right Horizontal List",Value=DisplayTypes.Right_Horizontal_List.ToString()},
+                new UCManualDropdownModel{ Text="Left Horizontal List",Value=DisplayTypes.Left_Horizontal_List.ToString()},
+                 new UCManualDropdownModel{ Text="Rectangle Horizontal List",Value=DisplayTypes.Rectangle_Horizontal_List.ToString()},
+                new UCManualDropdownModel{ Text="Normal Horizontal List",Value=DisplayTypes.Normal_Horizontal_List.ToString()},
+                new UCManualDropdownModel{ Text="Normal Horizontal List",Value=DisplayTypes.Square_Title_Horizontal_List.ToString()}
+            };
+    List<UCManualDropdownModel> groupTypes = new List<UCManualDropdownModel>
+            {
+                new UCManualDropdownModel{ Text="Categories",Value=GroupType.CATEGORIES.ToString()},
+                new UCManualDropdownModel{ Text="Sub categories",Value=GroupType.SUB_CATEGORIES.ToString()},
+                 new UCManualDropdownModel{ Text="Cacaoo Chef",Value=GroupType.CACAOO_CHEF.ToString()},
+                new UCManualDropdownModel{ Text="Cacaoo Boutique",Value=GroupType.CACAOO_BOUTIQUE.ToString()},
+                 new UCManualDropdownModel{ Text="Products",Value=GroupType.PRODUCTS.ToString()},
+                new UCManualDropdownModel{ Text="Brands",Value=GroupType.RESTAURANTS.ToString()},
+                 new UCManualDropdownModel{ Text="Occasions",Value=GroupType.OCCASIONS.ToString()}
+            };
+
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Group</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Group_Name_E",CSSClass="form-control",Placeholder="Enter Group Name",Value=Model != null ?Model.Group_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Group_Name_A",CSSClass="form-control",Placeholder="Enter Group Name(Ar)",Value=Model != null ?Model.Group_Name_A != null?Model.Group_Name_A.ToString():"" :"",
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 65})
+                                    @await Component.InvokeAsync("UCManualDropDown",new UCProperties{
+                                    Id="Display_Type",Placeholder="Select Display Type",Value=Model != null ?Model.Display_Type.ToString():"",Is_Required=true,Error_Label_Id=66,DropDownData = displayTypes
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Sequence",CSSClass="form-control",Placeholder="Enter Sequence",Value=Model != null ?Model.Sequence.ToString():"" ,Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="">
+                                <div class="">
+                                    @Html.CheckBox("Show",true)
+                                    @*  @Html.CheckBox("Show", true)*@
+                                    @*  <input type="checkbox" asp-for="Show">*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="row row-sm mb-3">
+                                                <div class="col-lg-2">
+                                                    @await Component.InvokeAsync("UCLabel",new{labelId = 5})
+                                                    @await Component.InvokeAsync("UCManualDropDown",new UCProperties{
+                                                    Id="Group_Type_Id",Placeholder="Select Group Type",DropDownData = groupTypes
+                                                    })
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    @await Component.InvokeAsync("UCLabel",new{labelId = 6})
+                                                    @await Component.InvokeAsync("UCManualDropDown",new UCProperties{
+                                                    Id="Item_Id",Placeholder="Select Item"
+                                                    })
+
+                                                </div>
+
+                                                <div class="col-lg-2">
+                                                    <button id="table2-new-row-button" type="button" class="btn btn-primary" onclick="AddItem();" style="margin-top:20px;"> Add Item</button>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered border text-nowrap mb-0" id="tblItem">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Line No</th>
+                                                            <th>Group</th>
+                                                            <th>Item</th>
+                                                            <th>Sequence</th>
+                                                            <th>Show</th>
+                                                            <th name="bstable-actions">Delete</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if (Model != null)
+                                                        {
+                                                            for (int i = 0; i < Model.SM_Home_Group_Details.Count; i++)
+                                                            {
+                                                                var detail_id = "SM_Home_Group_Details[" + i + "].Group_Detail_Id";
+                                                                var id = "SM_Home_Group_Details[" + i + "].Id";
+                                                                var group_type_id = "SM_Home_Group_Details[" + i + "].Group_Type_Id";
+                                                                var line_id = "SM_Home_Group_Details[" + i + "].Line_No";
+                                                                <tr>
+                                                                    <input type="hidden" id="@detail_id" name="@detail_id" value="@Model.SM_Home_Group_Details[i].Group_Detail_Id" />
+                                                                    <input type="hidden" id="@id" name="@id" value="@Model.SM_Home_Group_Details[i].Id" />
+                                                                    <input type="hidden" id="@group_type_id" name="@group_type_id" value="@Model.SM_Home_Group_Details[i].Group_Type_Id" />
+                                                                    <input type="hidden" id="@line_id" name="@line_id" value="@Model.SM_Home_Group_Details[i].Line_No" />
+                                                                    <td> <label>@Model.SM_Home_Group_Details[i].Line_No</label></td>
+                                                                    <td> @Model.SM_Home_Group_Details[i].Group_Type_Name</td>
+                                                                    <td> @Model.SM_Home_Group_Details[i].Item_Name</td>
+                                                                    <td> @Html.TextBox("SM_Home_Group_Details[" + @i + "].Sequence",Model.SM_Home_Group_Details[i].Sequence)</td>
+                                                                    <td> @Html.CheckBox("SM_Home_Group_Details[" + @i + "].Show",Model.SM_Home_Group_Details[i].Show)</td>
+
+                                                                    <td name="bstable-actions">
+                                                                        <div class="btn-list">
+
+                                                                            <button id="bDel" type="button" onclick='deleteRow(this,@Model.SM_Home_Group_Details[i].Group_Detail_Id)' class="btn  btn-sm btn-danger">
+                                                                                <span class="fe fe-trash-2"> </span>
+                                                                            </button>
+
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        var base_url = window.location.origin;
+        let Group_Detail = [];
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+            $('#Group_Type_Id').on('select2:select', function (e) {
+                var data = e.params.data;
+                console.log("id:" + data.id + ",text:" + data.text);
+                //console.log("select 2 id:" + $(this).select2('data').id);
+
+                var ajaxurl = base_url + "/api/GroupItems/" + data.id;
+                console.log(ajaxurl);
+                $("#global-loader").show();
+                $.ajax({
+                    type: "Get",
+                    url: ajaxurl,
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        //data - response from server
+                        var stringdata = JSON.stringify(data);
+                        console.log("Success :" + stringdata);
+                        if (data.status == 0) {
+                            var stringdata = JSON.stringify(data);
+                            console.log("Success :" + stringdata);
+                            $('#Item_Id').empty();
+                            $('#Item_Id').select2({
+                                data: data.results
+                            });
+                        }
+                        $("#global-loader").hide();
+                        //ResetData();
+                    },
+                    error: function (errordata) {
+                        console.log(errordata);
+                        $("#global-loader").hide();
+                        //alert("Error:" + errordata);
+                    }
+                });
+            });
+        });
+        function AddItem() {
+            var rowCount = $('#tblItem > tbody > tr').length;
+            console.log("table Row Count: " + rowCount);
+            if ($("#Item_Id").val() == "") {
+                alert("Please Select Item");
+                $('#Item_Id').focus();
+                return false;
+            } else if ($("#Group_Type_Id").val().trim() == "") {
+                alert("Please Select Group Type");
+                $('#Group_Type_Id').focus();
+                return false;
+            }
+            else {
+                var data = $('#Item_Id').select2('data');
+                var groupTypeData = $('#Group_Type_Id').select2('data');
+                //alert(data[0].text);
+                var item_id = $("#Item_Id").val();
+                var group_type_id = $("#Group_Type_Id").val();
+                console.log("adding item_id :" + item_id * 1)
+
+
+                var item_name = data[0].text;
+                var group_type_name = groupTypeData[0].text;
+                var sequence = 1;
+
+                var appendRow = "<tr><input type='hidden' id='SM_Home_Group_Details[" + rowCount + "]Group_Detail_Id' name='SM_Home_Group_Details[" + rowCount + "]Group_Detail_Id' value='0' /><input type='hidden' id='SM_Home_Group_Details[" + rowCount + "].Id' name='SM_Home_Group_Details[" + rowCount + "].Id' value='" + $("#Item_Id").val() + "' /><input type='hidden' id='SM_Home_Group_Details[" + rowCount + "].Group_Type_Id' name='SM_Home_Group_Details[" + rowCount + "].Group_Type_Id' value='" + group_type_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + rowCount + "].Line_No' name='SM_Home_Group_Details[" + rowCount + "].Line_No' value='" + (rowCount * 1 + 1) + "' /><td><label>" + (rowCount * 1 + 1) + "</label></td><td>" + group_type_name + "</td><td>" + item_name + "</td><td><input type='text' name='SM_Home_Group_Details[" + rowCount + "].Sequence' value='" + sequence + "'/></td><td><input type='checkbox' checked='checked' name='SM_Home_Group_Details[" + rowCount + "].Show' value='true'/></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this,0)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+                console.log("Append Row:" + appendRow);
+                $("#tblItem > tbody").append(appendRow);
+                $("#Item_Id").val("").trigger('change');
+
+                let row = {
+                    "Group_Detail_Id": 0,
+                    "Group_Type_Id": group_type_id * 1,
+                    "Group_Type_Name": group_type_name,
+                    "Item_Id": item_id * 1,
+                    "Item_Name": item_name,
+                    "Sequence": sequence,
+                    "Show": true,
+                    "Line_No": rowCount + 1
+                }
+                Group_Detail.push(row);
+                console.log(JSON.stringify(Group_Detail));
+
+
+            }
+        }
+        function deleteRow(element, delete_detail_id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                if (delete_detail_id != 0) {
+                    $("#global-loader").show();
+
+                    var formdata = {
+                        Detail_Id: delete_detail_id,
+                        Deleted_By: @user_cd
+                                                                }
+
+                    console.log(JSON.stringify(formdata));
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/HomeGroup/DeleteItem",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: formdata,
+                        dataType: "json",
+                        success: function (response) {
+                            $("#global-loader").hide();
+                            console.log("response:" + JSON.stringify(response));
+                            if (response.status == 0) {
+                                ProcessDelete(element);
+                            }
+
+                        },
+                        failure: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        }
+                    });
+                } else {
+                    ProcessDelete(element);
+                }
+
+            }
+        }
+
+        function ProcessDelete(element) {
+            var delete_line_no = $(element).closest('tr').find('label').text();
+            console.log("line no deleting:" + delete_line_no);
+            $(element).closest('tr').remove();
+            console.log("Group Detail before removing"+JSON.stringify(Group_Detail));
+            removeByAttr(Group_Detail, 'Line_No', delete_line_no * 1);
+             console.log("Group Detail after removing"+JSON.stringify(Group_Detail));
+            var appendRow = "";
+           
+            for (var i = 0; i < Group_Detail.length; i++) {
+                console.log("loop i:"+i);
+                var line_detail = Group_Detail[i];
+                line_detail.Line_No = i + 1;
+                var detail_id = line_detail.Group_Detail_Id;
+                var item_id = line_detail.Item_Id;
+                var item_name = line_detail.Item_Name;
+                var group_type_name = line_detail.Group_Type_Name;
+                var sequence = line_detail.Sequence;
+               
+                //appendRow += "<tr><input type='hidden' id='SM_Home_Group_Details[" + i + "]Group_Detail_Id' name='SM_Home_Group_Details[" + i + "]Group_Detail_Id' value='" + detail_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + i + "].Id' name='SM_Home_Group_Details[" + i + "].Id' value='" + item_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + i + "].Line_No' name='SM_Home_Group_Details[" + i + "].Line_No' value='" + (i * 1 + 1) + "' /><td><label>" + (i * 1 + 1) + "</label></td><td><input type='text' name='SM_Home_Group_Details[" + i + "].Item_Name' value='" + item_name + "'/></td><td><input type='text' name='SM_Home_Group_Details[" + i + "].Sequence' value='" + desc + "'/></td><td><input type='text' onkeyup='OnLineQtyChanged(this)' name='SM_Home_Group_Details[" + i + "].Qty' class='qty number' value='" + qty + "'/></td><td><input type='text' onkeyup='OnLinePriceChanged(this)' name='SM_Home_Group_Details[" + i + "].Price' class='price number' value='" + price + "'/></td><td><input type='text' onkeyup='OnLineAmtChanged(this)' name='SM_Home_Group_Details[" + i + "].Amount' class='amt number' readonly='readonly' value='" + amt + "'/></td></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this," + detail_id + ")' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+               
+                appendRow += "<tr><input type='hidden' id='SM_Home_Group_Details[" + i + "].Group_Detail_Id' name='SM_Home_Group_Details[" + i + "].Group_Detail_Id' value='" + detail_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + i + "].Id' name='SM_Home_Group_Details[" + i + "].Id' value='" + item_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + i + "].Group_Type_Id' name='SM_Home_Group_Details[" + i + "].Group_Type_Id' value='" + group_type_id + "' /><input type='hidden' id='SM_Home_Group_Details[" + i + "].Line_No' name='SM_Home_Group_Details[" + i + "].Line_No' value='" + (i * 1 + 1) + "' /><td><label>" + (i * 1 + 1) + "</label></td><td>" + group_type_name + "</td><td>" + item_name + "</td><td><input type='text' name='SM_Home_Group_Details[" + i + "].Sequence' value='" + sequence + "'/></td><td><input type='checkbox' checked='checked' name='SM_Home_Group_Details[" + i + "].Show' value='true'/></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this,0)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+            }
+
+            $("#tblItem > tbody").html(appendRow);
+            //var appendRow = "<tr><input type='hidden' id='SM_Home_Group_Details[" + rowCount + "].Unit_Cd' name='rowCount' value='" + $("#Unit_Cd").val() + "' /><td><input type='text' name='SM_Home_Group_Details[" + rowCount + "].Unit_No' value='" + unit_no + "'/></td><td><input type='text' name='SM_Home_Group_Details[" + rowCount + "].Amount' class='number' value='" + amt + "'/></td><td><input type='text' name='SM_Home_Group_Details[" + rowCount + "].Remarks' value='" + remarks + "'/></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+            console.log(JSON.stringify(Group_Detail));
+
+        }
+    </script>
+
+}

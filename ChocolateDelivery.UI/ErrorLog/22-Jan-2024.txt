@@ -1,0 +1,147 @@
+=========================================================================
+Date Time : 22-Jan-2024 11:41:05 AM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 11:42:47 AM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 11:58:00 AM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 12:20:51 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 12:21:44 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 12:22:35 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 12:35:57 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:12:23 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:14:05 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:16:30 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:20:26 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:23:52 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:47:35 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 1:49:01 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:27 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:28 PM
+-------------------------------------------------------------------------
+error in uc dropdown for list id:8
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:28 PM
+-------------------------------------------------------------------------
+MySqlConnector.MySqlException (0x80004005): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at ChocolateDelivery.UI.Components.UCDropDown.Invoke(UCProperties properties)
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:40 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:40 PM
+-------------------------------------------------------------------------
+error in uc dropdown for list id:8
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:20:40 PM
+-------------------------------------------------------------------------
+MySqlConnector.MySqlException (0x80004005): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at ChocolateDelivery.UI.Components.UCDropDown.Invoke(UCProperties properties)
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:23:10 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:24:14 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:24:31 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:24:58 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================
+=========================================================================
+Date Time : 22-Jan-2024 4:25:17 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 4
+=========================================================================

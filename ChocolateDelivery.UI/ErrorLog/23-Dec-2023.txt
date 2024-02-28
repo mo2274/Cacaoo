@@ -1,0 +1,25 @@
+=========================================================================
+Date Time : 23-Dec-2023 11:20:10 AM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 2
+=========================================================================
+=========================================================================
+Date Time : 23-Dec-2023 6:21:49 PM
+-------------------------------------------------------------------------
+MailKit.Security.SslHandshakeException: An error occurred while attempting to establish an SSL or TLS connection.
+
+The host name (mail.innovasolution.net) did not match any of the names given in the server's SSL certificate:
+  • *.win.arvixe.com
+  • win.arvixe.com
+
+ ---> System.Security.Authentication.AuthenticationException: The remote certificate was rejected by the provided RemoteCertificateValidationCallback.
+   at System.Net.Security.SslStream.SendAuthResetSignal(ProtocolToken message, ExceptionDispatchInfo exception)
+   at System.Net.Security.SslStream.CompleteHandshake(SslAuthenticationOptions sslAuthenticationOptions)
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](TIOAdapter adapter, Boolean receiveFirst, Byte[] reAuthenticationData, Boolean isApm)
+   at System.Net.Security.SslStream.AuthenticateAsClient(SslClientAuthenticationOptions sslClientAuthenticationOptions)
+   at MailKit.Net.Smtp.SmtpClient.PostConnect(Stream stream, String host, Int32 port, SecureSocketOptions options, Boolean starttls, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at MailKit.Net.Smtp.SmtpClient.PostConnect(Stream stream, String host, Int32 port, SecureSocketOptions options, Boolean starttls, CancellationToken cancellationToken)
+   at MailKit.Net.Smtp.SmtpClient.Connect(String host, Int32 port, SecureSocketOptions options, CancellationToken cancellationToken)
+   at ChocolateDelivery.UI.Controllers.WebAPIController.SendHTMLMail(String to, String subject, String body, String cc, String bcc, String fromEmail, String password, String receiverName) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 1775
+=========================================================================

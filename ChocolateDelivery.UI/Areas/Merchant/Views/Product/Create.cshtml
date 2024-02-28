@@ -1,0 +1,794 @@
+﻿@model SM_Products
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    int user_cd = 0;
+    if (HttpContextAccessor.HttpContext != null)
+    {
+        user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("VendorId") ?? 0;
+
+    }
+
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Product</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Product_Name_E",CSSClass="form-control",Placeholder="Enter Product Name",Value=Model != null ?Model.Product_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Product_Name_A",CSSClass="form-control",Placeholder="Enter Product Name(Ar)",Value=Model != null ?Model.Product_Name_A != null?Model.Product_Name_A.ToString():"" :"",
+                                    })
+                                </div>
+                                @* <div class="col-sm-4">
+                                @await Component.InvokeAsync("UCLabel",new{labelId = 32})
+                                @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Brand_Id",Placeholder="Select Brand",Value=Model != null && Model.Brand_Id != null ?Model.Brand_Id.ToString():"",List_Id=8
+                                })
+                                </div>*@
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 192})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Product_Desc_E",CSSClass="form-control",Placeholder="Enter Desc",Value=Model != null ?Model.Product_Desc_E != null?Model.Product_Desc_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 193})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Product_Desc_A",CSSClass="form-control",Placeholder="Enter Desc(Ar)",Value=Model != null ?Model.Product_Desc_A != null?Model.Product_Desc_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-lg-3">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 34})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Category_Id",Placeholder="Select Category",Value=Model != null ?Model.Category_Id.ToString():"",Is_Required=true,Error_Label_Id=35,List_Id=3
+                                    })
+                                </div>
+                                <div class="col-lg-3">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 41})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Sub_Category_Id",Placeholder="Select Sub Category",Value=Model != null ?Model.Sub_Category_Id.ToString():"",Is_Required=true,Error_Label_Id=42,
+                                    })
+                                </div>
+                                <div class="col-lg-3">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 194})
+                                    @await Component.InvokeAsync("UCTextBox",new UCProperties{
+                                    Id="Price",CSSClass="form-control number",Placeholder="Enter Price",Value=Model != null ?Model.Price.ToString():"0.000",Is_Required=true,Error_Label_Id=53
+                                    })
+                                </div>
+                                <div class="col-lg-3">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 89})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{ Id="Occasion_Ids",Placeholder="Select Occasion(s)",Value=Model != null ? string.Join(",", Model.Occasion_Ids):"",List_Id=14,Multiple =true
+                                    })
+                                </div>
+                                @*<div class="col-lg-3">
+                                @await Component.InvokeAsync("UCLabel",new{labelId = 43})
+                                @await Component.InvokeAsync("UCTextBox",new UCProperties{
+                                Id="Stock_In_Hand",CSSClass="form-control number",Placeholder="Enter Stock in Hand",Value=Model != null ?Model.Stock_In_Hand.ToString():"0.000",Is_Required=true,Error_Label_Id=44
+                                })
+                                </div>*@
+                            </div>
+
+                            <!-- row -->
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 27})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Comments",CSSClass="form-control",Placeholder="Enter Comments",Value=Model != null ?Model.Comments != null?Model.Comments.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    })
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div>
+                                                <h6 class="card-title mb-1">Image Upload</h6>
+
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col-sm-12 col-md-4">
+                                                    @if (Model != null && !string.IsNullOrEmpty(Model.Image_URL))
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" data-default-file="/@Model.Image_URL" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="file" id="Image_File" name="Image_File" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <!-- row closed -->
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-3">
+                                    <div class="checkbox">
+                                        <input asp-for="Show" />
+                                        @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+                                    </div>
+                                </div>
+                                @if (Model != null)
+                                {
+                                    <div class="col-lg-3">
+                                        @await Component.InvokeAsync("UCLabel",new{labelId = 93})
+                                        <div class="rating-stars block my-custom-rating">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+
+                                        @await Component.InvokeAsync("UCLabel",new{labelId = 94})
+                                        @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Total_Ratings",CSSClass="form-control",Value=Model != null ?Model.Total_Ratings.ToString() :"",Read_Only=true
+                                    })
+                                    </div>
+                                }
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-3">
+                                    <div class="checkbox">
+                                        <input asp-for="Is_Catering_Menu_Product" />
+                                        @await Component.InvokeAsync("UCLabel",new{labelId = 123,cssClass=" mt-1"})
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="checkbox">
+                                        <input asp-for="Is_Catering" />
+                                        @await Component.InvokeAsync("UCLabel",new{labelId = 124,cssClass=" mt-1"})
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row row-sm">
+
+                                <div class="col-xl-12">
+                                    <!-- div -->
+                                    <div class="card mg-b-20" id="tabs-style2">
+                                        <div class="text-wrap">
+                                            <div class="example">
+                                                <div class="panel panel-primary tabs-style-2">
+                                                    <div class=" tab-menu-heading">
+                                                        <div class="tabs-menu1">
+                                                            <!-- Tabs -->
+                                                            <ul class="nav panel-tabs main-nav-line">
+                                                                <li class="nav-item" id="liAddOn"><a href="#tabAddOn" class="nav-link active" data-bs-toggle="tab">Add Ons</a></li>
+                                                                <li><a href="#tabBranch" class="nav-link" data-bs-toggle="tab">  Branches   </a> </li>
+                                                                <li id="liCatering" class="hidden"><a href="#tabCatering" class="nav-link" data-bs-toggle="tab">  Catering   </a> </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body tabs-menu-body main-content-body-right border">
+                                                        <div class="tab-content">
+                                                            <div class="tab-pane active" id="tabAddOn">
+                                                                <div class="row row-sm mb-3">
+                                                                    <div class="col-lg-3">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 65})
+                                                                        @await Component.InvokeAsync("UCDropDown",new UCProperties{
+                                                                        Id="AddOn_Id",Placeholder="Select Add On",List_Id=10,
+                                                                        })
+                                                                    </div>
+                                                                    <div class="col-lg-3">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 6})
+                                                                        @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                                                        Id="Line_AddOn_Name_E",CSSClass="form-control",Placeholder="Enter Name (En)",
+                                                                        })
+
+                                                                    </div>
+                                                                    <div class="col-lg-3">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 6})
+                                                                        @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                                                        Id="Line_AddOn_Name_A",CSSClass="form-control",Placeholder="Enter Name (Ar)",
+                                                                        })
+
+                                                                    </div>
+                                                                    <div class="col-lg-2">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 194})
+                                                                        @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                                                        Id="AddOn_Price",CSSClass="form-control number",Placeholder="Enter Price",
+                                                                        })
+                                                                    </div>
+
+
+                                                                    <div class="col-lg-1">
+                                                                        <button id="table2-new-row-button" type="button" class="btn btn-primary" onclick="AddRow();" style="margin-top:20px;"> Add</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered border text-nowrap mb-0" id="tblAddOn">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Line No</th>
+                                                                                <th>AddOn Name</th>
+                                                                                <th>AddOn (En)</th>
+                                                                                <th>AddOn (Ar)</th>
+                                                                                <th>Price</th>
+                                                                                <th>Publish</th>
+                                                                                <th name="bstable-actions">Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @if (Model != null)
+                                                                            {
+                                                                                for (int i = 0; i < Model.SM_Product_AddOns.Count; i++)
+                                                                                {
+                                                                                    var detail_id = "SM_Product_AddOns[" + i + "].Product_AddOnId";
+                                                                                    var id = "SM_Product_AddOns[" + i + "].AddOn_Id";
+                                                                                    var current_line_no = i + 1;
+                                                                                    <tr>
+                                                                                        <input type="hidden" id="@detail_id" name="@detail_id" value="@Model.SM_Product_AddOns[i].Product_AddOnId" />
+                                                                                        <input type="hidden" id="@id" name="@id" value="@Model.SM_Product_AddOns[i].AddOn_Id" />
+                                                                                        <td> <label>@current_line_no</label></td>
+                                                                                        <td> @Model.SM_Product_AddOns[i].AddOn_Name</td>
+                                                                                        <td> @Html.TextBox("SM_Product_AddOns[" + @i + "].Line_AddOn_Name_E",Model.SM_Product_AddOns[i].Line_AddOn_Name_E)</td>
+                                                                                        <td> @Html.TextBox("SM_Product_AddOns[" + @i + "].Line_AddOn_Name_A",Model.SM_Product_AddOns[i].Line_AddOn_Name_A)</td>
+                                                                                        <td> @Html.TextBox("SM_Product_AddOns[" + @i + "].Price",Model.SM_Product_AddOns[i].Price,new {@class= "price number",})</td>
+                                                                                        <td> @Html.CheckBox("SM_Product_AddOns[" + @i + "].Publish",Model.SM_Product_AddOns[i].Publish)</td>
+                                                                                        <td name="bstable-actions">
+                                                                                            <div class="btn-list">
+
+                                                                                                <button id="bDel" type="button" onclick='deleteRow(this,@Model.SM_Product_AddOns[i].Product_AddOnId)' class="btn  btn-sm btn-danger">
+                                                                                                    <span class="fe fe-trash-2"> </span>
+                                                                                                </button>
+
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane" id="tabBranch">
+                                                                <div class="table-responsive text-center">
+                                                                    <table class="table table-bordered border text-nowrap mb-0" id="tblAddOn">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Branch Name</th>
+                                                                                <th>Available</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @if (Model != null)
+                                                                            {
+                                                                                for (int i = 0; i < Model.SM_Product_Branches.Count; i++)
+                                                                                {
+                                                                                    var detail_id = "SM_Product_Branches[" + i + "].Product_Branch_Id";
+                                                                                    var branch_id = "SM_Product_Branches[" + i + "].Branch_Id";
+                                                                                    <tr>
+                                                                                        <input type="hidden" id="@detail_id" name="@detail_id" value="@Model.SM_Product_Branches[i].Product_Branch_Id" />
+                                                                                        <input type="hidden" id="@branch_id" name="@branch_id" value="@Model.SM_Product_Branches[i].Branch_Id" />
+                                                                                        <td> @Model.SM_Product_Branches[i].Branch_Name</td>
+                                                                                        <td> @Html.CheckBox("SM_Product_Branches[" + @i + "].Is_Available",Model.SM_Product_Branches[i].Is_Available)</td>
+
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+                                                                            else if (ViewBag.Branches != null)
+                                                                            {
+                                                                                for (int i = 0; i < ViewBag.Branches.Count; i++)
+                                                                                {
+                                                                                    var detail_id = "SM_Product_Branches[" + i + "].Product_Branch_Id";
+                                                                                    var branch_id = "SM_Product_Branches[" + i + "].Branch_Id";
+                                                                                    <tr>
+                                                                                        <input type="hidden" id="@detail_id" name="@detail_id" value="0" />
+                                                                                        <input type="hidden" id="@branch_id" name="@branch_id" value="@ViewBag.Branches[i].Branch_Id" />
+                                                                                        <td> @ViewBag.Branches[i].Branch_Name_E</td>
+                                                                                        <td> @Html.CheckBox("SM_Product_Branches[" + @i + "].Is_Available",true)</td>
+
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane hidden" id="tabCatering">
+                                                                <div class="row row-sm mb-3">
+                                                                    <div class="col-lg-3">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 34})
+                                                                        @await Component.InvokeAsync("UCDropDown",new UCProperties{
+                                                                        Id="Catering_Category_Id",Placeholder="Select Category",List_Id=16,
+                                                                        })
+                                                                    </div>
+                                                                    <div class="col-lg-3">
+                                                                        @await Component.InvokeAsync("UCLabel",new{labelId = 123})
+                                                                        @await Component.InvokeAsync("UCDropDown",new UCProperties{
+                                                                        Id="Category_Menu_Product_Id",Placeholder="Select Product",List_Id=9,Additional_Where_Clause=" p.Is_Catering_Menu_Product = 1"
+                                                                        })
+                                                                    </div>
+
+
+                                                                    <div class="col-lg-1">
+                                                                        <button id="table2-new-row-button" type="button" class="btn btn-primary" onclick="AddCategoringProductRow();" style="margin-top:20px;"> Add</button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered border text-nowrap mb-0" id="tblCateringProducts">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Line No</th>
+                                                                                <th>Category</th>
+                                                                                <th>Product</th>
+                                                                                <th>Publish</th>
+                                                                                <th name="bstable-actions">Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @if (Model != null)
+                                                                            {
+                                                                                for (int i = 0; i < Model.SM_Product_Catering_Products.Count; i++)
+                                                                                {
+                                                                                    var detail_id = "SM_Product_Catering_Products[" + i + "].Catering_Product_Id";
+                                                                                    var cat_id = "SM_Product_Catering_Products[" + i + "].Category_Id";
+                                                                                    var child_prod_id = "SM_Product_Catering_Products[" + i + "].Child_Product_Id";
+                                                                                    var current_line_no = i + 1;
+                                                                                    <tr>
+                                                                                        <input type="hidden" id="@detail_id" name="@detail_id" value="@Model.SM_Product_Catering_Products[i].Catering_Product_Id" />
+                                                                                        <input type="hidden" id="@cat_id" name="@cat_id" value="@Model.SM_Product_Catering_Products[i].Category_Id" />
+                                                                                        <input type="hidden" id="@child_prod_id" name="@child_prod_id" value="@Model.SM_Product_Catering_Products[i].Child_Product_Id" />
+                                                                                        <td> <label>@current_line_no</label></td>
+                                                                                        <td> @Model.SM_Product_Catering_Products[i].Category_Name</td>
+                                                                                        <td> @Model.SM_Product_Catering_Products[i].Product_Name</td>
+                                                                                        <td> @Html.CheckBox("SM_Product_Catering_Products[" + @i + "].Publish",Model.SM_Product_Catering_Products[i].Publish)</td>
+                                                                                        <td name="bstable-actions">
+                                                                                            <div class="btn-list">
+
+                                                                                                <button id="bDel" type="button" onclick='deleteCateringProductRow(this,@Model.SM_Product_Catering_Products[i].Catering_Product_Id)' class="btn  btn-sm btn-danger">
+                                                                                                    <span class="fe fe-trash-2"> </span>
+                                                                                                </button>
+
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /div -->
+
+
+
+
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/Merchant/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        var serviceArr = [];
+        let gridServiceArr = [];
+        let Product_AddOns = [];
+        let Catering_Products = [];
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+            $('#Category_Id').on('select2:select', function (e) {
+                var data = e.params.data;
+                console.log("id:" + data.id + ",text:" + data.text);
+                var sub_categories = serviceArr.filter(v => v.Category_Id === data.id * 1);
+                var results = $.map(sub_categories, function (obj) {
+                    obj.id = obj.id || obj.Sub_Category_Id; // replace pk with your identifier
+                    obj.text = obj.text || obj.Sub_Category_Name_E;
+                    return obj;
+                });
+                var emptyObj = { id: "", text: "" };
+                results.splice(0, 0, emptyObj);
+                $('#Sub_Category_Id').empty();
+                $('#Sub_Category_Id').select2({
+                    data: results,
+                    placeholder: "Select Sub Category",
+                    allowClear: true
+                });
+            });
+            $('#Is_Catering').change(function () {
+                if (this.checked) {
+                    console.log("Is_Catering checked");
+                    $('#liCatering').removeClass("hidden");
+                    $('#tabCatering').removeClass("hidden");
+                }
+                else {
+                    console.log("Is_Catering unchecked");
+                    $('#liCatering').addClass("hidden");
+                    $('#tabCatering').addClass("hidden");
+                    if ($('#tabCatering').hasClass("active")) {
+                        console.log("Is_Catering is active");
+                        $('#tabCatering').removeClass("active");
+                        $('#liCatering a').removeClass("active");
+                        $('#tabAddOn').addClass("active");
+                        $('#liAddOn a').addClass("active");
+                    } else {
+                        console.log("Is_Catering is not active");
+                    }
+                }
+            });
+
+            serviceArr = @(Html.Raw(ViewBag.Sub_Categories));
+        @if (Model != null)
+        {
+            <text>
+                                                                                                                                                            var sub_categories = serviceArr.filter(v => v.Category_Id === @Model.Category_Id * 1);
+                var results = $.map(sub_categories, function (obj) {
+                    obj.id = obj.id || obj.Sub_Category_Id; // replace pk with your identifier
+                    obj.text = obj.text || obj.Sub_Category_Name_E;
+                    return obj;
+                });
+                var emptyObj = { id: "", text: "" };
+                results.splice(0, 0, emptyObj);
+                $('#Sub_Category_Id').empty();
+                $('#Sub_Category_Id').select2({
+                    data: results,
+                    placeholder: "Select Sub Category",
+                    allowClear: true
+                });
+                $('#Sub_Category_Id').val('@Model.Sub_Category_Id').trigger('change');
+                $(".my-custom-rating").starRating({
+                    starSize: 35,
+                    initialRating: @Model.Rating,
+                    strokeWidth: 0,
+                    readOnly: true,
+                    starShape: 'rounded'
+                });
+            </text>
+            int product_line_add_on = 1;
+            foreach (SM_Product_AddOns detail in Model.SM_Product_AddOns)
+            {
+                <text>
+
+                        Product_AddOns.push({
+                            "Product_AddOnId": @detail.Product_AddOnId,
+                            "AddOn_Id": @detail.AddOn_Id,
+                            "AddOn_Name": '@detail.AddOn_Name',
+                            "Line_AddOn_Name_E": '@detail.Line_AddOn_Name_E',
+                            "Line_AddOn_Name_A": '@detail.Line_AddOn_Name_A',
+                            "Price": @detail.Price,
+                            "Publish": @detail.Publish.ToString().ToLower(),
+                            "Line_No": @product_line_add_on
+                                                                                                                                                                        });
+
+                </text>
+                product_line_add_on++;
+            }
+            int line_no = 1;
+            foreach (SM_Product_Catering_Products detail in Model.SM_Product_Catering_Products)
+            {
+                <text>
+
+                        Catering_Products.push({
+                            "Catering_Product_Id": @detail.Catering_Product_Id,
+                            "Category_Id": @detail.Category_Id,
+                            "Child_Product_Id": @detail.Child_Product_Id,
+                            "Category_Name": '@detail.Category_Name',
+                            "Product_Name": '@detail.Product_Name',
+                            "Publish": @detail.Publish.ToString().ToLower(),
+                            "Line_No": @line_no
+                                                                                                                                                                        });
+
+                </text>
+                line_no++;
+            }
+            if (Model.Is_Catering)
+            {
+                <text>
+                 $('#liCatering').removeClass("hidden");
+                    $('#tabCatering').removeClass("hidden");
+                </text>
+            }
+        }
+
+                                                                                                });
+
+        function AddRow() {
+            var rowCount = $('#tblAddOn > tbody > tr').length;
+            console.log("table Row Count: " + rowCount);
+            if ($("#AddOn_Id").val() == "") {
+                alert("Please Select Add On");
+                $('#AddOn_Id').focus();
+                return false;
+            } else if ($("#Line_AddOn_Name_E").val().trim() == "") {
+                alert("Please Enter Name (En)");
+                $('#Line_AddOn_Name_E').focus();
+                return false;
+            } else if ($("#Line_AddOn_Name_A").val().trim() == "") {
+                alert("Please Enter Name (Ar)");
+                $('#Line_AddOn_Name_A').focus();
+                return false;
+            } else if ($("#AddOn_Price").val().trim() == "") {
+                alert("Please Enter Price");
+                $('#AddOn_Price').focus();
+                return false;
+            }
+            else {
+                var data = $('#AddOn_Id').select2('data');
+                //alert(data[0].text);
+                var addon_id = $("#AddOn_Id").val();
+                var addon_name = data[0].text;
+                var price = ($("#AddOn_Price").val() * 1).toFixed(3);
+                var line_addon_en = $("#Line_AddOn_Name_E").val();
+                var line_addon_ar = $("#Line_AddOn_Name_A").val();
+                var appendRow = "<tr><input type='hidden' id='SM_Product_AddOns[" + rowCount + "].Product_AddOnId' name='SM_Product_AddOns[" + rowCount + "].Product_AddOnId' value='0' /><input type='hidden' id='SM_Product_AddOns[" + rowCount + "].AddOn_Id' name='SM_Product_AddOns[" + rowCount + "].AddOn_Id' value='" + $("#AddOn_Id").val() + "' /><td><label>" + (rowCount * 1 + 1) + "</label></td><td>" + addon_name + "</td><td><input type='text' name='SM_Product_AddOns[" + rowCount + "].Line_AddOn_Name_E' value='" + line_addon_en + "'/></td><td><input type='text' name='SM_Product_AddOns[" + rowCount + "].Line_AddOn_Name_A' value='" + line_addon_ar + "'/></td><td><input type='text' name='SM_Product_AddOns[" + rowCount + "].Price' class='price number' value='" + price + "'/></td><td><input type='checkbox' name='SM_Product_AddOns[" + rowCount + "].Publish'  value='true' checked='checked' /></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this,0)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+                console.log("Append Row:" + appendRow);
+                $("#tblAddOn > tbody").append(appendRow);
+                $("#AddOn_Id").val("").trigger('change');
+                $("#AddOn_Price").val("");
+                $("#Line_AddOn_Name_E").val("");
+                $("#Line_AddOn_Name_A").val("");
+
+                let row = {
+                    "Product_AddOnId": 0,
+                    "AddOn_Id": addon_id * 1,
+                    "AddOn_Name": addon_name,
+                    "Line_AddOn_Name_E": line_addon_en,
+                    "Line_AddOn_Name_A": line_addon_ar,
+                    "Price": price * 1,
+                    "Publish": true,
+                    "Line_No": rowCount + 1
+                }
+                Product_AddOns.push(row);
+                console.log(JSON.stringify(Product_AddOns));
+
+
+            }
+        }
+
+        function deleteRow(element, delete_detail_id) {
+            if (confirm('Are you sure you want to delete this AddOn?')) {
+                if (delete_detail_id != 0) {
+                    $("#global-loader").show();
+
+                    var formdata = {
+                        Detail_Id: delete_detail_id,
+                        Deleted_By: @user_cd
+                                                                                                                                        }
+
+                    console.log(JSON.stringify(formdata));
+                    $.ajax({
+                        type: "POST",
+                        url: "/Merchant/Product/DeleteProductAddOn",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: formdata,
+                        dataType: "json",
+                        success: function (response) {
+                            $("#global-loader").hide();
+                            console.log("response:" + JSON.stringify(response));
+                            if (response.status == 0) {
+                                ProcessDelete(element);
+                            }
+
+                        },
+                        failure: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        }
+                    });
+                } else {
+                    ProcessDelete(element);
+                }
+
+            }
+        }
+
+        function ProcessDelete(element) {
+            var delete_line_no = $(element).closest('tr').find('label').text();
+            console.log("line no deleting:" + delete_line_no);
+            $(element).closest('tr').remove();
+            removeByAttr(Product_AddOns, 'Line_No', delete_line_no * 1);
+            var appendRow = "";
+            var gross_amt = 0;
+            for (var i = 0; i < Product_AddOns.length; i++) {
+                var line_detail = Product_AddOns[i];
+                line_detail.Line_No = i + 1;
+                var product_addon_id = line_detail.Product_AddOnId;
+                var addon_id = line_detail.AddOn_Id;
+                var addon_name = line_detail.AddOn_Name;
+                var line_addon_en = line_detail.Line_AddOn_Name_E;
+                var line_addon_ar = line_detail.Line_AddOn_Name_A;
+                var price = line_detail.Price.toFixed(3);
+                var publish = line_detail.Publish;
+                var isChecked = "";
+                if (publish) {
+                    isChecked = "checked";
+                }
+                appendRow += "<tr><input type='hidden' id='SM_Product_AddOns[" + i + "].Product_AddOnId' name='SM_Product_AddOns[" + i + "].Product_AddOnId' value='" + product_addon_id + "' /><input type='hidden' id='SM_Product_AddOns[" + i + "].AddOn_Id' name='SM_Product_AddOns[" + i + "].AddOn_Id' value='" + addon_id + "' /><td><label>" + (i * 1 + 1) + "</label></td><td>" + addon_name + "</td><td><input type='text' name='SM_Product_AddOns[" + i + "].Line_AddOn_Name_E' value='" + line_addon_en + "'/></td><td><input type='text' name='SM_Product_AddOns[" + i + "].Line_AddOn_Name_A' value='" + line_addon_ar + "'/></td><td><input type='text' name='SM_Product_AddOns[" + i + "].Price' class='price number' value='" + price + "'/></td><td><input type='checkbox' name='SM_Product_AddOns[" + i + "].Publish' value='true' " + isChecked + "  /></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteRow(this," + product_addon_id + ")' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+            }
+            $("#tblAddOn > tbody").html(appendRow);
+            console.log(JSON.stringify(Product_AddOns));
+
+
+        }
+
+        function AddCategoringProductRow() {
+            var rowCount = $('#tblCateringProducts > tbody > tr').length;
+            console.log("table Row Count: " + rowCount);
+            if ($("#Catering_Category_Id").val() == "") {
+                alert("Please Select Category");
+                $('#Catering_Category_Id').focus();
+                return false;
+            } else if ($("#Category_Menu_Product_Id").val().trim() == "") {
+                alert("Please Select Product");
+                $('#Category_Menu_Product_Id').focus();
+                return false;
+            }
+            else {
+                var categoryData = $('#Catering_Category_Id').select2('data');
+                var productData = $('#Category_Menu_Product_Id').select2('data');
+                //alert(data[0].text);
+                var cat_id = $("#Catering_Category_Id").val();
+                var cat_name = categoryData[0].text;
+                var prod_id = $("#Category_Menu_Product_Id").val();
+                var prod_name = productData[0].text;
+
+                var appendRow = "<tr><input type='hidden' id='SM_Product_Catering_Products[" + rowCount + "].Catering_Product_Id' name='SM_Product_Catering_Products[" + rowCount + "].Catering_Product_Id' value='0' /><input type='hidden' id='SM_Product_Catering_Products[" + rowCount + "].Category_Id' name='SM_Product_Catering_Products[" + rowCount + "].Category_Id' value='" + cat_id + "' /><input type='hidden' id='SM_Product_Catering_Products[" + rowCount + "].Child_Product_Id' name='SM_Product_Catering_Products[" + rowCount + "].Child_Product_Id' value='" + prod_id + "' /><td><label>" + (rowCount * 1 + 1) + "</label></td><td>" + cat_name + "</td><td>" + prod_name + "</td><td><input type='checkbox' name='SM_Product_Catering_Products[" + rowCount + "].Publish'  value='true' checked='checked' /></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteCateringProductRow(this,0)' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+                console.log("Append Row:" + appendRow);
+                $("#tblCateringProducts > tbody").append(appendRow);
+                $("#Catering_Category_Id").val("").trigger('change');
+                $("#Category_Menu_Product_Id").val("").trigger('change');
+
+                let row = {
+                    "Catering_Product_Id": 0,
+                    "Category_Id": cat_id * 1,
+                    "Child_Product_Id": prod_id * 1,
+                    "Category_Name": cat_name,
+                    "Product_Name": prod_name,
+                    "Publish": true,
+                    "Line_No": rowCount + 1
+                }
+                Product_AddOns.push(row);
+                console.log(JSON.stringify(Product_AddOns));
+
+
+            }
+        }
+
+        function deleteCateringProductRow(element, delete_detail_id) {
+            if (confirm('Are you sure you want to delete this Product?')) {
+                if (delete_detail_id != 0) {
+                    $("#global-loader").show();
+
+                    var formdata = {
+                        Detail_Id: delete_detail_id,
+                        Deleted_By: @user_cd
+                                                                                                                                        }
+
+                    console.log(JSON.stringify(formdata));
+                    $.ajax({
+                        type: "POST",
+                        url: "/Merchant/Product/DeleteProductCateringProduct",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: formdata,
+                        dataType: "json",
+                        success: function (response) {
+                            $("#global-loader").hide();
+                            console.log("response:" + JSON.stringify(response));
+                            if (response.status == 0) {
+                                ProcessDeleteCateringProduct(element);
+                            }
+
+                        },
+                        failure: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            $("#global-loader").hide();
+                            alert(response.responseText);
+                        }
+                    });
+                } else {
+                    ProcessDeleteCateringProduct(element);
+                }
+
+            }
+        }
+
+        function ProcessDeleteCateringProduct(element) {
+            var delete_line_no = $(element).closest('tr').find('label').text();
+            console.log("line no deleting:" + delete_line_no);
+            $(element).closest('tr').remove();
+            removeByAttr(Catering_Products, 'Line_No', delete_line_no * 1);
+            var appendRow = "";
+            var gross_amt = 0;
+            for (var i = 0; i < Catering_Products.length; i++) {
+                var line_detail = Catering_Products[i];
+                line_detail.Line_No = i + 1;
+                var cat_prod_id = line_detail.Catering_Product_Id;
+                var cat_id = line_detail.Category_Id;
+                var prod_id = line_detail.Child_Product_Id;
+                var cat_name = line_detail.Category_Name;
+                var prod_name = line_detail.Product_Name;
+                var publish = line_detail.Publish;
+                var isChecked = "";
+                if (publish) {
+                    isChecked = "checked";
+                }
+                appendRow += "<tr><input type='hidden' id='SM_Product_Catering_Products[" + i + "].Catering_Product_Id' name='SM_Product_Catering_Products[" + i + "].Catering_Product_Id' value='" + cat_prod_id + "' /><input type='hidden' id='SM_Product_Catering_Products[" + i + "].Category_Id' name='SM_Product_Catering_Products[" + i + "].Category_Id' value='" + cat_id + "' /><input type='hidden' id='SM_Product_Catering_Products[" + i + "].Child_Product_Id' name='SM_Product_Catering_Products[" + i + "].Child_Product_Id' value='" + prod_id + "' /><td><label>" + (i * 1 + 1) + "</label></td><td>" + cat_name + "</td><td>" + prod_name + "</td><td><input type='checkbox' name='SM_Product_Catering_Products[" + i + "].Publish' value='true' " + isChecked + "  /></td><td name='bstable-actions'><div class='btn-list'><button id='bDel' type='button' onclick='deleteCateringProductRow(this," + product_addon_id + ")' class='btn btn-sm btn-danger'> <span class='fe fe-trash-2'> </span></button> </div></td></tr>";
+            }
+            $("#tblCateringProducts > tbody").html(appendRow);
+            console.log(JSON.stringify(Product_AddOns));
+
+
+        }
+    </script>
+
+}

@@ -1,0 +1,306 @@
+﻿@using System.Data
+@using System.Net
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model DataTable
+@{
+    int i = 0;
+    int k = 0;
+    int pv = 0;
+    List<SM_LIST_FIELDS> listDetails = new List<SM_LIST_FIELDS>();
+    if (ViewData["ListDetails"] != null)
+    {
+        listDetails = ViewData["ListDetails"] as List<SM_LIST_FIELDS>;
+    }
+    List<SM_LIST_PARAMETERS> findParameters = new List<SM_LIST_PARAMETERS>();
+    if (ViewData["findParameters"] != null)
+    {
+        findParameters = ViewData["findParameters"] as List<SM_LIST_PARAMETERS>;
+    }
+    string[] parameterValues = ViewData["parameterValues"] as string[];
+
+     int user_cd = 0;
+    if (HttpContextAccessor.HttpContext != null)
+    {
+        user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("VendorId") ?? 0;
+
+    }
+}
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4><span class="text-muted mt-1 tx-13 ms-2 mb-0">/@ViewBag.List_Name List</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- Row -->
+    <div class="row row-sm">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header" style="display:inline">
+                    <div style="float:left">
+                        <h3 class="card-title">@ViewBag.List_Name List</h3>
+                    </div>
+                    @if (ViewBag.Show_Add_New_URL)
+                    {
+                        <div style="float:right">
+                            <a href="@ViewBag.Add_New_URL" id="table2-new-row-button" class="btn btn-primary mb-4" style="color:white"> Add New @ViewBag.List_Name</a>
+                        </div>
+                    }
+
+
+
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        @if (findParameters != null && findParameters.Count > 0)
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="row row-sm mb-3">
+                                                @foreach (SM_LIST_PARAMETERS par in findParameters)
+                                                {
+                                                    <div class="@par.Control_Size">
+
+                                                        @if (par.Parameter_Type == Parameter_Types.TextBox)
+                                                        {
+                                                            <label class="@par.Control_Label_Size">@par.Control_Label_E</label>
+                                                            DateTime now = StaticMethods.GetKuwaitTime();
+                                                            if (par.Default_Value == Parameter_Default_Values.FirstOfMonth)
+                                                            {
+                                                                var startDate = new DateTime(now.Year, now.Month, 1);
+                                                                if (parameterValues.Count() == 0)
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@startDate.ToString("dd-MMM-yyyy")" class="@par.Control_Css_Class">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@parameterValues[pv]" class="@par.Control_Css_Class">
+
+                                                                }
+
+                                                            }
+                                                            else if (par.Default_Value == Parameter_Default_Values.LastOfMonth)
+                                                            {
+                                                                if (parameterValues.Count() == 0)
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@now.ToString("dd-MMM-yyyy")" class="@par.Control_Css_Class">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@parameterValues[pv].Substring(0, Math.Min(parameterValues[pv].Length, 11))" class="@par.Control_Css_Class">
+                                                                }
+
+                                                            }
+                                                            else
+                                                            {
+                                                                if (parameterValues.Count() == 0)
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@par.Default_Value" class="@par.Control_Css_Class">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="text" id="@par.Control_Name" name="txtParameter" value="@parameterValues[pv]" class="@par.Control_Css_Class">
+
+                                                                }
+
+                                                            }
+                                                        }
+                                                        else if (par.Parameter_Type == Parameter_Types.DropDownList)
+                                                        {
+                                                            <label class="@par.Control_Label_Size">@par.Control_Label_E</label>
+                                                            var ucProperty = new UCProperties
+                        {
+                            Id = par.Control_Name ?? "",
+                            Name = "txtParameter",
+                            Placeholder = par.Required_Field_Msg ?? "",
+                            Is_Required = par.Is_Required ?? false,
+                            Error_Label_Id = par.Error_Label_Id,
+                            List_Id = par.Find_Id
+                        };
+
+                                                            if (parameterValues.Count() == 0)
+                                                            {
+                                                                if (!string.IsNullOrEmpty(par.Default_Value))
+                                                                {
+                                                                    ucProperty.Value = par.Default_Value;
+
+                                                                }
+
+                                                            }
+                                                            else
+                                                            {
+
+                                                                ucProperty.Value = parameterValues[pv];
+                                                            }
+
+
+                                                            @await Component.InvokeAsync("UCDropDown", ucProperty)
+                                                            ;
+                                                        }
+                                                        else if (par.Parameter_Type == Parameter_Types.ListBox)
+                                                        {
+                                                            <label class="@par.Control_Label_Size">@par.Control_Label_E</label>
+                                                        }
+                                                        else if (par.Parameter_Type == Parameter_Types.Session)
+                                                        {
+                                                            if (parameterValues.Count() == 0)
+                                                            {
+                                                                <input type="hidden" id="@par.Control_Name" name="txtParameter" value="@par.Default_Value" class="@par.Control_Css_Class">
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="hidden" id="@par.Control_Name" name="txtParameter" value="@parameterValues[pv]" class="@par.Control_Css_Class">
+
+                                                            }
+                                                        }
+
+                                                        @if (par.Is_Required == true)
+                                                        {
+                                                            <span class="field-validation-valid" data-valmsg-for="@par.Control_Name" data-valmsg-replace="true"></span>
+                                                        }
+                                                    </div>
+
+                                                    pv++;
+                                                }
+                                                <div class="col-sm-3">
+                                                    <input type="submit" name="btnLoadReport" value="Search" class="btn btn-primary mt-3 mb-0" />
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+                        <div class="table-responsive">
+                            <table id="file-datatable" class="border-top-0  table table-bordered text-nowrap key-buttons border-bottom centered-text ">
+                                <thead>
+                                    <tr>
+
+                                        @foreach (DataColumn col in Model.Columns)
+                                        {
+                                            var listDetail = listDetails[i];
+                                            <th class="@listDetail.HeaderStyle_CssClass"> @col.ColumnName </th>
+                                            i++;
+                                        }
+                                        <th name="bstable-actions">Actions</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (DataRow dr in Model.Rows)
+                                    {
+                                        k = 0;
+                                        var primary_key_value = "0";
+
+                                        <tr>
+
+                                            @foreach (DataColumn col in Model.Columns)
+                                            {
+                                                var listDetail = listDetails[k];
+                                                if (listDetail.Primary_Key_Column)
+                                                {
+                                                    primary_key_value = @dr[col.ColumnName].ToString();
+                                                }
+
+                                                if (listDetail.Field_Type == List_Fields_Types.ZImage)
+                                                {
+
+                                                    <td class="@listDetail.ItemStyle_CssClass"> <img alt="avatar" class="rounded-circle avatar-md me-2" src="/@dr[col.ColumnName]"></td>
+                                                }
+                                                else
+                                                {
+                                                     <td class="@listDetail.ItemStyle_CssClass">@dr[col.ColumnName]</td>
+                                                }
+                                               
+
+                                                k++;
+                                            }
+                                            <td name="bstable-actions">
+                                                <div class="btn-list">
+
+
+                                                    <a href="@ViewBag.Update_URL/@WebUtility.UrlEncode(SecurityClass.Encrypt(primary_key_value).Replace("+","ا"))?List_Id=@ViewBag.Id&Type=@ViewBag.Type" class="btn btn-sm btn-primary" style="">
+                                                        <span class="fe fe-edit" style="color:white"> </span>
+                                                    </a>
+
+
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Row -->
+
+
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+    <!--Internal  Datepicker js -->
+    <script src="~/assets/plugins/jquery-ui/ui/widgets/datepicker.js"></script>
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        $(function () {
+            $('.fc-datepicker').datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true,
+                dateFormat: "dd-M-yy"
+            });
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+        });
+    </script>
+}
+@section DatatableScripts {
+    <!-- DATA TABLE JS-->
+    <script src="~/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/plugins/datatable/js/dataTables.bootstrap5.js"></script>
+    <script src="~/assets/plugins/datatable/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/plugins/datatable/js/buttons.bootstrap5.min.js"></script>
+    <script src="~/assets/plugins/datatable/js/jszip.min.js"></script>
+    <script src="~/assets/plugins/datatable/pdfmake/pdfmake.min.js"></script>
+    <script src="~/assets/plugins/datatable/pdfmake/vfs_fonts.js"></script>
+    <script src="~/assets/plugins/datatable/js/buttons.html5.min.js"></script>
+    <script src="~/assets/plugins/datatable/js/buttons.print.min.js"></script>
+    <script src="~/assets/plugins/datatable/js/buttons.colVis.min.js"></script>
+    <script src="~/assets/plugins/datatable/dataTables.responsive.min.js"></script>
+    <script src="~/assets/plugins/datatable/responsive.bootstrap5.min.js"></script>
+
+    <!--Internal  Datatable js -->
+    <script src="~/assets/js/table-data.js"></script>
+}

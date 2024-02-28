@@ -1,0 +1,109 @@
+﻿@model SM_USERS
+@{
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/User</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post">
+                        <div class="">
+
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 184})
+                                    @await Component.InvokeAsync("UCTextBox",new UCProperties{
+                                    Id="User_Id",CSSClass="form-control",Placeholder="Enter User Id",Value=Model != null ?Model.User_Id:"",Is_Required=true,Error_Label_Id=185
+                                    })
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 2})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Password",CSSClass="form-control",Placeholder="Enter Password",Value=Model != null ?Model.Password ?? "":"",Is_Required=true,Error_Label_Id=186,Element_Type = Form_Element_Types.Password
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 1})
+                                    @await Component.InvokeAsync("UCTextBox",new UCProperties{
+                                    Id="User_Name",CSSClass="form-control",Placeholder="Enter User Name",Value=Model != null ?Model.User_Name:"",Is_Required=true,Error_Label_Id=187
+                                    })
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 188})
+                                    @await Component.InvokeAsync("UCDropDown",new UCProperties{
+                                    Id="Group_Cd",Placeholder="Select Group",Value=Model != null ?Model.Group_Cd.ToString():"",Is_Required=true,Error_Label_Id=189,List_Id=24
+                                    })
+
+                                </div>
+
+                            </div>
+                        </div>
+                        @*  <button type="submit" class="btn btn-primary mt-3 mb-0">Submit</button>*@
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        @* @Html.ValidationSummary(false, "", new { @class = "text-danger" })*@
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+        });
+    </script>
+}

@@ -1,0 +1,46 @@
+=========================================================================
+Date Time : 19-Jan-2024 3:54:29 PM
+-------------------------------------------------------------------------
+System.Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ChocolateDelivery.BLL.OrderBC.GetPendingDriverOrders(String lang, Int64 driver_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 472
+   at ChocolateDelivery.BLL.OrderBC.GetPendingDriverOrders(String lang, Int64 driver_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 505
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetDriverPendingOrders(String app_user_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 2608
+=========================================================================
+=========================================================================
+Date Time : 19-Jan-2024 3:55:25 PM
+-------------------------------------------------------------------------
+System.Exception: System.NullReferenceException: Object reference not set to an instance of an object.
+   at ChocolateDelivery.BLL.OrderBC.GetPendingDriverOrders(String lang, Int64 driver_id)
+   at ChocolateDelivery.BLL.OrderBC.GetPendingDriverOrders(String lang, Int64 driver_id)
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetDriverPendingOrders(String app_user_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 2608
+=========================================================================
+=========================================================================
+Date Time : 19-Jan-2024 4:24:34 PM
+-------------------------------------------------------------------------
+System.Exception: System.Exception: System.InvalidCastException: Unable to cast object of type 'System.Int32' to type 'System.Decimal'.
+   at MySqlConnector.Core.Row.GetDecimal(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 324
+   at lambda_method765(Closure , QueryContext , DbDataReader , ResultContext , SingleQueryResultCoordinator )
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.Enumerator.MoveNext()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at ChocolateDelivery.BLL.OrderBC.GetOrderDetails(Int64 order_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 237
+   at ChocolateDelivery.BLL.OrderBC.GetOrderDetails(Int64 order_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 256
+   at ChocolateDelivery.BLL.OrderBC.GetOrder(Int64 order_id, String lang) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 186
+   at ChocolateDelivery.BLL.OrderBC.GetOrder(Int64 order_id, String lang) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 191
+   at ChocolateDelivery.UI.Controllers.WebAPIController.UpdateOrder(DriverOrderRequest driverOrderRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 2688
+=========================================================================
+=========================================================================
+Date Time : 19-Jan-2024 4:26:26 PM
+-------------------------------------------------------------------------
+System.Exception: System.Exception: System.InvalidCastException: Unable to cast object of type 'System.Int32' to type 'System.Decimal'.
+   at MySqlConnector.Core.Row.GetDecimal(Int32 ordinal) in /_/src/MySqlConnector/Core/Row.cs:line 324
+   at lambda_method765(Closure , QueryContext , DbDataReader , ResultContext , SingleQueryResultCoordinator )
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.Enumerator.MoveNext()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at ChocolateDelivery.BLL.OrderBC.GetOrderDetails(Int64 order_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 237
+   at ChocolateDelivery.BLL.OrderBC.GetOrderDetails(Int64 order_id) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 256
+   at ChocolateDelivery.BLL.OrderBC.GetOrder(Int64 order_id, String lang) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 186
+   at ChocolateDelivery.BLL.OrderBC.GetOrder(Int64 order_id, String lang) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 191
+   at ChocolateDelivery.UI.Controllers.WebAPIController.UpdateOrder(DriverOrderRequest driverOrderRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 2688
+=========================================================================

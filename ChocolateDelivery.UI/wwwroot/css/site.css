@@ -1,0 +1,42 @@
+/*html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}*/
+form .input-validation-error {
+    border: 1px solid Red;
+    background-color: #fee;
+}
+
+.field-validation-error {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.centered-text {
+    text-align: center;
+}
+
+.ar-labels {
+    font-size: 18px;
+}
+
+.ar-texts {
+    font-size: 18px;
+}

@@ -1,0 +1,194 @@
+=========================================================================
+Date Time : 13-Feb-2024 4:57:03 PM
+-------------------------------------------------------------------------
+Order Request:{"Remarks":"want extra sweet chocolate","App_User_Id":"47e9c03e-595e-476f-8c99-1c0e6fc830eb","Payment_Type_Id":1,"Address_Id":1,"Cust_Name":"Yusuf Jaorawala","Email":"yusuf.9116@gmail.com","Mobile":"+96551533409","Delivery_Type":1,"Channel_Id":1,"Promo_Code":"","Branch_Id":3,"Gift_Msg":"","Recepient_Name":"","Recepient_Mobile":"","Video_File":"","Video_Link":"","Show_Sender_Name":null,"Redeem_Points":0.0,"Redeem_Amount":0.000,"Pickup_Datetime":null,"OrderDetails":[{"Prod_Id":4,"Prod_Name":"","Qty":2,"Promo_Code":"","Product_AddOn_Ids":[],"Remarks":"","Rate":0.0,"Amount":0.0,"Gross_Amount":0.0}]}
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 4:57:35 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:108
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 4:57:36 PM
+-------------------------------------------------------------------------
+Notification Payload :{ "message": { "topic": "driver", "notification": { "title": "New Order Received", "body": "Please accept Order # ORD_000096 for delivery" }, "data": { "story_id": "story_12345" }, "android": { "notification": { "click_action": "FLUTTER_NOTIFICATION_CLICK" } }, "apns": { "payload": { "aps": { "category" : "NEW_MESSAGE_CATEGORY" } } } } }
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 4:57:37 PM
+-------------------------------------------------------------------------
+{
+  "name": "projects/cacaoo-409514/messages/3930848245297581433"
+}
+
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 4:59:18 PM
+-------------------------------------------------------------------------
+System.Exception: System.InvalidOperationException: The LINQ expression 'DbSet<TXN_Orders>()
+    .SelectMany(
+        collectionSelector: t => DbSet<SM_Order_Status>(), 
+        resultSelector: (t, c) => new TransparentIdentifier<TXN_Orders, SM_Order_Status>(
+            Outer = t, 
+            Inner = c
+        ))
+    .SelectMany(
+        collectionSelector: ti => DbSet<SM_Restaurants>(), 
+        resultSelector: (ti, c) => new TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>(
+            Outer = ti, 
+            Inner = c
+        ))
+    .LeftJoin(
+        inner: DbSet<SM_Restaurant_Branches>(), 
+        outerKeySelector: ti0 => (object)ti0.Outer.Outer.Branch_Id, 
+        innerKeySelector: s1 => (object)(long?)s1.Branch_Id, 
+        resultSelector: (ti0, s1) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>(
+            Outer = ti0, 
+            Inner = s1
+        ))
+    .LeftJoin(
+        inner: DbSet<App_Users>(), 
+        outerKeySelector: ti1 => (object)ti1.Outer.Outer.Outer.Driver_Id, 
+        innerKeySelector: a => (object)(long?)(long)a.App_User_Id, 
+        resultSelector: (ti1, a) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>, App_Users>(
+            Outer = ti1, 
+            Inner = a
+        ))
+    .Where(ti2 => (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 1 || (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 4 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id == (int)ti2.Outer.Outer.Outer.Inner.Status_Id && ti2.Outer.Outer.Outer.Outer.Restaurant_Id == ti2.Outer.Outer.Inner.Restaurant_Id && ti2.Outer.Outer.Outer.Outer.Order_Datetime.Date == __kwtDate_0 || ti2.Outer.Outer.Outer.Outer.Pickup_Datetime != null && Convert.ToDateTime((object)ti2.Outer.Outer.Outer.Outer.Pickup_Datetime).Date == __kwtDate_0)' could not be translated. Additional information: Translation of method 'System.Convert.ToDateTime' failed. If this method can be mapped to your custom function, see https://go.microsoft.com/fwlink/?linkid=2132413 for more information. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.<VisitMethodCall>g__CheckTranslated|15_0(ShapedQueryExpression translated, <>c__DisplayClass15_0& )
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.<>c__DisplayClass9_0`1.<Execute>b__0()
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.Execute[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryable`1.GetEnumerator()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 797
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 899
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 4115
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 4:59:22 PM
+-------------------------------------------------------------------------
+System.Exception: System.InvalidOperationException: The LINQ expression 'DbSet<TXN_Orders>()
+    .SelectMany(
+        collectionSelector: t => DbSet<SM_Order_Status>(), 
+        resultSelector: (t, c) => new TransparentIdentifier<TXN_Orders, SM_Order_Status>(
+            Outer = t, 
+            Inner = c
+        ))
+    .SelectMany(
+        collectionSelector: ti => DbSet<SM_Restaurants>(), 
+        resultSelector: (ti, c) => new TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>(
+            Outer = ti, 
+            Inner = c
+        ))
+    .LeftJoin(
+        inner: DbSet<SM_Restaurant_Branches>(), 
+        outerKeySelector: ti0 => (object)ti0.Outer.Outer.Branch_Id, 
+        innerKeySelector: s1 => (object)(long?)s1.Branch_Id, 
+        resultSelector: (ti0, s1) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>(
+            Outer = ti0, 
+            Inner = s1
+        ))
+    .LeftJoin(
+        inner: DbSet<App_Users>(), 
+        outerKeySelector: ti1 => (object)ti1.Outer.Outer.Outer.Driver_Id, 
+        innerKeySelector: a => (object)(long?)(long)a.App_User_Id, 
+        resultSelector: (ti1, a) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>, App_Users>(
+            Outer = ti1, 
+            Inner = a
+        ))
+    .Where(ti2 => (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 1 || (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 4 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id == (int)ti2.Outer.Outer.Outer.Inner.Status_Id && ti2.Outer.Outer.Outer.Outer.Restaurant_Id == ti2.Outer.Outer.Inner.Restaurant_Id && ti2.Outer.Outer.Outer.Outer.Order_Datetime.Date == __kwtDate_0 || ti2.Outer.Outer.Outer.Outer.Pickup_Datetime != null && Convert.ToDateTime((object)ti2.Outer.Outer.Outer.Outer.Pickup_Datetime).Date == __kwtDate_0)' could not be translated. Additional information: Translation of method 'System.Convert.ToDateTime' failed. If this method can be mapped to your custom function, see https://go.microsoft.com/fwlink/?linkid=2132413 for more information. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.<VisitMethodCall>g__CheckTranslated|15_0(ShapedQueryExpression translated, <>c__DisplayClass15_0& )
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.<>c__DisplayClass9_0`1.<Execute>b__0()
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.Execute[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryable`1.GetEnumerator()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 797
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 899
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 4115
+=========================================================================
+=========================================================================
+Date Time : 13-Feb-2024 5:02:14 PM
+-------------------------------------------------------------------------
+System.Exception: System.InvalidOperationException: The LINQ expression 'DbSet<TXN_Orders>()
+    .SelectMany(
+        collectionSelector: t => DbSet<SM_Order_Status>(), 
+        resultSelector: (t, c) => new TransparentIdentifier<TXN_Orders, SM_Order_Status>(
+            Outer = t, 
+            Inner = c
+        ))
+    .SelectMany(
+        collectionSelector: ti => DbSet<SM_Restaurants>(), 
+        resultSelector: (ti, c) => new TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>(
+            Outer = ti, 
+            Inner = c
+        ))
+    .LeftJoin(
+        inner: DbSet<SM_Restaurant_Branches>(), 
+        outerKeySelector: ti0 => (object)ti0.Outer.Outer.Branch_Id, 
+        innerKeySelector: s1 => (object)(long?)s1.Branch_Id, 
+        resultSelector: (ti0, s1) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>(
+            Outer = ti0, 
+            Inner = s1
+        ))
+    .LeftJoin(
+        inner: DbSet<App_Users>(), 
+        outerKeySelector: ti1 => (object)ti1.Outer.Outer.Outer.Driver_Id, 
+        innerKeySelector: a => (object)(long?)(long)a.App_User_Id, 
+        resultSelector: (ti1, a) => new TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TransparentIdentifier<TXN_Orders, SM_Order_Status>, SM_Restaurants>, SM_Restaurant_Branches>, App_Users>(
+            Outer = ti1, 
+            Inner = a
+        ))
+    .Where(ti2 => (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 1 || (int)ti2.Outer.Outer.Outer.Outer.Payment_Type_Id == 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 4 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id != 2 && (int)ti2.Outer.Outer.Outer.Outer.Status_Id == (int)ti2.Outer.Outer.Outer.Inner.Status_Id && ti2.Outer.Outer.Outer.Outer.Restaurant_Id == ti2.Outer.Outer.Inner.Restaurant_Id && ti2.Outer.Outer.Outer.Outer.Order_Datetime.Date == __kwtDate_0 || ti2.Outer.Outer.Outer.Outer.Pickup_Datetime != null && Convert.ToDateTime((object)ti2.Outer.Outer.Outer.Outer.Pickup_Datetime).Date == __kwtDate_0)' could not be translated. Additional information: Translation of method 'System.Convert.ToDateTime' failed. If this method can be mapped to your custom function, see https://go.microsoft.com/fwlink/?linkid=2132413 for more information. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.<VisitMethodCall>g__CheckTranslated|15_0(ShapedQueryExpression translated, <>c__DisplayClass15_0& )
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at Microsoft.EntityFrameworkCore.Query.RelationalQueryableMethodTranslatingExpressionVisitor.VisitMethodCall(MethodCallExpression methodCallExpression)
+   at System.Linq.Expressions.MethodCallExpression.Accept(ExpressionVisitor visitor)
+   at System.Linq.Expressions.ExpressionVisitor.Visit(Expression node)
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.<>c__DisplayClass9_0`1.<Execute>b__0()
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.Execute[TResult](Expression query)
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryable`1.GetEnumerator()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 797
+   at ChocolateDelivery.BLL.OrderBC.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 899
+   at ChocolateDelivery.UI.Controllers.WebAPIController.GetDashboardOrders(Int32 dashboard_order_type) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 4115
+=========================================================================

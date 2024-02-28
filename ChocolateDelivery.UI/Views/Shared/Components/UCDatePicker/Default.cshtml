@@ -1,0 +1,11 @@
+﻿@model UCProperties
+@if (Model.Is_Required)
+{  
+    <input class="form-control fc-datepicker @Model.CSSClass" id="@Model.Id" name="@Model.Id" value="@Model.Value"  placeholder="@Model.Placeholder" type="text" data-val="true" data-val-required="@ViewBag.ErrorMessage">
+    <span class="field-validation-valid" data-valmsg-for="@Model.Id" data-valmsg-replace="true"></span>
+}
+else
+{
+     <input class="form-control fc-datepicker" id="@Model.Id" name="@Model.Id" value="@Model.Value"  placeholder="DD/MM/YYYY" type="text">
+
+}

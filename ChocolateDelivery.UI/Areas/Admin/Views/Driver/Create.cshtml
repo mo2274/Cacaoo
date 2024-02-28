@@ -1,0 +1,135 @@
+﻿@model App_Users
+
+@section CSS{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css" />
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/Driver</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="">
+
+                           
+                            
+
+                            
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 97})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Email",CSSClass="form-control",Placeholder="Enter Email",Value=Model != null ?Model.Email != null?Model.Email.ToString():"" :"",
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 2})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Password",CSSClass="form-control",Placeholder="Enter Password",Value=Model != null ?Model.Password != null?Model.Password.ToString():"" :"",Is_Required=true,Error_Label_Id=186
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="row row-sm mb-3">
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Name",CSSClass="form-control",Placeholder="Enter Name",Value=Model != null ?Model.Name :"",Is_Required=true,Error_Label_Id=56
+                                    })
+                                </div>
+
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 100})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Mobile",CSSClass="form-control",Placeholder="Enter Mobile",Value=Model != null ?Model.Mobile != null?Model.Mobile.ToString():"" :"",
+                                    })
+                                </div>
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 83})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Plate_Num",CSSClass="form-control",Placeholder="Enter Plate Num",Value=Model != null ?Model.Plate_Num != null?Model.Plate_Num.ToString():"" :"",
+                                    })
+                                </div>
+                            </div>
+                                                      
+                            <!-- row closed -->
+                            <div class="">
+                                <div class="">
+                                    @Html.CheckBox("Show",true)
+                                    @*  @Html.CheckBox("Show", true)*@
+                                    @*  <input type="checkbox" asp-for="Show">*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+                        </div>
+
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    <!-- Internal Select2.min js -->
+    <script src="~/assets/plugins/select2/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                allowClear: true,
+                searchInputPlaceholder: 'Search'
+            });
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one'
+            });
+            $('.boot-datetimepicker').datetimepicker({
+                useCurrent: false, //Important! See issue #1075
+                icons: {
+                    time: "fa fa-clock-o",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                },
+                format: 'hh:mm a'
+            });
+        });
+    </script>
+
+}

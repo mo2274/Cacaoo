@@ -1,0 +1,114 @@
+=========================================================================
+Date Time : 11-Jan-2024 3:07:23 PM
+-------------------------------------------------------------------------
+System.ArgumentException: Path cannot be the empty string or all whitespace. (Parameter 'path')
+   at System.IO.Directory.CreateDirectory(String path)
+   at ChocolateDelivery.BLL.globalCls.WriteToFile(String p_str_path, String p_str_data, Boolean p_bln_append) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\globalCls.cs:line 23
+   at ChocolateDelivery.UI.CustomFilters.TapPayment.CreateChargeRequest(TapChargeRequest tapChargeRequest, IConfiguration _config) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\CustomFilters\TapPayment.cs:line 82
+   at ChocolateDelivery.UI.Controllers.WebAPIController.SaveOrder(OrderRequest orderRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 1794
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:11:33 PM
+-------------------------------------------------------------------------
+API URL:https://api.tap.company/v2/charges
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:11:33 PM
+-------------------------------------------------------------------------
+Authorization:Bearer sk_test_mU0qCZnJVyGjfOrBEd8R7Hu5
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:11:33 PM
+-------------------------------------------------------------------------
+Body:{"amount":45.000,"currency":"KWD","threeDSecure":false,"save_card":false,"description":"","statement_descriptor":"","reference":{"track":null,"payment":null,"gateway":null,"acquirer":null,"transaction":"19","order":"19"},"receipt":null,"customer":{"id":"","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"source":{"type":"","payment_type":"","payment_method":"","channel":"","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:18:51 PM
+-------------------------------------------------------------------------
+API URL:https://api.tap.company/v2/charges
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:18:51 PM
+-------------------------------------------------------------------------
+Authorization:Bearer sk_test_mU0qCZnJVyGjfOrBEd8R7Hu5
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:18:51 PM
+-------------------------------------------------------------------------
+Body:{"amount":45.000,"currency":"KWD","threeDSecure":true,"save_card":false,"description":"","statement_descriptor":"","reference":{"track":null,"payment":null,"gateway":null,"acquirer":null,"transaction":"ORD_000017","order":"20"},"receipt":{"email":true,"sms":true},"customer":{"id":"","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"source":{"type":"","payment_type":"","payment_method":"","channel":"","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:19:06 PM
+-------------------------------------------------------------------------
+System.Exception: Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> MySqlConnector.MySqlException (0x80004005): Unknown column 'Appointment_Id' in 'field list'
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReader(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.Execute(IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+   at Pomelo.EntityFrameworkCore.MySql.Storage.Internal.MySqlExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at ChocolateDelivery.BLL.OrderBC.CreatePayment(PAYMENTS paymentDM) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 347
+   at ChocolateDelivery.BLL.OrderBC.CreatePayment(PAYMENTS paymentDM) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.BLL\OrderBC.cs:line 352
+   at ChocolateDelivery.UI.Controllers.WebAPIController.SaveOrder(OrderRequest orderRequest) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Controllers\WebAPIController.cs:line 1810
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:21:45 PM
+-------------------------------------------------------------------------
+API URL:https://api.tap.company/v2/charges
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:21:45 PM
+-------------------------------------------------------------------------
+Authorization:Bearer sk_test_mU0qCZnJVyGjfOrBEd8R7Hu5
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:21:45 PM
+-------------------------------------------------------------------------
+Body:{"amount":45.000,"currency":"KWD","threeDSecure":true,"save_card":false,"description":"","statement_descriptor":"","reference":{"track":null,"payment":null,"gateway":null,"acquirer":null,"transaction":"ORD_000017","order":"21"},"receipt":{"email":true,"sms":true},"customer":{"id":"","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"source":{"type":"","payment_type":"","payment_method":"","channel":"","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:21:50 PM
+-------------------------------------------------------------------------
+Redirecting to :https://sandbox.payments.tap.company/test_gosell/v2/payment/tap_process.aspx?chg=B2nmqEv7L9otgjrMVt3COtlcx0DuLMTCkjzw5m802a0%3d
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:23:28 PM
+-------------------------------------------------------------------------
+{"id":"chg_TS06A4820241251m3F61101899","live_mode":false,"api_version":"V2","method":"GET","status":"CAPTURED","amount":45.000,"currency":"KWD","threeDSecure":true,"card_threeDSecure":false,"save_card":false,"merchant_id":null,"product":"GOSELL","statement_descriptor":null,"description":"","transaction":{"timezone":"UTC+03:00","created":"1704977508914","url":null,"asynchronous":false,"amount":45.000,"currency":"KWD"},"reference":{"track":"tck_TS06A4920241251r9BQ1101477","payment":"4911241251014771986","gateway":"401101000716271","acquirer":"401101000595","transaction":"ORD_000017","order":"21"},"response":{"code":"000","message":"Captured"},"receipt":{"email":true,"sms":true},"customer":{"id":"cus_TS07A4920241251p9MZ1101602","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"merchant":{"id":"28799366"},"source":{"type":"CARD_NOT_PRESENT","payment_type":"DEBIT","payment_method":"KNET","channel":"INTERNET","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:24:11 PM
+-------------------------------------------------------------------------
+Email sent successfully for Order Id:21
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:27:39 PM
+-------------------------------------------------------------------------
+{"id":"chg_TS06A4820241251m3F61101899","live_mode":false,"api_version":"V2","method":"GET","status":"CAPTURED","amount":45.000,"currency":"KWD","threeDSecure":true,"card_threeDSecure":false,"save_card":false,"merchant_id":null,"product":"GOSELL","statement_descriptor":null,"description":"","transaction":{"timezone":"UTC+03:00","created":"1704977508914","url":null,"asynchronous":false,"amount":45.000,"currency":"KWD"},"reference":{"track":"tck_TS06A4920241251r9BQ1101477","payment":"4911241251014771986","gateway":"401101000716271","acquirer":"401101000595","transaction":"ORD_000017","order":"21"},"response":{"code":"000","message":"Captured"},"receipt":{"email":true,"sms":true},"customer":{"id":"cus_TS07A4920241251p9MZ1101602","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"merchant":{"id":"28799366"},"source":{"type":"CARD_NOT_PRESENT","payment_type":"DEBIT","payment_method":"KNET","channel":"INTERNET","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:28:20 PM
+-------------------------------------------------------------------------
+{"id":"chg_TS06A4820241251m3F61101899","live_mode":false,"api_version":"V2","method":"GET","status":"CAPTURED","amount":45.000,"currency":"KWD","threeDSecure":true,"card_threeDSecure":false,"save_card":false,"merchant_id":null,"product":"GOSELL","statement_descriptor":null,"description":"","transaction":{"timezone":"UTC+03:00","created":"1704977508914","url":null,"asynchronous":false,"amount":45.000,"currency":"KWD"},"reference":{"track":"tck_TS06A4920241251r9BQ1101477","payment":"4911241251014771986","gateway":"401101000716271","acquirer":"401101000595","transaction":"ORD_000017","order":"21"},"response":{"code":"000","message":"Captured"},"receipt":{"email":true,"sms":true},"customer":{"id":"cus_TS07A4920241251p9MZ1101602","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"merchant":{"id":"28799366"},"source":{"type":"CARD_NOT_PRESENT","payment_type":"DEBIT","payment_method":"KNET","channel":"INTERNET","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:29:51 PM
+-------------------------------------------------------------------------
+{"id":"chg_TS06A4820241251m3F61101899","live_mode":false,"api_version":"V2","method":"GET","status":"CAPTURED","amount":45.000,"currency":"KWD","threeDSecure":true,"card_threeDSecure":false,"save_card":false,"merchant_id":null,"product":"GOSELL","statement_descriptor":null,"description":"","transaction":{"timezone":"UTC+03:00","created":"1704977508914","url":null,"asynchronous":false,"amount":45.000,"currency":"KWD"},"reference":{"track":"tck_TS06A4920241251r9BQ1101477","payment":"4911241251014771986","gateway":"401101000716271","acquirer":"401101000595","transaction":"ORD_000017","order":"21"},"response":{"code":"000","message":"Captured"},"receipt":{"email":true,"sms":true},"customer":{"id":"cus_TS07A4920241251p9MZ1101602","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"merchant":{"id":"28799366"},"source":{"type":"CARD_NOT_PRESENT","payment_type":"DEBIT","payment_method":"KNET","channel":"INTERNET","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================
+=========================================================================
+Date Time : 11-Jan-2024 3:30:29 PM
+-------------------------------------------------------------------------
+{"id":"chg_TS06A4820241251m3F61101899","live_mode":false,"api_version":"V2","method":"GET","status":"CAPTURED","amount":45.000,"currency":"KWD","threeDSecure":true,"card_threeDSecure":false,"save_card":false,"merchant_id":null,"product":"GOSELL","statement_descriptor":null,"description":"","transaction":{"timezone":"UTC+03:00","created":"1704977508914","url":null,"asynchronous":false,"amount":45.000,"currency":"KWD"},"reference":{"track":"tck_TS06A4920241251r9BQ1101477","payment":"4911241251014771986","gateway":"401101000716271","acquirer":"401101000595","transaction":"ORD_000017","order":"21"},"response":{"code":"000","message":"Captured"},"receipt":{"email":true,"sms":true},"customer":{"id":"cus_TS07A4920241251p9MZ1101602","first_name":"Yusuf Jaorawala","last_name":"","email":"yusuf.9116@gmail.com","phone":{"country_code":965,"number":51533409},"currency":""},"merchant":{"id":"28799366"},"source":{"type":"CARD_NOT_PRESENT","payment_type":"DEBIT","payment_method":"KNET","channel":"INTERNET","id":"src_kw.knet"},"redirect":{"url":"https://localhost:35656/Knet/PaymentResponse"}}
+=========================================================================

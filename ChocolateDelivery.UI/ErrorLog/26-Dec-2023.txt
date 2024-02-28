@@ -1,0 +1,41 @@
+=========================================================================
+Date Time : 26-Dec-2023 2:15:47 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 2
+=========================================================================
+=========================================================================
+Date Time : 26-Dec-2023 3:07:31 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 2
+=========================================================================
+=========================================================================
+Date Time : 26-Dec-2023 3:08:45 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 2
+=========================================================================
+=========================================================================
+Date Time : 26-Dec-2023 3:10:54 PM
+-------------------------------------------------------------------------
+select cs.Brand_Id as 'Brand Id',cs.Brand_Name_E as 'Brand Name (en)' from sm_brands cs where 1=1  and restaurant_id = 2
+=========================================================================
+=========================================================================
+Date Time : 26-Dec-2023 6:46:13 PM
+-------------------------------------------------------------------------
+error in uc dropdown for list id:12
+=========================================================================
+=========================================================================
+Date Time : 26-Dec-2023 6:46:14 PM
+-------------------------------------------------------------------------
+MySqlConnector.MySqlException (0x80004005): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 43
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 130
+   at MySqlConnector.MySqlDataReader.CreateAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 468
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(IReadOnlyList`1 commands, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteReaderAsync(CommandBehavior behavior, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 344
+   at MySqlConnector.MySqlCommand.ExecuteDbDataReader(CommandBehavior behavior) in /_/src/MySqlConnector/MySqlCommand.cs:line 278
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at ChocolateDelivery.UI.Components.UCDropDown.Invoke(UCProperties properties) in D:\Projects\chocolate-delivery\BackAdmin\ChocolateDelivery\ChocolateDelivery.UI\Components\UCDropDown.cs:line 253
+=========================================================================

@@ -1,0 +1,151 @@
+﻿@model SM_USER_GROUPS
+@{
+}
+
+<!-- container -->
+<div class="main-container container-fluid">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Home</h4>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/User Group</span>
+            </div>
+        </div>
+
+    </div>
+    <!-- breadcrumb -->
+    <!-- row -->
+    <div class="row row-sm">
+
+        <div class="col-lg-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card  box-shadow-0 ">
+                <div class="card-header">
+                    <h4 class="card-title mb-1"></h4>
+                    <p class="mb-2"></p>
+                </div>
+                <div class="card-body pt-0">
+                    <form method="post">
+                        <div class="">
+
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 181})
+                                    @await Component.InvokeAsync("UCTextBox",new UCProperties{
+                                    Id="Group_Name_En",CSSClass="form-control",Placeholder="Enter Group Name",Value=Model != null ?Model.Group_Name_En:"",Is_Required=true,Error_Label_Id=183
+                                    })
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6">
+
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 182})
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
+                                    Id="Group_Name_Ar",CSSClass="form-control",Placeholder="Enter Group Name in arabic",Value=Model != null ?Model.Group_Name_Ar ?? "":""
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-6">
+                                    @Html.CheckBox("Show")
+                                    @*<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" asp-for="Show">*@
+                                    @* <label asp-for="Show" class="custom-control-label mt-1">Show</label>*@
+                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Group Rights</h3>
+                                        </div>
+                                        <div class="card-body">
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered border text-nowrap mb-0" style="text-align:center" id="tblUnit">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Menu</th>
+                                                            <th><input id="checkAllView" type="checkbox" onclick="SelectAllCheckboxes(this, '.chkView');">View</th>
+                                                           @* <th>Add</th>
+                                                            <th>Edit</th>
+                                                            <th>Delete</th>*@
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @if (Model != null)
+                                                        {
+                                                            @for (int i = 0; i < Model.SM_USER_GROUP_RIGHTS.Count; i++)
+                                                            {
+                                                                <tr>
+                                                                    <td class="hidden">@Html.HiddenFor(x=>x.SM_USER_GROUP_RIGHTS[i].Right_Id)</td>
+                                                                    <td class="hidden">@Html.HiddenFor(x=>x.SM_USER_GROUP_RIGHTS[i].Menu_Id)</td>
+                                                                    <td>@Html.DisplayFor(x=>x.SM_USER_GROUP_RIGHTS[i].MenuName_En)</td>
+                                                                    <td>@Html.CheckBoxFor(x => x.SM_USER_GROUP_RIGHTS[i].AllowView,new{@class = "chkView"})</td>
+                                                                    @*<td>@Html.CheckBoxFor(x=>x.SM_USER_GROUP_RIGHTS[i].AllowAdd)</td>
+                                                                    <td>@Html.CheckBoxFor(x=>x.SM_USER_GROUP_RIGHTS[i].AllowEdit)</td>
+                                                                    <td>@Html.CheckBoxFor(x=>x.SM_USER_GROUP_RIGHTS[i].AllowDelete)</td>*@
+                                                                </tr>
+                                                            }
+                                                            @*@foreach (SM_USER_GROUP_RIGHTS right in Model.SM_USER_GROUP_RIGHTS)
+                                                        {
+                                                        <tr>
+                                                        <td class="hidden">@Html.HiddenFor(x=>right.Right_Id)</td>
+                                                        <td class="hidden">@Html.HiddenFor(x=>right.Menu_Id)</td>
+                                                        <td>@Html.DisplayFor(x=>right.MenuName_En)</td>
+                                                        <td>@Html.CheckBoxFor(x=>right.AllowView)</td>
+                                                        <td>@Html.CheckBoxFor(x=>right.AllowAdd)</td>
+                                                        <td>@Html.CheckBoxFor(x=>right.AllowEdit)</td>
+                                                        <td>@Html.CheckBoxFor(x=>right.AllowDelete)</td>
+
+                                                        </tr>
+                                                        }*@
+                                                        }
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*  <button type="submit" class="btn btn-primary mt-3 mb-0">Submit</button>*@
+                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
+                        @* @Html.ValidationSummary(false, "", new { @class = "text-danger" })*@
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row -->
+
+
+</div>
+<!-- Container closed -->
+@section  Scripts{
+    @await Html.PartialAsync("/Views/Shared/_ValidationScriptsPartial.cshtml")
+    <script type="text/javascript">
+        function SelectAllCheckboxes(chk, selector) {
+            console.log("Inside select all checkbox");
+           var child_length =  $('#tblUnit .chkView').length;
+          
+            $('#tblUnit').find(selector).each(function () {
+                $(this).prop("checked", $(chk).prop("checked"));
+               
+            });
+        }
+    </script>
+}
