@@ -14,5 +14,7 @@ namespace ChocolateDelivery.DAL
         public string Payment_Type_Name_E { get; set; } = string.Empty;
         public string Payment_Type_Name_A { get; set; } = string.Empty;
         public bool Show { get; set; }
+        public string tap_payment_id { get; set; }
+        public string icon { get; set; }
     }
 }

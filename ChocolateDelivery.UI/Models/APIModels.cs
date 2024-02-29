@@ -757,7 +757,7 @@ namespace ChocolateDelivery.UI.Models
     {
         public int Type_Id { get; set; }
         public string Type_Name { get; set; } = string.Empty;
-
+        public string Icon { get; set; }
     }
     public partial class OrderPaymentResponse
     {
