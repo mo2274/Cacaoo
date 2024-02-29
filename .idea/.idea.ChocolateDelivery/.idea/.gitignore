@@ -6,6 +6,10 @@
 /contentModel.xml
 /projectSettingsUpdater.xml
 /.idea.ChocolateDelivery.iml
+/.idea.ChocolateDelivery.iml
+/contentModel.xml
+/modules.xml
+/projectSettingsUpdater.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Datasource local storage ignored files

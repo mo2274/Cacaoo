@@ -12,16 +12,16 @@ namespace ChocolateDelivery.UI.Controllers
 {
     public class KnetController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private readonly ChocolateDeliveryEntities _context;
         private readonly IConfiguration _config;
-        private string logPath = "";
-        OrderBC orderBC;
+        private readonly string _logPath = "";
+        private readonly OrderBC _orderBc;
         public KnetController(ChocolateDeliveryEntities cc, IConfiguration config)
         {
-            context = cc;
+            _context = cc;
             _config = config;
-            logPath = _config.GetValue<string>("ErrorFilePath"); // "Information"
-            orderBC = new OrderBC(context);
+            _logPath = _config.GetValue<string>("ErrorFilePath"); // "Information"
+            _orderBc = new OrderBC(_context);
 
         }
         public IActionResult PaymentResponse()
@@ -68,57 +68,57 @@ namespace ChocolateDelivery.UI.Controllers
                         {
 
                             string trackId = response.id;
-                            globalCls.WriteToFile(logPath, JsonConvert.SerializeObject(response));
-                            var paymentDM = orderBC.GetPaymentByTrackId(trackId);
-                            if (paymentDM != null && string.IsNullOrEmpty(paymentDM.Payment_Id))
+                            globalCls.WriteToFile(_logPath, JsonConvert.SerializeObject(response));
+                            var paymentDm = _orderBc.GetPaymentByTrackId(trackId);
+                            if (paymentDm != null && string.IsNullOrEmpty(paymentDm.Payment_Id))
                             {
                                 if (response.reference != null)
                                 {
-                                    paymentDM.Reference_No = response.reference.acquirer;
-                                    paymentDM.Payment_Id = response.reference.payment;
-                                    paymentDM.Auth = response.reference.gateway;
-                                    paymentDM.Trans_Id = response.reference.track;
+                                    paymentDm.Reference_No = response.reference.acquirer;
+                                    paymentDm.Payment_Id = response.reference.payment;
+                                    paymentDm.Auth = response.reference.gateway;
+                                    paymentDm.Trans_Id = response.reference.track;
                                 }
                                 if (response.source != null)
                                 {
-                                    paymentDM.Payment_Mode = response.source.payment_method;
+                                    paymentDm.Payment_Mode = response.source.payment_method;
                                 }
-                                paymentDM.Result = response.status;
-                                paymentDM.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                                orderBC.CreatePayment(paymentDM);
+                                paymentDm.Result = response.status;
+                                paymentDm.Updated_Datetime = StaticMethods.GetKuwaitTime();
+                                _orderBc.CreatePayment(paymentDm);
 
 
-                                if (paymentDM.Order_Id != null && paymentDM.Order_Id != 0)
+                                if (paymentDm.Order_Id != null && paymentDm.Order_Id != 0)
                                 {
-                                    var orderDM = orderBC.GetOrder((long)paymentDM.Order_Id);
-                                    if (orderDM != null)
+                                    var orderDm = _orderBc.GetOrder((long)paymentDm.Order_Id);
+                                    if (orderDm != null)
                                     {
 
-                                        ViewBag.TypeNo = orderDM.Order_Serial;
-                                        ViewBag.Cust_Name = orderDM.Cust_Name;
-                                        ViewBag.Cust_Mobile = orderDM.Mobile;
+                                        ViewBag.TypeNo = orderDm.Order_Serial;
+                                        ViewBag.Cust_Name = orderDm.Cust_Name;
+                                        ViewBag.Cust_Mobile = orderDm.Mobile;
                                     }
                                     if (response.status != null && (response.status.ToUpper() == "CAPTURED" || response.status.ToUpper() == "SUCCESS"))
                                     {
-                                        orderDM.Status_Id = OrderStatus.ORDER_PAID;
-                                        orderBC.SaveOrder(orderDM);
-                                        SendOrderEmail(orderDM.Order_Id);
+                                        orderDm.Status_Id = OrderStatus.ORDER_PAID;
+                                        _orderBc.SaveOrder(orderDm);
+                                        SendOrderEmail(orderDm.Order_Id);
 
                                         #region clear cart after successful order
-                                        CartBC cartBC = new CartBC(context);
-                                        var removeCart = cartBC.RemoveCart(orderDM.App_User_Id);
+                                        CartBC cartBc = new CartBC(_context);
+                                        var removeCart = cartBc.RemoveCart(orderDm.App_User_Id);
                                         #endregion
 
-                                        NotificationBC notificationBC = new NotificationBC(context, logPath);
-                                        notificationBC.SendNotificationToDriver(orderDM.Order_Serial);
+                                        NotificationBC notificationBc = new NotificationBC(_context, _logPath);
+                                        notificationBc.SendNotificationToDriver(orderDm.Order_Serial);
 
-                                        APP_PUSH_CAMPAIGN campaignDM = new APP_PUSH_CAMPAIGN();
-                                        campaignDM.Title_E = "Pick up Request";
-                                        campaignDM.Desc_E = "Please accept Order # " + orderDM.Order_Serial + " for delivery";
-                                        campaignDM.Title_A = "Pick up Request";
-                                        campaignDM.Desc_A = "Please accept Order # " + orderDM.Order_Serial + " for delivery";
-                                        campaignDM.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        notificationBC.CreatePushCampaign(campaignDM);
+                                        APP_PUSH_CAMPAIGN campaignDm = new APP_PUSH_CAMPAIGN();
+                                        campaignDm.Title_E = "Pick up Request";
+                                        campaignDm.Desc_E = "Please accept Order # " + orderDm.Order_Serial + " for delivery";
+                                        campaignDm.Title_A = "Pick up Request";
+                                        campaignDm.Desc_A = "Please accept Order # " + orderDm.Order_Serial + " for delivery";
+                                        campaignDm.Created_Datetime = StaticMethods.GetKuwaitTime();
+                                        notificationBc.CreatePushCampaign(campaignDm);
 
                                         string connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
                                         using (MySqlConnection con = new MySqlConnection(connectionString))
@@ -130,7 +130,7 @@ namespace ChocolateDelivery.UI.Controllers
                                                 using (var da = new MySqlDataAdapter(cmd))
                                                 {
                                                     cmd.CommandType = CommandType.StoredProcedure;
-                                                    cmd.Parameters.AddWithValue("@Campaign_Id", campaignDM.Campaign_Id);
+                                                    cmd.Parameters.AddWithValue("@Campaign_Id", campaignDm.Campaign_Id);
                                                     cmd.ExecuteReader();
 
                                                 }
@@ -142,7 +142,7 @@ namespace ChocolateDelivery.UI.Controllers
                                 }
                                 
                             }
-                            return View(paymentDM);
+                            return View(paymentDm);
                         }
                         else
                         {
@@ -155,7 +155,7 @@ namespace ChocolateDelivery.UI.Controllers
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                globalCls.WriteToFile(_logPath, ex.ToString(), true);
             }
             return View();
         }
@@ -166,21 +166,21 @@ namespace ChocolateDelivery.UI.Controllers
             try
             {
 
-                var orderBC = new OrderBC(context);
-                RestaurantBC restaurantBC = new RestaurantBC(context);
+                var orderBc = new OrderBC(_context);
+                RestaurantBC restaurantBc = new RestaurantBC(_context);
                 decimal grossAmount = Decimal.Zero;
 
-                var order = orderBC.GetOrder(Convert.ToInt32(orderId));
-                var orderDetails = orderBC.GetOrderDetails(Convert.ToInt32(orderId));
+                var order = orderBc.GetOrder(Convert.ToInt32(orderId));
+                var orderDetails = orderBc.GetOrderDetails(Convert.ToInt32(orderId));
 
 
                 if (order != null)
                 {
                     string bodyMessage = "";
 
-                    var site_configuration = orderBC.GetSiteConfiguration(Email_Templates.COD_EMAIL_MESSAGE);
+                    var siteConfiguration = orderBc.GetSiteConfiguration(Email_Templates.COD_EMAIL_MESSAGE);
 
-                    bodyMessage = site_configuration.Config_Value;
+                    bodyMessage = siteConfiguration.Config_Value;
                     bodyMessage = bodyMessage.Replace("[CUST_NAME]", order.Cust_Name);
                     bodyMessage = bodyMessage.Replace("[ORDER_NO]", order.Order_Serial);
                     bodyMessage = bodyMessage.Replace("[ORDER_DATE]", Convert.ToDateTime(order.Order_Datetime).ToString("dd/MM/yy hh:mm tt"));
@@ -232,7 +232,7 @@ namespace ChocolateDelivery.UI.Controllers
                     bodyMessage = bodyMessage.Replace("[DELIVERY_CHARGE]", deliveryCharge.ToString("N3"));
                     bodyMessage = bodyMessage.Replace("[NET_AMOUNT]", netAmount.ToString("N3"));
 
-                    var subject = site_configuration.Subject;
+                    var subject = siteConfiguration.Subject;
                     subject = subject.Replace("[LOCATION_NAME]", "");
                     subject = subject.Replace("[DELIVERY_OPTION]", order.Delivery_Type_Name);
                     subject = subject.Replace("[orderId]", order.Order_Serial);
@@ -247,12 +247,12 @@ namespace ChocolateDelivery.UI.Controllers
 
 
 
-                    var restaurantDM = restaurantBC.GetRestaurant(order.Restaurant_Id);
-                    if (restaurantDM != null && !string.IsNullOrEmpty(restaurantDM.Email))
+                    var restaurantDm = restaurantBc.GetRestaurant(order.Restaurant_Id);
+                    if (restaurantDm != null && !string.IsNullOrEmpty(restaurantDm.Email))
                     {
-                        site_configuration.BCC_Email = site_configuration.BCC_Email.Replace("[RESTAURANT_EMAIL]", restaurantDM.Email);
+                        siteConfiguration.BCC_Email = siteConfiguration.BCC_Email.Replace("[RESTAURANT_EMAIL]", restaurantDm.Email);
                     }
-                    bSuccess = SendHTMLMail(order.Email, subject, bodyMessage, site_configuration.CC_Email ?? "", site_configuration.BCC_Email ?? "", site_configuration.From_Email ?? "", site_configuration.Password ?? "");
+                    bSuccess = GetSendHtmlMail(order.Email, subject, bodyMessage, siteConfiguration.CC_Email ?? "", siteConfiguration.BCC_Email ?? "", siteConfiguration.From_Email ?? "", siteConfiguration.Password ?? "");
                     var emailMsg = "";
                     if (bSuccess)
                     {
@@ -263,12 +263,12 @@ namespace ChocolateDelivery.UI.Controllers
                         emailMsg = "Email not sent successfully for Order Id:" + orderId;
                     }
 
-                    globalCls.WriteToFile(logPath, emailMsg);
+                    globalCls.WriteToFile(_logPath, emailMsg);
                 }
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, ex.ToString());
+                globalCls.WriteToFile(_logPath, ex.ToString());
             }
 
 
@@ -276,7 +276,7 @@ namespace ChocolateDelivery.UI.Controllers
             return bSuccess;
         }
 
-        public bool SendHTMLMail(string to, string subject, string body, string cc, string bcc, string fromEmail, string password, string receiverName = "")
+        public bool GetSendHtmlMail(string to, string subject, string body, string cc, string bcc, string fromEmail, string password, string receiverName = "")
         {
             try
             {
@@ -321,7 +321,7 @@ namespace ChocolateDelivery.UI.Controllers
             catch (Exception ex)
             {
                 // Exception Details
-                globalCls.WriteToFile(logPath, ex.ToString());
+                globalCls.WriteToFile(_logPath, ex.ToString());
                 return false;
             }
 
