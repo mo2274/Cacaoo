@@ -54,6 +54,7 @@ namespace ChocolateDelivery.BLL
                     query.Email = restaurantDM.Email;
                     query.Mobile = restaurantDM.Mobile;
                     query.Background_Color = restaurantDM.Background_Color;
+                    query.RestaurantStatus = restaurantDM.RestaurantStatus;
                 }
                 else
                 {
@@ -72,6 +73,8 @@ namespace ChocolateDelivery.BLL
         public SM_Restaurants? GetRestaurant(long restaurant_id)
         {
             var area = new SM_Restaurants();
+            var currentTime = StaticMethods.GetKuwaitTime().TimeOfDay;
+
             try
             {
                 area = (from o in context.sm_restaurants
@@ -88,6 +91,15 @@ namespace ChocolateDelivery.BLL
                     {
                         DateTime time = StaticMethods.GetKuwaitTime().Date.Add((TimeSpan)area.Closing_Time);
                         area.Closing_Time_String = time.ToString("hh:mm tt");
+                    }
+
+                    if (area.Opening_Time != null && area.Closing_Time != null && currentTime >= area.Opening_Time.Value && currentTime <= area.Closing_Time.Value)
+                    {
+                        area.RestaurantStatus = DAL.Models.Enums.ResturantStatus.Available;
+                    }
+                    else
+                    {
+                        area.RestaurantStatus = DAL.Models.Enums.ResturantStatus.Closed;
                     }
                 }
             }
@@ -123,11 +135,11 @@ namespace ChocolateDelivery.BLL
             var customer = new List<SM_Restaurant_AddOns>();
             try
             {
-                customer= (from o in context.sm_restaurant_addons                            
-                             where o.Restaurant_Id == restaurant_id
-                             select o).ToList();
+                customer = (from o in context.sm_restaurant_addons
+                            where o.Restaurant_Id == restaurant_id
+                            select o).ToList();
 
-               
+
             }
             catch (Exception ex)
             {

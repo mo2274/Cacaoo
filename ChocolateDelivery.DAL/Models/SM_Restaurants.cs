@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChocolateDelivery.DAL.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,8 +10,7 @@ namespace ChocolateDelivery.DAL
 {
     public partial class SM_Restaurants
     {
-        [Key]
-        public long Restaurant_Id { get; set; }
+        [Key] public long Restaurant_Id { get; set; }
         public string Restaurant_Name_E { get; set; } = string.Empty;
         public string? Restaurant_Name_A { get; set; } = string.Empty;
         public string? Restaurant_Desc_E { get; set; } = string.Empty;
@@ -40,5 +40,6 @@ namespace ChocolateDelivery.DAL
         public string? Email { get; set; } = string.Empty;
         public string? Mobile { get; set; } = string.Empty;
         public string? Background_Color { get; set; } = string.Empty;
+        public ResturantStatus? RestaurantStatus { get; set; }
     }
 }

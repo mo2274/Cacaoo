@@ -22,8 +22,8 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
             restaurantBC = new RestaurantBC(context);
-
         }
+
         public IActionResult Create()
         {
             var list_id = Request.Query["List_Id"];
@@ -41,8 +41,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 ViewBag.List_Id = list_id;
                 if (ModelState.IsValid)
                 {
-
-
                     var user_cd = HttpContext.Session.GetInt32("UserCd");
                     if (user_cd != null)
                     {
@@ -55,12 +53,16 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             {
                                 Directory.CreateDirectory(path);
                             }
+
                             var filePath = Path.Combine(path, fileName);
                             var stream = new FileStream(filePath, FileMode.Create);
                             restaurant.Image_File.CopyToAsync(stream);
 
                             restaurant.Image_URL = image_path_dir + fileName;
                         }
+
+                        restaurant.Closing_Time = (DateTime.Parse(restaurant.Closing_Time_String)).TimeOfDay;
+                        restaurant.Opening_Time = DateTime.Parse(restaurant.Opening_Time_String).TimeOfDay;
                         restaurant.Row_Id = Guid.NewGuid();
                         restaurant.Created_By = Convert.ToInt16(user_cd);
                         restaurant.Created_Datetime = StaticMethods.GetKuwaitTime();
@@ -71,13 +73,9 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                     {
                         return RedirectToAction("Index", "Login");
                     }
-
-
-
                 }
                 else
                     return View();
-
             }
             catch (Exception ex)
             {
@@ -85,8 +83,8 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
                 globalCls.WriteToFile(logPath, ex.ToString(), true);
-
             }
+
             return View();
             /*if (ModelState.IsValid)
             {
@@ -97,7 +95,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             }
             else
                 return View();*/
-
         }
 
         public IActionResult Update(string Id)
@@ -116,7 +113,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 {
                     ModelState.AddModelError("name", "Restaurant not exist");
                 }
-
             }
             catch (Exception ex)
             {
@@ -124,8 +120,8 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
                 globalCls.WriteToFile(logPath, ex.ToString(), true);
-
             }
+
             return View("Create");
         }
 
@@ -142,7 +138,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                     var areaDM = restaurantBC.GetRestaurant(decryptedId);
                     if (areaDM != null && areaDM.Restaurant_Id != 0)
                     {
-
                         var user_cd = HttpContext.Session.GetInt32("UserCd");
                         if (user_cd != null)
                         {
@@ -155,19 +150,24 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                                 {
                                     Directory.CreateDirectory(path);
                                 }
+
                                 var filePath = Path.Combine(path, fileName);
                                 var stream = new FileStream(filePath, FileMode.Create);
                                 restaurant.Image_File.CopyToAsync(stream);
 
                                 restaurant.Image_URL = image_path_dir + fileName;
                             }
-                            if (!string.IsNullOrEmpty(restaurant.Opening_Time_String)) {
+
+                            if (!string.IsNullOrEmpty(restaurant.Opening_Time_String))
+                            {
                                 restaurant.Opening_Time = DateTime.ParseExact(restaurant.Opening_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
                             }
+
                             if (!string.IsNullOrEmpty(restaurant.Closing_Time_String))
                             {
                                 restaurant.Closing_Time = DateTime.ParseExact(restaurant.Closing_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
                             }
+
                             restaurant.Restaurant_Id = decryptedId;
                             restaurant.Updated_By = Convert.ToInt16(user_cd);
                             restaurant.Updated_Datetime = StaticMethods.GetKuwaitTime();
@@ -178,7 +178,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                         {
                             return RedirectToAction("Index", "Login");
                         }
-
                     }
                     else
                     {
@@ -190,13 +189,11 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 {
                     ModelState.AddModelError("", "Model State is not valid");
                     var message = string.Join(" | ", ModelState.Values
-      .SelectMany(v => v.Errors)
-      .Select(e => e.ErrorMessage));
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
                     globalCls.WriteToFile(logPath, "Model state invalid in invoice for field:" + message, true);
                     return View("Create", restaurant);
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -204,8 +201,8 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
                 globalCls.WriteToFile(logPath, ex.ToString(), true);
-
             }
+
             return View("Create");
         }
     }

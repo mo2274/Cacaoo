@@ -1,8 +1,9 @@
-﻿@model SM_Restaurants
+﻿@using ChocolateDelivery.DAL.Models.Enums
+@model SM_Restaurants
 
-@section CSS{
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css" />
+@section CSS {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css"/>
 }
 
 <!-- container -->
@@ -35,16 +36,26 @@
                             <div class="row row-sm mb-3">
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 190})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Name_E",CSSClass="form-control",Placeholder="Enter Restaurant Name",Value=Model != null ?Model.Restaurant_Name_E.ToString() :"",Is_Required=true,Error_Label_Id=56
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 190 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Name_E",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Restaurant Name",
+                                        Value = Model != null ? Model.Restaurant_Name_E.ToString() : "",
+                                        Is_Required = true,
+                                        Error_Label_Id = 56
                                     })
                                 </div>
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 191})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Name_A",CSSClass="form-control",Placeholder="Enter Restaurant Name(Ar)",Value=Model != null ?Model.Restaurant_Name_A != null?Model.Restaurant_Name_A.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 191 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Name_A",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Restaurant Name(Ar)",
+                                        Value = Model != null ? Model.Restaurant_Name_A != null ? Model.Restaurant_Name_A.ToString() : "" : "",
                                     })
                                 </div>
 
@@ -52,16 +63,26 @@
                             <div class="row row-sm mb-3">
                                 <div class="col-sm-6">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 192})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Desc_E",CSSClass="form-control",Placeholder="Enter Desc",Value=Model != null ?Model.Restaurant_Desc_E != null?Model.Restaurant_Desc_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 192 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Desc_E",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Desc",
+                                        Value = Model != null ? Model.Restaurant_Desc_E != null ? Model.Restaurant_Desc_E.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.MultiLine
                                     })
                                 </div>
                                 <div class="col-sm-6">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 193})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Desc_A",CSSClass="form-control",Placeholder="Enter Desc(Ar)",Value=Model != null ?Model.Restaurant_Desc_A != null?Model.Restaurant_Desc_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 193 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Desc_A",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Desc(Ar)",
+                                        Value = Model != null ? Model.Restaurant_Desc_A != null ? Model.Restaurant_Desc_A.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.MultiLine
                                     })
                                 </div>
 
@@ -70,16 +91,26 @@
                             <div class="row row-sm mb-3">
                                 <div class="col-sm-6">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 26})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Address_E",CSSClass="form-control",Placeholder="Enter Address",Value=Model != null ?Model.Restaurant_Address_E != null?Model.Restaurant_Address_E.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 26 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Address_E",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Address",
+                                        Value = Model != null ? Model.Restaurant_Address_E != null ? Model.Restaurant_Address_E.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.MultiLine
                                     })
                                 </div>
                                 <div class="col-sm-6">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 39})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Restaurant_Address_A",CSSClass="form-control",Placeholder="Enter Address(Ar)",Value=Model != null ?Model.Restaurant_Address_A != null?Model.Restaurant_Address_A.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 39 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Restaurant_Address_A",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Address(Ar)",
+                                        Value = Model != null ? Model.Restaurant_Address_A != null ? Model.Restaurant_Address_A.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.MultiLine
                                     })
                                 </div>
 
@@ -87,54 +118,91 @@
                             <div class="row row-sm mb-3">
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 1})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Username",CSSClass="form-control",Placeholder="Enter Username",Value=Model != null ?Model.Username.ToString() :"",Is_Required=true,Error_Label_Id=187
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 1 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Username",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Username",
+                                        Value = Model != null ? Model.Username.ToString() : "",
+                                        Is_Required = true,
+                                        Error_Label_Id = 187
                                     })
                                 </div>
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 2})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Password",CSSClass="form-control",Placeholder="Enter Password",Value=Model != null ?Model.Password != null?Model.Password.ToString():"" :"",Is_Required=true,Error_Label_Id=186
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 2 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Password",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Password",
+                                        Value = Model != null ? Model.Password != null ? Model.Password.ToString() : "" : "",
+                                        Is_Required = true,
+                                        Error_Label_Id = 186
                                     })
                                 </div>
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 82})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Background_Color",CSSClass="form-control colorTextHeight",Placeholder="Select Background Color",Value=Model != null ?Model.Background_Color != null?Model.Background_Color.ToString():"" :"",Element_Type=Form_Element_Types.Color
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 82 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Background_Color",
+                                        CSSClass = "form-control colorTextHeight",
+                                        Placeholder = "Select Background Color",
+                                        Value = Model != null ? Model.Background_Color != null ? Model.Background_Color.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.Color
                                     })
                                 </div>
                             </div>
                             <div class="row row-sm mb-3">
                                 <div class="col-sm-3">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 36})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Commission",CSSClass="form-control",Placeholder="Enter Commission",Value=Model != null ?Model.Commission.ToString() :"",Is_Required=true,Error_Label_Id=40
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 36 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Commission",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Commission",
+                                        Value = Model != null ? Model.Commission.ToString() : "",
+                                        Is_Required = true,
+                                        Error_Label_Id = 40
                                     })
                                     @*<span class="input-group-text">%</span>*@
                                 </div>
                                 <div class="col-sm-3">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 209})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Delivery_Charge",CSSClass="form-control",Placeholder="Enter Delivery Charge",Value=Model != null ?Model.Delivery_Charge.ToString() :"0.000",Is_Required=true,Error_Label_Id=210
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 209 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Delivery_Charge",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Delivery Charge",
+                                        Value = Model != null ? Model.Delivery_Charge.ToString() : "0.000",
+                                        Is_Required = true,
+                                        Error_Label_Id = 210
                                     })
                                 </div>
                                 <div class="col-sm-3">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 37})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Latitude",CSSClass="form-control",Placeholder="Enter Latitude",Value=Model != null ?Model.Latitude != null?Model.Latitude.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 37 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Latitude",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Latitude",
+                                        Value = Model != null ? Model.Latitude != null ? Model.Latitude.ToString() : "" : "",
                                     })
                                 </div>
                                 <div class="col-sm-3">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 38})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Longitude",CSSClass="form-control",Placeholder="Enter Longitude",Value=Model != null ?Model.Longitude != null?Model.Longitude.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 38 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Longitude",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Longitude",
+                                        Value = Model != null ? Model.Longitude != null ? Model.Longitude.ToString() : "" : "",
                                     })
                                 </div>
                             </div>
@@ -142,45 +210,72 @@
 
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 208})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Delivery_Time",CSSClass="form-control",Placeholder="Enter Delivery Time",Value=Model != null ?Model.Delivery_Time != null?Model.Delivery_Time.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 208 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Delivery_Time",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Delivery Time",
+                                        Value = Model != null ? Model.Delivery_Time != null ? Model.Delivery_Time.ToString() : "" : "",
+                                    })
+                                </div>
+                                <br/>
+                                <label for="ResturantStatus" class="form-label">Resturant Status</label>
+                                <div class="col-sm-4">
+                                    @Html.DropDownListFor(model => model.RestaurantStatus, Enum.GetValues(typeof(ResturantStatus)).Cast<ResturantStatus>().Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() }), "Select Status", new { @class = "form-control" })
+                                </div>
+
+
+                                <div class="col-sm-4">
+
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 97 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Email",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Email",
+                                        Value = Model != null ? Model.Email != null ? Model.Email.ToString() : "" : "",
                                     })
                                 </div>
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 97})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Email",CSSClass="form-control",Placeholder="Enter Email",Value=Model != null ?Model.Email != null?Model.Email.ToString():"" :"",
-                                    })
-                                </div>
-                                <div class="col-sm-4">
-
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 100})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Mobile",CSSClass="form-control",Placeholder="Enter Mobile",Value=Model != null ?Model.Mobile != null?Model.Mobile.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 100 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Mobile",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Mobile",
+                                        Value = Model != null ? Model.Mobile != null ? Model.Mobile.ToString() : "" : "",
                                     })
                                 </div>
                             </div>
 
-                          @*  <div class="row row-sm mb-3">
+                            <div class="row row-sm mb-3">
 
 
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 48})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Opening_Time_String",CSSClass="form-control timepicker",Placeholder="Select Opening Time",Value=Model != null ?Model.Opening_Time_String != null?Model.Opening_Time_String.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 48 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Opening_Time_String",
+                                        CSSClass = "form-control timepicker",
+                                        Placeholder = "Select Opening Time",
+                                        Value = Model != null ? Model.Opening_Time_String != null ? Model.Opening_Time_String.ToString() : "" : "",
                                     })
                                 </div>
                                 <div class="col-sm-4">
 
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 49})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Closing_Time_String",CSSClass="form-control timepicker",Placeholder="Select Closing Time",Value=Model != null ?Model.Closing_Time_String != null?Model.Closing_Time_String.ToString():"" :"",
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 49 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Closing_Time_String",
+                                        CSSClass = "form-control timepicker",
+                                        Placeholder = "Select Closing Time",
+                                        Value = Model != null ? Model.Closing_Time_String != null ? Model.Closing_Time_String.ToString() : "" : "",
                                     })
                                 </div>
-                            </div>*@
+                            </div>
                             <!-- row -->
                             <div class="row">
                                 <div class="col-lg-6 col-md-6">
@@ -194,11 +289,11 @@
                                                 <div class="col-sm-12 col-md-4">
                                                     @if (Model != null && !string.IsNullOrEmpty(Model.Image_URL))
                                                     {
-                                                        <input type="file" id="Image_File" name="Image_File" data-default-file="/@Model.Image_URL" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                        <input type="file" id="Image_File" name="Image_File" data-default-file="/@Model.Image_URL" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg"/>
                                                     }
                                                     else
                                                     {
-                                                        <input type="file" id="Image_File" name="Image_File" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg" />
+                                                        <input type="file" id="Image_File" name="Image_File" class="dropify" data-height="100" accept="image/*" data-allowed-file-extensions="jpg png jpeg"/>
                                                     }
 
                                                 </div>
@@ -209,25 +304,30 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 27})
-                                    @await Component.InvokeAsync("UCTextBox", new UCProperties {
-                                    Id="Comments",CSSClass="form-control",Placeholder="Enter Comments",Value=Model != null ?Model.Comments != null?Model.Comments.ToString():"" :"",Element_Type=Form_Element_Types.MultiLine
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 27 })
+                                    @await Component.InvokeAsync("UCTextBox", new UCProperties
+                                    {
+                                        Id = "Comments",
+                                        CSSClass = "form-control",
+                                        Placeholder = "Enter Comments",
+                                        Value = Model != null ? Model.Comments != null ? Model.Comments.ToString() : "" : "",
+                                        Element_Type = Form_Element_Types.MultiLine
                                     })
                                 </div>
                             </div>
                             <!-- row closed -->
                             <div class="">
                                 <div class="">
-                                    @Html.CheckBox("Show",true)
+                                    @Html.CheckBox("Show", true)
                                     @*  @Html.CheckBox("Show", true)*@
                                     @*  <input type="checkbox" asp-for="Show">*@
-                                    @await Component.InvokeAsync("UCLabel",new{labelId = 7,cssClass=" mt-1"})
+                                    @await Component.InvokeAsync("UCLabel", new { labelId = 7, cssClass = " mt-1" })
 
                                 </div>
                             </div>
                         </div>
 
-                        @await Component.InvokeAsync("UCLabel",new{labelId = 8,cssClass="btn btn-primary mt-3 mb-0",userControlType="Button"})
+                        @await Component.InvokeAsync("UCLabel", new { labelId = 8, cssClass = "btn btn-primary mt-3 mb-0", userControlType = "Button" })
                         <a href="/List/@ViewBag.List_Id" class="btn btn-dark mt-3 mb-0">Cancel</a>
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     </form>
@@ -240,7 +340,8 @@
 
 </div>
 <!-- Container closed -->
-@section  Scripts{
+
+@section Scripts {
     <!-- Internal Select2.min js -->
     <script src="~/assets/plugins/select2/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
