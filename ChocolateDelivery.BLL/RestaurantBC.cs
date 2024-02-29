@@ -14,7 +14,6 @@ namespace ChocolateDelivery.BLL
         public RestaurantBC(ChocolateDeliveryEntities benayaatEntities)
         {
             context = benayaatEntities;
-
         }
 
         public SM_Restaurants CreateRestaurant(SM_Restaurants restaurantDM)
@@ -22,8 +21,8 @@ namespace ChocolateDelivery.BLL
             try
             {
                 var query = (from o in context.sm_restaurants
-                             where o.Restaurant_Id == restaurantDM.Restaurant_Id
-                             select o).FirstOrDefault();
+                    where o.Restaurant_Id == restaurantDM.Restaurant_Id
+                    select o).FirstOrDefault();
 
                 if (query != null)
                 {
@@ -41,6 +40,7 @@ namespace ChocolateDelivery.BLL
                     {
                         query.Image_URL = restaurantDM.Image_URL;
                     }
+
                     query.Opening_Time = restaurantDM.Opening_Time;
                     query.Closing_Time = restaurantDM.Closing_Time;
                     query.Commission = restaurantDM.Commission;
@@ -60,6 +60,7 @@ namespace ChocolateDelivery.BLL
                 {
                     context.sm_restaurants.Add(restaurantDM);
                 }
+
                 context.SaveChanges();
             }
 
@@ -67,6 +68,7 @@ namespace ChocolateDelivery.BLL
             {
                 throw new Exception(ex.ToString());
             }
+
             return restaurantDM;
         }
 
@@ -78,8 +80,8 @@ namespace ChocolateDelivery.BLL
             try
             {
                 area = (from o in context.sm_restaurants
-                        where o.Restaurant_Id == restaurant_id
-                        select o).FirstOrDefault();
+                    where o.Restaurant_Id == restaurant_id
+                    select o).FirstOrDefault();
                 if (area != null)
                 {
                     if (area.Opening_Time != null)
@@ -87,17 +89,14 @@ namespace ChocolateDelivery.BLL
                         DateTime time = StaticMethods.GetKuwaitTime().Date.Add((TimeSpan)area.Opening_Time);
                         area.Opening_Time_String = time.ToString("hh:mm tt");
                     }
+
                     if (area.Closing_Time != null)
                     {
                         DateTime time = StaticMethods.GetKuwaitTime().Date.Add((TimeSpan)area.Closing_Time);
                         area.Closing_Time_String = time.ToString("hh:mm tt");
                     }
 
-                    if (area.Opening_Time != null && area.Closing_Time != null && currentTime >= area.Opening_Time.Value && currentTime <= area.Closing_Time.Value)
-                    {
-                        area.RestaurantStatus = DAL.Models.Enums.ResturantStatus.Available;
-                    }
-                    else
+                    if (area.Opening_Time != null && area.Closing_Time != null && currentTime <= area.Opening_Time.Value && currentTime >= area.Closing_Time.Value)
                     {
                         area.RestaurantStatus = DAL.Models.Enums.ResturantStatus.Closed;
                     }
@@ -107,6 +106,7 @@ namespace ChocolateDelivery.BLL
             {
                 throw new Exception(ex.ToString());
             }
+
             return area;
         }
 
@@ -116,37 +116,33 @@ namespace ChocolateDelivery.BLL
             try
             {
                 userId = (from o in context.sm_restaurants
-                          where o.Username == userName && o.Password == password
-                          select o).FirstOrDefault();
-
-
+                    where o.Username == userName && o.Password == password
+                    select o).FirstOrDefault();
             }
 
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
+
             return userId;
         }
 
         public List<SM_Restaurant_AddOns> GetAllRestaurantAddOns(long restaurant_id)
         {
-
             var customer = new List<SM_Restaurant_AddOns>();
             try
             {
                 customer = (from o in context.sm_restaurant_addons
-                            where o.Restaurant_Id == restaurant_id
-                            select o).ToList();
-
-
+                    where o.Restaurant_Id == restaurant_id
+                    select o).ToList();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
+
             return customer;
         }
-
     }
 }
