@@ -2020,7 +2020,7 @@ namespace ChocolateDelivery.UI.Controllers
                                 Type_Name = lang == "A"
                                     ? currentevent.Payment_Type_Name_A ?? currentevent.Payment_Type_Name_E
                                     : currentevent.Payment_Type_Name_E,
-                                Icon = "https://localhost:7260" + currentevent.icon
+                                Icon = $"{Request.Scheme}://{Request.Host}{currentevent.icon}"
                             };
                             response.PaymentTypes.Add(eventsDto);
                         }
