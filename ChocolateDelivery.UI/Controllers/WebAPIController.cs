@@ -814,6 +814,7 @@ namespace ChocolateDelivery.UI.Controllers
                                 : currentevent.Brand_Name_A ?? "";
                             eventsDto.Is_Exclusive = currentevent.Is_Exclusive;
                             eventsDto.Is_Catering = currentevent.Is_Catering;
+                            eventsDto.Brand_id = currentevent.Brand_Id;
                             response.Products.Add(eventsDto);
                         }
 

@@ -364,6 +364,7 @@ namespace ChocolateDelivery.UI.Models
         public decimal Price { get; set; }
         public bool Is_Exclusive { get; set; }
         public bool Is_Catering { get; set; }
+        public long? Brand_id { get; set; }
     }
 
     public partial class BrandsResponse
