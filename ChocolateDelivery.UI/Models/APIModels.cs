@@ -1,8 +1,6 @@
-﻿using ChocolateDelivery.BLL;
-using ChocolateDelivery.DAL;
+﻿using ChocolateDelivery.DAL;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 
 namespace ChocolateDelivery.UI.Models
 {
@@ -226,12 +224,19 @@ namespace ChocolateDelivery.UI.Models
         public int Status { get; set; }
         public string Message { get; set; } = "";
         public int Unread_Count { get; set; }
-        public List<TXN_APPOINTMENTS> Appointments { get; set; }
-        public UnreadAppointmentResponse()
-        {
-            Appointments = new List<TXN_APPOINTMENTS>();
-        }
+        public List<TXN_APPOINTMENTS> Appointments { get; set; } = new();
     }
+    
+    public class TXN_APPOINTMENTS {
+        [NotMapped]
+        public string Cust_Name { get; set; } = "";
+        [NotMapped]
+        public string Cust_Mobile { get; set; } = "";
+        [NotMapped]
+        public string Appointment_Time { get; set; } = "";
+
+    }
+    
     public partial class MeasurementResponse
     {
         public int Status { get; set; }

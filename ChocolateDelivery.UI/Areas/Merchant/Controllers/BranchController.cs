@@ -8,21 +8,21 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
     [Area("Merchant")]
     public class BranchController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        BranchBC branchBC;
+        BranchService _branchService;
         decimal defaultLatitude = 29.3463985M;
         decimal defaultLongitude = 47.9785674M;
 
-        public BranchController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public BranchController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            branchBC = new BranchBC(context);
+            _branchService = new BranchService(context);
 
         }
         public IActionResult Create()
@@ -62,7 +62,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                         branch.Restaurant_Id = Convert.ToInt32(vendor_id);
                         branch.Created_By = Convert.ToInt16(vendor_id);
                         branch.Created_Datetime = StaticMethods.GetKuwaitTime();
-                        branchBC.CreateBranch(branch);
+                        _branchService.CreateBranch(branch);
                         return Redirect("/Merchant/List/" + list_id);
                     }
                     else
@@ -82,7 +82,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();
@@ -105,7 +105,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = branchBC.GetBranch(decryptedId);
+                var areaexist = _branchService.GetBranch(decryptedId);
                 ViewBag.Latitude = defaultLatitude;
                 ViewBag.Longitude = defaultLongitude;
                 if (areaexist != null && areaexist.Branch_Id != 0)
@@ -125,7 +125,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -143,7 +143,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = branchBC.GetBranch(decryptedId);
+                    var areaDM = _branchService.GetBranch(decryptedId);
                     if (areaDM != null && areaDM.Branch_Id != 0)
                     {
 
@@ -161,7 +161,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                             branch.Branch_Id = decryptedId;
                             branch.Updated_By = Convert.ToInt16(vendor_id);
                             branch.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            branchBC.CreateBranch(branch);
+                            _branchService.CreateBranch(branch);
                             return Redirect("/Merchant/List/" + list_id);
                         }
                         else
@@ -188,7 +188,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");

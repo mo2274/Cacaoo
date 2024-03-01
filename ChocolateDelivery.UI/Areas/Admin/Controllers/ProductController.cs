@@ -10,22 +10,22 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProductController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        ProductBC productBC;
-        SubCategoryBC subCategoryBC;
+        ProductService _productService;
+        SubCategoryService _subCategoryService;
 
 
-        public ProductController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public ProductController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            productBC = new ProductBC(context);
-            subCategoryBC = new SubCategoryBC(context);
+            _productService = new ProductService(context);
+            _subCategoryService = new SubCategoryService(context);
 
         }
         public IActionResult Create()
@@ -71,30 +71,32 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                         product.Created_By = Convert.ToInt16(user_cd);
                         product.Created_Datetime = StaticMethods.GetKuwaitTime();
                         product.Show = true; // by default we are showing the product for vendor
-                        productBC.CreateProduct(product);
+                        _productService.CreateProduct(product);
 
                         foreach (var detail in product.SM_Product_AddOns)
                         {
                             detail.Product_Id = product.Product_Id;
-                            productBC.CreateProductAddOn(detail);
+                            _productService.CreateProductAddOn(detail);
                         }
                         foreach (var detail in product.SM_Product_Branches)
                         {
                             detail.Product_Id = product.Product_Id;
-                            productBC.CreateProductBranch(detail);
+                            _productService.CreateProductBranch(detail);
                         }
                         foreach (var occasion_id in product.Occasion_Ids)
                         {
-                            var occasionDM = new SM_Product_Occasions();
-                            occasionDM.Product_Id = product.Product_Id;
-                            occasionDM.Occasion_Id = Convert.ToInt64(occasion_id);
-                            productBC.CreateProductOccasion(occasionDM);
+                            var occasionDM = new SM_Product_Occasions
+                            {
+                                Product_Id = product.Product_Id,
+                                Occasion_Id = Convert.ToInt64(occasion_id)
+                            };
+                            _productService.CreateProductOccasion(occasionDM);
                         }
                         return Redirect("/Merchant/List/" + list_id);
                     }
                     else
                     {
-                        globalCls.WriteToFile(logPath, "Getting user id null while creating product", true);
+                        Helpers.WriteToFile(logPath, "Getting user id null while creating product", true);
                         return RedirectToAction("Index", "Login");
                     }
 
@@ -110,7 +112,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();
@@ -135,7 +137,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 SetSubCategories();
 
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = productBC.GetProduct(decryptedId);
+                var areaexist = _productService.GetProduct(decryptedId);
                 if (areaexist != null && areaexist.Product_Id != 0)
                 {
                     return View("Create", areaexist);
@@ -151,7 +153,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -167,7 +169,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = productBC.GetProduct(decryptedId);
+                    var areaDM = _productService.GetProduct(decryptedId);
                     if (areaDM != null && areaDM.Product_Id != 0)
                     {
 
@@ -193,25 +195,27 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             product.Product_Id = decryptedId;
                             product.Updated_By = Convert.ToInt16(user_cd);
                             product.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            productBC.CreateProduct(product);
+                            _productService.CreateProduct(product);
                             foreach (var detail in product.SM_Product_AddOns)
                             {
                                 detail.Product_Id = product.Product_Id;
-                                productBC.CreateProductAddOn(detail);
+                                _productService.CreateProductAddOn(detail);
                             }
-                            productBC.CreateProduct(product);
+                            _productService.CreateProduct(product);
                             foreach (var detail in product.SM_Product_Branches)
                             {
                                 detail.Product_Id = product.Product_Id;
-                                productBC.CreateProductBranch(detail);
+                                _productService.CreateProductBranch(detail);
                             }
-                            productBC.DeleteProductOccasions(product.Product_Id);
+                            _productService.DeleteProductOccasions(product.Product_Id);
                             foreach (var occasion_id in product.Occasion_Ids)
                             {
-                                var occasionDM = new SM_Product_Occasions();
-                                occasionDM.Product_Id = product.Product_Id;
-                                occasionDM.Occasion_Id = Convert.ToInt64(occasion_id);
-                                productBC.CreateProductOccasion(occasionDM);
+                                var occasionDM = new SM_Product_Occasions
+                                {
+                                    Product_Id = product.Product_Id,
+                                    Occasion_Id = Convert.ToInt64(occasion_id)
+                                };
+                                _productService.CreateProductOccasion(occasionDM);
                             }
                             return Redirect("/Merchant/List/" + list_id);
                         }
@@ -239,7 +243,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -256,7 +260,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 }
                 else
                 {
-                    subCategories = subCategoryBC.GetAllSubCategories();
+                    subCategories = _subCategoryService.GetAllSubCategories();
                     SessionHelper.SetObjectAsJson(HttpContext.Session, "SubCategories", subCategories);
                     ViewBag.Sub_Categories = JsonSerializer.Serialize(subCategories);
                 }
@@ -266,7 +270,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
         }
@@ -278,12 +282,12 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             try
             {
 
-                var detailDM = productBC.GetProductAddOn(request.Detail_Id);
+                var detailDM = _productService.GetProductAddOn(request.Detail_Id);
                 if (detailDM != null)
                 {
                     detailDM.Deleted_By = request.Deleted_By;
                     detailDM.Deleted_Datetime = StaticMethods.GetKuwaitTime();
-                    productBC.DeleteProductAddOn(detailDM);
+                    _productService.DeleteProductAddOn(detailDM);
                     response.Status = 0;
                     response.Message = ServiceResponse.Success;
                 }
@@ -295,7 +299,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
             }
 
             return Json(response);

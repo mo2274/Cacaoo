@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ChocolateDelivery.DAL
+namespace ChocolateDelivery.DAL;
+
+public class SM_Product_Branches
 {
-    public partial class SM_Product_Branches
-    {
-        [Key]
-        public long Product_Branch_Id { get; set; }
-        public long Product_Id { get; set; }
-        public long Branch_Id { get; set; }     
-        public bool Is_Available { get; set; }
-    }
+
+
+    [Key]
+    public long Product_Branch_Id { get; set; }
+    public long Product_Id { get; set; }
+    public long Branch_Id { get; set; }     
+    public bool Is_Available { get; set; }
+    [NotMapped]
+    public string Branch_Name { get; set; } = "";
 }

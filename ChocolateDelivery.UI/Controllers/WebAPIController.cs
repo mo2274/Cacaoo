@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Globalization;
 using System.Transactions;
-using Microsoft.EntityFrameworkCore;
 
 //using static System.Net.Mime.MediaTypeNames;
 
@@ -20,12 +19,12 @@ namespace ChocolateDelivery.UI.Controllers
     [ApiController]
     public class WebApiController : ControllerBase
     {
-        private readonly ChocolateDeliveryEntities _context;
+        private readonly AppDbContext _context;
         private readonly IConfiguration _config;
         private readonly string _logPath = "";
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public WebApiController(ChocolateDeliveryEntities cc, IConfiguration config,
+        public WebApiController(AppDbContext cc, IConfiguration config,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = cc;
@@ -43,14 +42,15 @@ namespace ChocolateDelivery.UI.Controllers
             var response = new RegisterDeviceResponse();
             try
             {
-                var entryBc = new DeviceBC(_context, _logPath);
-                var deviceRegisterDm = new Device_Registration();
+                var entryBc = new DeviceService(_context);
+                var deviceRegisterDm = new Device_Registration
+                {
+                    Device_Id = registerDeviceDto.UniqueDeviceId,
+                    Notification_Token = registerDeviceDto.NotificationToken,
+                    Client_Key = StaticMethods.Base64Decode(registerDeviceDto.ClientKey),
+                    Created_Datetime = StaticMethods.GetKuwaitTime()
+                };
 
-                deviceRegisterDm.Device_Id = registerDeviceDto.UniqueDeviceId;
-                deviceRegisterDm.Notification_Token = registerDeviceDto.NotificationToken;
-                deviceRegisterDm.Client_Key = StaticMethods.Base64Decode(registerDeviceDto.ClientKey);
-                deviceRegisterDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                ;
                 deviceRegisterDm.Device_Type = registerDeviceDto.DeviceType;
                 deviceRegisterDm.Notification_Enabled = true;
                 deviceRegisterDm.NotificationSound_Enabled = true;
@@ -82,7 +82,7 @@ namespace ChocolateDelivery.UI.Controllers
                 }
                 catch (Exception ex)
                 {
-                    globalCls.WriteToFile(_logPath, ex.ToString(), true);
+                    Helpers.WriteToFile(_logPath, ex.ToString(), true);
                 }
 
                 #endregion
@@ -91,7 +91,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString(), true);
+                Helpers.WriteToFile(_logPath, ex.ToString(), true);
             }
 
             return response;
@@ -101,7 +101,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public RegisterResponse Register(RegisterRequest registerRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new RegisterResponse();
 
             try
@@ -115,7 +115,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -161,27 +161,29 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        var appuserBc = new AppUserBC(_context);
-                        var entryBc = new DeviceBC(_context);
+                        var appuserBc = new AppUserService(_context);
+                        var entryBc = new DeviceService(_context);
 
                         var existingUser = appuserBc.GetAppUser(registerRequest.Email, registerRequest.Login_Type);
                         var deviceRegisterDm = entryBc.GetDeviceByClientKey(Base64Decode(securityKey));
 
                         if (existingUser == null)
                         {
-                            var appuserDm = new App_Users();
-                            appuserDm.Name = registerRequest.Name;
-                            appuserDm.Email = registerRequest.Email;
-                            appuserDm.Password = registerRequest.Password;
-                            appuserDm.Mobile = registerRequest.Mobile;
-                            appuserDm.Login_Type = registerRequest.Login_Type;
-                            appuserDm.App_User_Type = App_User_Types.APP_USER;
-                            appuserDm.Facebook_Id = registerRequest.Facebook_Id;
-                            appuserDm.Google_Id = registerRequest.Google_Id;
-                            appuserDm.Apple_Id = registerRequest.Apple_Id;
-                            appuserDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                            appuserDm.Show = true;
-                            appuserDm.Row_Id = Guid.NewGuid();
+                            var appuserDm = new App_Users
+                            {
+                                Name = registerRequest.Name,
+                                Email = registerRequest.Email,
+                                Password = registerRequest.Password,
+                                Mobile = registerRequest.Mobile,
+                                Login_Type = registerRequest.Login_Type,
+                                App_User_Type = App_User_Types.APP_USER,
+                                Facebook_Id = registerRequest.Facebook_Id,
+                                Google_Id = registerRequest.Google_Id,
+                                Apple_Id = registerRequest.Apple_Id,
+                                Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                Show = true,
+                                Row_Id = Guid.NewGuid()
+                            };
 
                             appuserDm = appuserBc.CreateAppUser(appuserDm);
 
@@ -232,7 +234,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -242,7 +244,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public RegisterResponse Login(LoginRequest loginRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new RegisterResponse();
 
             try
@@ -256,7 +258,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -278,9 +280,8 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        var userBc = new App_Users();
-                        var appuserBc = new AppUserBC(_context);
-                        var entryBc = new DeviceBC(_context);
+                        var appuserBc = new AppUserService(_context);
+                        var entryBc = new DeviceService(_context);
                         var user = appuserBc.ValidateAppUser(loginRequest.Email, loginRequest.Password);
 
                         if (user != null && user.App_User_Id != 0)
@@ -313,7 +314,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -323,7 +324,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse Logout()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -337,7 +338,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -352,8 +353,7 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var entryBc = new DeviceBC(_context);
-                        var appuserBc = new AppUserBC(_context);
+                        var entryBc = new DeviceService(_context);
                         var deviceDm = entryBc.GetDevice(_securityDto.Device_Id);
 
                         deviceDm.App_User_Id = null;
@@ -380,7 +380,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -394,16 +394,18 @@ namespace ChocolateDelivery.UI.Controllers
             var response = new LabelResponse();
             try
             {
-                var promterBc = new CommonBC(_context, _logPath);
+                var promterBc = new CommonService(_context, _logPath);
                 var currentevents = promterBc.GetAppLabels();
 
                 foreach (var currentevent in currentevents)
                 {
-                    var eventsDto = new LabelDTO();
-                    eventsDto.Label_Id = currentevent.Label_Id;
-                    eventsDto.Label_Name_E = currentevent.L_Label_Name;
-                    eventsDto.Label_Name_A = currentevent.A_Label_Name ?? "";
-                    eventsDto.Label_Code = currentevent.Label_Code ?? "";
+                    var eventsDto = new LabelDTO
+                    {
+                        Label_Id = currentevent.Label_Id,
+                        Label_Name_E = currentevent.L_Label_Name,
+                        Label_Name_A = currentevent.A_Label_Name ?? "",
+                        Label_Code = currentevent.Label_Code ?? ""
+                    };
                     response.Labels.Add(eventsDto);
                 }
 
@@ -416,7 +418,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -426,7 +428,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public CategoryResponse GetCategories()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new CategoryResponse();
 
             try
@@ -440,7 +442,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -449,7 +451,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var categoryBc = new CategoryBC(_context);
+                        var categoryBc = new CategoryService(_context);
                         var currentevents = categoryBc.GetCategories();
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -459,23 +461,27 @@ namespace ChocolateDelivery.UI.Controllers
 
                         foreach (var currentevent in currentevents)
                         {
-                            var eventsDto = new CategoryDTO();
-                            eventsDto.Category_Id = currentevent.Category_Id;
-                            eventsDto.Category_Name = lang == "A"
-                                ? currentevent.Category_Name_A ?? currentevent.Category_Name_E
-                                : currentevent.Category_Name_E;
-                            eventsDto.Image_URL = currentevent.Image_URL ?? "";
-                            eventsDto.Background_Color = currentevent.Background_Color ?? "";
-                            var subCategories = categoryBc.GetSubCategories(currentevent.Category_Id);
-                            foreach (SM_Sub_Categories subCategory in subCategories)
+                            var eventsDto = new CategoryDTO
                             {
-                                var subCategoryDto = new SubCategoryDTO();
-                                subCategoryDto.Sub_Category_Id = subCategory.Sub_Category_Id;
-                                subCategoryDto.Sub_Category_Name = lang == "A"
-                                    ? subCategory.Sub_Category_Name_A ?? subCategory.Sub_Category_Name_E
-                                    : subCategory.Sub_Category_Name_E;
-                                subCategoryDto.Image_URL = subCategory.Image_URL ?? "";
-                                subCategoryDto.Background_Color = subCategory.Background_Color ?? "";
+                                Category_Id = currentevent.Category_Id,
+                                Category_Name = lang == "A"
+                                    ? currentevent.Category_Name_A ?? currentevent.Category_Name_E
+                                    : currentevent.Category_Name_E,
+                                Image_URL = currentevent.Image_URL ?? "",
+                                Background_Color = currentevent.Background_Color ?? ""
+                            };
+                            var subCategories = categoryBc.GetSubCategories(currentevent.Category_Id);
+                            foreach (var subCategory in subCategories)
+                            {
+                                var subCategoryDto = new SubCategoryDTO
+                                {
+                                    Sub_Category_Id = subCategory.Sub_Category_Id,
+                                    Sub_Category_Name = lang == "A"
+                                        ? subCategory.Sub_Category_Name_A ?? subCategory.Sub_Category_Name_E
+                                        : subCategory.Sub_Category_Name_E,
+                                    Image_URL = subCategory.Image_URL ?? "",
+                                    Background_Color = subCategory.Background_Color ?? ""
+                                };
                                 eventsDto.SubCategories.Add(subCategoryDto);
                             }
 
@@ -493,7 +499,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -503,7 +509,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public SubCategoryResponse GetSubCategories(int catId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new SubCategoryResponse();
 
             try
@@ -517,7 +523,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -526,7 +532,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var categoryBc = new CategoryBC(_context);
+                        var categoryBc = new CategoryService(_context);
 
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -535,15 +541,17 @@ namespace ChocolateDelivery.UI.Controllers
                         }
 
                         var subCategories = categoryBc.GetSubCategories(catId);
-                        foreach (SM_Sub_Categories subCategory in subCategories)
+                        foreach (var subCategory in subCategories)
                         {
-                            var subCategoryDto = new SubCategoryDTO();
-                            subCategoryDto.Sub_Category_Id = subCategory.Sub_Category_Id;
-                            subCategoryDto.Sub_Category_Name = lang == "A"
-                                ? subCategory.Sub_Category_Name_A ?? subCategory.Sub_Category_Name_E
-                                : subCategory.Sub_Category_Name_E;
-                            subCategoryDto.Image_URL = subCategory.Image_URL ?? "";
-                            subCategoryDto.Background_Color = subCategory.Background_Color ?? "";
+                            var subCategoryDto = new SubCategoryDTO
+                            {
+                                Sub_Category_Id = subCategory.Sub_Category_Id,
+                                Sub_Category_Name = lang == "A"
+                                    ? subCategory.Sub_Category_Name_A ?? subCategory.Sub_Category_Name_E
+                                    : subCategory.Sub_Category_Name_E,
+                                Image_URL = subCategory.Image_URL ?? "",
+                                Background_Color = subCategory.Background_Color ?? ""
+                            };
                             response.SubCategories.Add(subCategoryDto);
                         }
 
@@ -558,7 +566,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -568,7 +576,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public AreaResponse GetAreas()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new AreaResponse();
 
             try
@@ -582,7 +590,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -591,7 +599,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var areaBc = new AreaBC(_context);
+                        var areaBc = new AreaService(_context);
                         var currentevents = areaBc.GetAreas();
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -601,11 +609,13 @@ namespace ChocolateDelivery.UI.Controllers
 
                         foreach (var currentevent in currentevents)
                         {
-                            var eventsDto = new AreaDTO();
-                            eventsDto.Area_Id = currentevent.Area_Id;
-                            eventsDto.Area_Name = lang == "A"
-                                ? currentevent.Area_Name_A ?? currentevent.Area_Name_E
-                                : currentevent.Area_Name_E;
+                            var eventsDto = new AreaDTO
+                            {
+                                Area_Id = currentevent.Area_Id,
+                                Area_Name = lang == "A"
+                                    ? currentevent.Area_Name_A ?? currentevent.Area_Name_E
+                                    : currentevent.Area_Name_E
+                            };
                             response.Areas.Add(eventsDto);
                         }
 
@@ -620,7 +630,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -631,7 +641,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public HomePageResponse GetHomePage()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new HomePageResponse();
 
             try
@@ -645,7 +655,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -660,37 +670,41 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var carouselBc = new CarouselBC(_context);
+                        var carouselBc = new CarouselService(_context);
                         var carousels = carouselBc.GetCarousels();
                         foreach (var currentevent in carousels)
                         {
-                            var eventsDto = new CarouselDTO();
-                            eventsDto.Carousel_Id = currentevent.Carousel_Id;
-                            eventsDto.Carousel_Name = lang.ToUpper() == "A" ? currentevent.Title_A :
-                                !string.IsNullOrEmpty(currentevent.Title_E) ? currentevent.Title_E :
-                                currentevent.Title_A;
-                            eventsDto.Carousel_Title = lang.ToUpper() == "A" ? currentevent.Sub_Title_A :
-                                !string.IsNullOrEmpty(currentevent.Sub_Title_E) ? currentevent.Sub_Title_E :
-                                currentevent.Sub_Title_A;
-                            eventsDto.Media_Type = currentevent.Media_Type;
-                            eventsDto.Media_From_Type = currentevent.Media_From_Type ?? 0;
-                            eventsDto.Redirect_Id = currentevent.Redirect_Id ?? 0;
-                            eventsDto.Media_Url = currentevent.Media_URL ?? "";
-                            eventsDto.ThumbNail_Url = currentevent.Thumbnail_URL ?? "";
+                            var eventsDto = new CarouselDTO
+                            {
+                                Carousel_Id = currentevent.Carousel_Id,
+                                Carousel_Name = lang.ToUpper() == "A" ? currentevent.Title_A :
+                                    !string.IsNullOrEmpty(currentevent.Title_E) ? currentevent.Title_E :
+                                    currentevent.Title_A,
+                                Carousel_Title = lang.ToUpper() == "A" ? currentevent.Sub_Title_A :
+                                    !string.IsNullOrEmpty(currentevent.Sub_Title_E) ? currentevent.Sub_Title_E :
+                                    currentevent.Sub_Title_A,
+                                Media_Type = currentevent.Media_Type,
+                                Media_From_Type = currentevent.Media_From_Type ?? 0,
+                                Redirect_Id = currentevent.Redirect_Id ?? 0,
+                                Media_Url = currentevent.Media_URL ?? "",
+                                ThumbNail_Url = currentevent.Thumbnail_URL ?? ""
+                            };
                             response.Carousels.Add(eventsDto);
                         }
 
-                        var groupBc = new HomeGroupBC(_context);
+                        var groupBc = new HomeGroupService(_context);
                         var groups = groupBc.GetGroups();
 
                         var i = 0;
                         foreach (var group in groups)
                         {
-                            var groupDm = new GroupDTO();
-                            groupDm.Group_Id = group.Group_Id;
-                            groupDm.Group_Name = lang.ToUpper() == "A" ? group.Group_Name_A :
-                                !string.IsNullOrEmpty(group.Group_Name_E) ? group.Group_Name_E : group.Group_Name_A;
-                            groupDm.Display_Type = group.Display_Type;
+                            var groupDm = new GroupDTO
+                            {
+                                Group_Id = group.Group_Id,
+                                Group_Name = lang.ToUpper() == "A" ? group.Group_Name_A :
+                                    !string.IsNullOrEmpty(group.Group_Name_E) ? group.Group_Name_E : group.Group_Name_A,
+                                Display_Type = group.Display_Type
+                            };
 
                             #region Group Items
 
@@ -702,11 +716,13 @@ namespace ChocolateDelivery.UI.Controllers
 
                             foreach (var currentevent in groupItems)
                             {
-                                var eventsDto = new GeneralDTO();
-                                eventsDto.Id = currentevent.Id;
-                                eventsDto.Group_Type_Id = currentevent.Group_Type_Id;
-                                eventsDto.Name = currentevent.Item_Name;
-                                eventsDto.Image_Url = currentevent.Image_Url ?? "";
+                                var eventsDto = new GeneralDTO
+                                {
+                                    Id = currentevent.Id,
+                                    Group_Type_Id = currentevent.Group_Type_Id,
+                                    Name = currentevent.Item_Name,
+                                    Image_Url = currentevent.Image_Url ?? ""
+                                };
                                 groupDm.GroupItems.Add(eventsDto);
                             }
 
@@ -726,7 +742,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -740,11 +756,13 @@ namespace ChocolateDelivery.UI.Controllers
             var response = new CustomerInvoicesResponse();
             try
             {
-                var invoiceBc = new HomeGroupBC(_context);
+                var invoiceBc = new HomeGroupService(_context);
                 var propertyUnits = invoiceBc.GetGroupItems(groupTypeId);
-                var emptyselect2dto = new Select2DTO();
-                emptyselect2dto.id = "";
-                emptyselect2dto.text = "";
+                var emptyselect2dto = new Select2DTO
+                {
+                    id = "",
+                    text = ""
+                };
                 response.results.Add(emptyselect2dto);
                 response.results.AddRange(propertyUnits);
                 response.Message = ServiceResponse.Success;
@@ -754,7 +772,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString(), true);
+                Helpers.WriteToFile(_logPath, ex.ToString(), true);
             }
 
             return response;
@@ -764,7 +782,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public ProductsResponse GetProducts(ProductRequest productRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new ProductsResponse();
 
             try
@@ -778,7 +796,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -793,28 +811,30 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var postBc = new ProductBC(_context);
+                        var postBc = new ProductService(_context);
                         var posts = postBc.GetAppProducts(productRequest);
 
 
                         foreach (var currentevent in posts.Items)
                         {
-                            var eventsDto = new ProductDTO();
-                            eventsDto.Product_Id = currentevent.Product_Id;
-                            eventsDto.Product_Name = lang.ToUpper() == "E"
-                                ? currentevent.Product_Name_E
-                                : currentevent.Product_Name_A ?? "";
-                            eventsDto.Product_Desc = lang.ToUpper() == "E"
-                                ? currentevent.Product_Desc_E ?? ""
-                                : currentevent.Product_Desc_A ?? "";
-                            eventsDto.Price = currentevent.Price;
-                            eventsDto.Image_Url = currentevent.Image_URL ?? "";
-                            eventsDto.Brand_Name = lang.ToUpper() == "E"
-                                ? currentevent.Brand_Name_E ?? ""
-                                : currentevent.Brand_Name_A ?? "";
-                            eventsDto.Is_Exclusive = currentevent.Is_Exclusive;
-                            eventsDto.Is_Catering = currentevent.Is_Catering;
-                            eventsDto.Brand_id = currentevent.Brand_Id;
+                            var eventsDto = new ProductDTO
+                            {
+                                Product_Id = currentevent.Product_Id,
+                                Product_Name = lang.ToUpper() == "E"
+                                    ? currentevent.Product_Name_E
+                                    : currentevent.Product_Name_A ?? "",
+                                Product_Desc = lang.ToUpper() == "E"
+                                    ? currentevent.Product_Desc_E ?? ""
+                                    : currentevent.Product_Desc_A ?? "",
+                                Price = currentevent.Price,
+                                Image_Url = currentevent.Image_URL ?? "",
+                                Brand_Name = lang.ToUpper() == "E"
+                                    ? currentevent.Brand_Name_E ?? ""
+                                    : currentevent.Brand_Name_A ?? "",
+                                Is_Exclusive = currentevent.Is_Exclusive,
+                                Is_Catering = currentevent.Is_Catering,
+                                Brand_id = currentevent.Brand_Id
+                            };
                             response.Products.Add(eventsDto);
                         }
 
@@ -829,7 +849,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -839,7 +859,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public BrandsResponse GetBrands(ProductRequest productRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new BrandsResponse();
 
             try
@@ -853,7 +873,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -868,22 +888,24 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var postBc = new BrandBC(_context);
+                        var postBc = new BrandService(_context);
                         var posts = postBc.GetBrands(productRequest);
 
 
                         foreach (var currentevent in posts)
                         {
-                            var eventsDto = new BrandDTO();
-                            eventsDto.Brand_Id = currentevent.Restaurant_Id;
-                            eventsDto.Brand_Name = lang.ToUpper() == "E"
-                                ? currentevent.Restaurant_Name_E
-                                : currentevent.Restaurant_Name_A ?? "";
-                            eventsDto.Image_Url = currentevent.Image_URL ?? "";
-                            eventsDto.Delivery_Time = currentevent.Delivery_Time ?? "";
-                            eventsDto.Delivery_Charge = currentevent.Delivery_Charge;
-                            eventsDto.Categories = currentevent.Categories;
-                            eventsDto.Background_Color = currentevent.Background_Color ?? "";
+                            var eventsDto = new BrandDTO
+                            {
+                                Brand_Id = currentevent.Restaurant_Id,
+                                Brand_Name = lang.ToUpper() == "E"
+                                    ? currentevent.Restaurant_Name_E
+                                    : currentevent.Restaurant_Name_A ?? "",
+                                Image_Url = currentevent.Image_URL ?? "",
+                                Delivery_Time = currentevent.Delivery_Time ?? "",
+                                Delivery_Charge = currentevent.Delivery_Charge,
+                                Categories = currentevent.Categories,
+                                Background_Color = currentevent.Background_Color ?? ""
+                            };
                             response.Brands.Add(eventsDto);
                         }
 
@@ -897,7 +919,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -907,7 +929,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public BrandDetailResponse GetBrandDetailResponse(int brandId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new BrandDetailResponse();
 
             try
@@ -921,7 +943,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -936,10 +958,10 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var restaurantBc = new RestaurantBC(_context);
+                        var restaurantBc = new RestaurantService(_context);
                         var brandDm = restaurantBc.GetRestaurant(brandId);
 
-                        BrandBC brandBc = new BrandBC(_context);
+                        var brandService = new BrandService(_context);
 
                         if (brandDm != null)
                         {
@@ -952,7 +974,7 @@ namespace ChocolateDelivery.UI.Controllers
                             response.Image_Url = brandDm.Image_URL ?? "";
                             response.Delivery_Charge = brandDm.Delivery_Charge;
                             response.Delivery_Time = brandDm.Delivery_Time ?? "";
-                            var categories = brandBc.GetBrandCategories(brandDm.Restaurant_Id);
+                            var categories = brandService.GetBrandCategories(brandDm.Restaurant_Id);
                             if (lang == "A")
                             {
                                 response.Brand_Categories = string.Join(",",
@@ -966,26 +988,30 @@ namespace ChocolateDelivery.UI.Controllers
 
                             foreach (var cat in categories)
                             {
-                                var categoryDto = new BrandCategoryDTO();
-                                categoryDto.Category_Id = cat.Category_Id;
-                                categoryDto.Category_Name = lang.ToUpper() == "E"
-                                    ? cat.Sub_Category_Name_E
-                                    : cat.Sub_Category_Name_A ?? "";
-                                var products = brandBc.GetBrandCategoryProducts(brandId, cat.Sub_Category_Id);
+                                var categoryDto = new BrandCategoryDTO
+                                {
+                                    Category_Id = cat.Category_Id,
+                                    Category_Name = lang.ToUpper() == "E"
+                                        ? cat.Sub_Category_Name_E
+                                        : cat.Sub_Category_Name_A ?? ""
+                                };
+                                var products = brandService.GetBrandCategoryProducts(brandId, cat.Sub_Category_Id);
                                 foreach (var product in products)
                                 {
-                                    var productDto = new ProductDTO();
-                                    productDto.Product_Id = product.Product_Id;
-                                    productDto.Product_Name = lang.ToUpper() == "E"
-                                        ? product.Product_Name_E
-                                        : product.Product_Name_A ?? "";
-                                    productDto.Product_Desc = lang.ToUpper() == "E"
-                                        ? product.Product_Desc_E ?? ""
-                                        : product.Product_Desc_A ?? "";
-                                    productDto.Price = product.Price;
-                                    productDto.Image_Url = product.Image_URL ?? "";
-                                    productDto.Is_Exclusive = product.Is_Exclusive;
-                                    productDto.Is_Catering = product.Is_Catering;
+                                    var productDto = new ProductDTO
+                                    {
+                                        Product_Id = product.Product_Id,
+                                        Product_Name = lang.ToUpper() == "E"
+                                            ? product.Product_Name_E
+                                            : product.Product_Name_A ?? "",
+                                        Product_Desc = lang.ToUpper() == "E"
+                                            ? product.Product_Desc_E ?? ""
+                                            : product.Product_Desc_A ?? "",
+                                        Price = product.Price,
+                                        Image_Url = product.Image_URL ?? "",
+                                        Is_Exclusive = product.Is_Exclusive,
+                                        Is_Catering = product.Is_Catering
+                                    };
                                     categoryDto.Products.Add(productDto);
                                 }
 
@@ -1008,7 +1034,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1018,7 +1044,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public ProductDetailResponse GetProductDetailResponse(int productId, string? appUserId = "0")
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new ProductDetailResponse();
 
             try
@@ -1032,7 +1058,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1050,9 +1076,9 @@ namespace ChocolateDelivery.UI.Controllers
                         var actualAppUserId = 0;
                         if (appUserId != "0")
                         {
-                            AppUserBC appUserBc = new AppUserBC(_context);
+                            var appUserService = new AppUserService(_context);
                             var rowId = new Guid(appUserId);
-                            var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                            var appUserDm = appUserService.GetAppUserByRowId(rowId);
                             if (appUserDm != null)
                             {
                                 actualAppUserId = appUserDm.App_User_Id;
@@ -1066,7 +1092,7 @@ namespace ChocolateDelivery.UI.Controllers
                         }
 
 
-                        var brandBc = new ProductBC(_context);
+                        var brandBc = new ProductService(_context);
                         var brandDm = brandBc.GetProduct(productId, actualAppUserId);
 
                         if (brandDm != null)
@@ -1111,7 +1137,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1121,7 +1147,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public ChefDetailResponse GetChefDetailResponse(int chefId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new ChefDetailResponse();
 
             try
@@ -1135,7 +1161,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1150,7 +1176,7 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var chefBc = new ChefBC(_context);
+                        var chefBc = new ChefService(_context);
                         var chefDm = chefBc.GetChef(chefId);
 
                         if (chefDm != null)
@@ -1165,19 +1191,21 @@ namespace ChocolateDelivery.UI.Controllers
                             var products = chefBc.GetChefProducts(chefId);
                             foreach (var currentevent in products.Items)
                             {
-                                var eventsDto = new ProductDTO();
-                                eventsDto.Product_Id = currentevent.Product_Id;
-                                eventsDto.Product_Name = lang.ToUpper() == "E"
-                                    ? currentevent.Product_Name_E
-                                    : currentevent.Product_Name_A ?? "";
-                                eventsDto.Product_Desc = lang.ToUpper() == "E"
-                                    ? currentevent.Product_Desc_E ?? ""
-                                    : currentevent.Product_Desc_A ?? "";
-                                eventsDto.Price = currentevent.Price;
-                                eventsDto.Image_Url = currentevent.Image_URL ?? "";
-                                eventsDto.Brand_Name = lang.ToUpper() == "E"
-                                    ? currentevent.Brand_Name_E ?? ""
-                                    : currentevent.Brand_Name_A ?? "";
+                                var eventsDto = new ProductDTO
+                                {
+                                    Product_Id = currentevent.Product_Id,
+                                    Product_Name = lang.ToUpper() == "E"
+                                        ? currentevent.Product_Name_E
+                                        : currentevent.Product_Name_A ?? "",
+                                    Product_Desc = lang.ToUpper() == "E"
+                                        ? currentevent.Product_Desc_E ?? ""
+                                        : currentevent.Product_Desc_A ?? "",
+                                    Price = currentevent.Price,
+                                    Image_Url = currentevent.Image_URL ?? "",
+                                    Brand_Name = lang.ToUpper() == "E"
+                                        ? currentevent.Brand_Name_E ?? ""
+                                        : currentevent.Brand_Name_A ?? ""
+                                };
                                 response.Products.Add(eventsDto);
                             }
 
@@ -1197,7 +1225,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1207,7 +1235,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public AddCartResponse AddToCart(CartRequest cartRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new AddCartResponse();
 
             try
@@ -1221,7 +1249,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1243,11 +1271,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var cartBc = new CartBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var cartBc = new CartService(_context);
 
                         var rowId = new Guid(cartRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             if (cartRequest.Cart_Id != 0)
@@ -1287,31 +1315,37 @@ namespace ChocolateDelivery.UI.Controllers
                                 return response;
                             }
 
-                            var cartDm = new TXN_Cart();
-                            cartDm.Cart_Id = cartRequest.Cart_Id;
-                            cartDm.App_User_Id = appUserDm.App_User_Id;
-                            cartDm.Product_Id = cartRequest.Product_Id;
-                            cartDm.Qty = cartRequest.Qty;
-                            cartDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                            cartDm.Comments = cartRequest.Comments;
+                            var cartDm = new TXN_Cart
+                            {
+                                Cart_Id = cartRequest.Cart_Id,
+                                App_User_Id = appUserDm.App_User_Id,
+                                Product_Id = cartRequest.Product_Id,
+                                Qty = cartRequest.Qty,
+                                Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                Comments = cartRequest.Comments
+                            };
                             cartBc.AddtoCart(cartDm);
 
                             if (cartRequest.Cart_Id == 0)
                             {
                                 foreach (var addonId in cartRequest.Product_AddOnIds)
                                 {
-                                    var addonDm = new TXN_Cart_AddOns();
-                                    addonDm.Product_AddOnId = addonId;
-                                    addonDm.Cart_Id = cartDm.Cart_Id;
+                                    var addonDm = new TXN_Cart_AddOns
+                                    {
+                                        Product_AddOnId = addonId,
+                                        Cart_Id = cartDm.Cart_Id
+                                    };
                                     cartBc.CreateCartAddOn(addonDm);
                                 }
 
                                 foreach (var cateringProduct in cartRequest.Catering_Products)
                                 {
-                                    var addonDm = new TXN_Cart_Catering_Products();
-                                    addonDm.Catering_Product_Id = cateringProduct.Catering_Product_Id;
-                                    addonDm.Qty = cateringProduct.Qty;
-                                    addonDm.Cart_Id = cartDm.Cart_Id;
+                                    var addonDm = new TXN_Cart_Catering_Products
+                                    {
+                                        Catering_Product_Id = cateringProduct.Catering_Product_Id,
+                                        Qty = cateringProduct.Qty,
+                                        Cart_Id = cartDm.Cart_Id
+                                    };
                                     cartBc.CreateCartCateringProduct(addonDm);
                                 }
                             }
@@ -1334,7 +1368,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1344,7 +1378,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public CartResponse GetCart(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new CartResponse();
 
             try
@@ -1358,7 +1392,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1367,7 +1401,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var cartBc = new CartBC(_context);
+                        var cartBc = new CartService(_context);
 
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -1382,11 +1416,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             response = cartBc.GetCartItems(appUserDm.App_User_Id, lang);
@@ -1405,7 +1439,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1415,7 +1449,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse RemoveCartItem(CartRequest cartRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -1429,7 +1463,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1452,11 +1486,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var cartBc = new CartBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var cartBc = new CartService(_context);
 
                         var rowId = new Guid(cartRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var cartExist = cartBc.GetCart(cartRequest.Cart_Id);
@@ -1498,7 +1532,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1508,7 +1542,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public ProfileResponse GetUserProfile(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new ProfileResponse();
 
             try
@@ -1522,7 +1556,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1537,10 +1571,10 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             response.Name = appUserDm.Name;
@@ -1566,7 +1600,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1576,7 +1610,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse UpdateProfile(UpdatePofileRequest updatePofileRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -1590,7 +1624,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1612,11 +1646,10 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var cartBc = new CartBC(_context);
+                        var appUserService = new AppUserService(_context);
 
                         var rowId = new Guid(updatePofileRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             appUserDm.Name = updatePofileRequest.Name;
@@ -1626,7 +1659,7 @@ namespace ChocolateDelivery.UI.Controllers
                             }
 
                             appUserDm.Mobile = updatePofileRequest.Mobile;
-                            appUserBc.CreateAppUser(appUserDm);
+                            appUserService.CreateAppUser(appUserDm);
 
                             response.Status = 0;
                             response.Message = ServiceResponse.Success;
@@ -1645,7 +1678,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1655,7 +1688,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse UpdatePassword(UpdatePasswordRequest updatePasswordRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -1669,7 +1702,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1691,11 +1724,10 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var cartBc = new CartBC(_context);
+                        var appUserService = new AppUserService(_context);
 
                         var rowId = new Guid(updatePasswordRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             if (appUserDm.Password != updatePasswordRequest.Old_Password)
@@ -1706,7 +1738,7 @@ namespace ChocolateDelivery.UI.Controllers
                             }
 
                             appUserDm.Password = updatePasswordRequest.New_Password;
-                            appUserBc.CreateAppUser(appUserDm);
+                            appUserService.CreateAppUser(appUserDm);
                             response.Status = 0;
                             response.Message = ServiceResponse.Success;
                         }
@@ -1724,7 +1756,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1734,7 +1766,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public UpdateAddressResponse UpdateUserAddress(UpdateAddressRequest updateAddressRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new UpdateAddressResponse();
 
             try
@@ -1748,7 +1780,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1777,33 +1809,34 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var cartBc = new CartBC(_context);
+                        var appUserService = new AppUserService(_context);
 
                         var rowId = new Guid(updateAddressRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            App_User_Address addressDm = new App_User_Address();
-                            addressDm.Address_Id = updateAddressRequest.Address_Id;
-                            addressDm.App_User_Id = appUserDm.App_User_Id;
-                            addressDm.Address_Name = updateAddressRequest.Address_Name;
-                            addressDm.Block = updateAddressRequest.Block;
-                            addressDm.Street = updateAddressRequest.Street;
-                            addressDm.Building = updateAddressRequest.Building;
-                            addressDm.Avenue = updateAddressRequest.Avenue;
-                            addressDm.Floor = updateAddressRequest.Floor;
-                            addressDm.Apartment = updateAddressRequest.Apartment;
-                            addressDm.Area_Id = updateAddressRequest.Area_Id;
-                            addressDm.Mobile = updateAddressRequest.Mobile;
-                            addressDm.Extra_Direction = updateAddressRequest.Extra_Direction;
-                            addressDm.House_No = updateAddressRequest.House_No;
-                            addressDm.Latitude = updateAddressRequest.Latitude;
-                            addressDm.Longitude = updateAddressRequest.Longitude;
-                            addressDm.Paci_Number = updateAddressRequest.Paci_Number;
-                            addressDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                            addressDm.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            appUserBc.CreateAppUserAddress(addressDm);
+                            var addressDm = new App_User_Address
+                            {
+                                Address_Id = updateAddressRequest.Address_Id,
+                                App_User_Id = appUserDm.App_User_Id,
+                                Address_Name = updateAddressRequest.Address_Name,
+                                Block = updateAddressRequest.Block,
+                                Street = updateAddressRequest.Street,
+                                Building = updateAddressRequest.Building,
+                                Avenue = updateAddressRequest.Avenue,
+                                Floor = updateAddressRequest.Floor,
+                                Apartment = updateAddressRequest.Apartment,
+                                Area_Id = updateAddressRequest.Area_Id,
+                                Mobile = updateAddressRequest.Mobile,
+                                Extra_Direction = updateAddressRequest.Extra_Direction,
+                                House_No = updateAddressRequest.House_No,
+                                Latitude = updateAddressRequest.Latitude,
+                                Longitude = updateAddressRequest.Longitude,
+                                Paci_Number = updateAddressRequest.Paci_Number,
+                                Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                Updated_Datetime = StaticMethods.GetKuwaitTime()
+                            };
+                            appUserService.CreateAppUserAddress(addressDm);
 
                             response.Status = 0;
                             response.Message = ServiceResponse.Success;
@@ -1823,7 +1856,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1833,7 +1866,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public UserAddressResponse GetUserAddresses(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new UserAddressResponse();
 
             try
@@ -1847,7 +1880,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1856,8 +1889,6 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var cartBc = new CartBC(_context);
-
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
                         {
@@ -1871,33 +1902,35 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var addresses = appUserBc.GetUserAddresses(appUserDm.App_User_Id);
+                            var addresses = appUserService.GetUserAddresses(appUserDm.App_User_Id);
                             foreach (var address in addresses)
                             {
-                                var addressDto = new AddressDTO();
-                                addressDto.Address_Id = address.Address_Id;
-                                addressDto.Address_Name = address.Address_Name;
-                                addressDto.Block = address.Block;
-                                addressDto.Street = address.Street;
-                                addressDto.Building = address.Building;
-                                addressDto.Avenue = address.Avenue ?? "";
-                                addressDto.Floor = address.Floor ?? "";
-                                addressDto.Apartment = address.Apartment ?? "";
-                                addressDto.Area_Id = address.Area_Id;
-                                addressDto.Mobile = address.Mobile ?? "";
-                                addressDto.Extra_Direction = address.Extra_Direction ?? "";
-                                addressDto.House_No = address.House_No ?? "";
-                                addressDto.Area_Name = address.Area_Name;
-                                addressDto.Latitude = address.Latitude;
-                                addressDto.Longitude = address.Longitude;
-                                addressDto.Paci_Number = address.Paci_Number ?? "";
+                                var addressDto = new AddressDTO
+                                {
+                                    Address_Id = address.Address_Id,
+                                    Address_Name = address.Address_Name,
+                                    Block = address.Block,
+                                    Street = address.Street,
+                                    Building = address.Building,
+                                    Avenue = address.Avenue ?? "",
+                                    Floor = address.Floor ?? "",
+                                    Apartment = address.Apartment ?? "",
+                                    Area_Id = address.Area_Id,
+                                    Mobile = address.Mobile ?? "",
+                                    Extra_Direction = address.Extra_Direction ?? "",
+                                    House_No = address.House_No ?? "",
+                                    Area_Name = address.Area_Name,
+                                    Latitude = address.Latitude,
+                                    Longitude = address.Longitude,
+                                    Paci_Number = address.Paci_Number ?? ""
+                                };
                                 response.UserAddresses.Add(addressDto);
                             }
 
@@ -1919,7 +1952,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1929,7 +1962,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse DeleteUserAddress(long userAddressId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -1943,7 +1976,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -1952,8 +1985,8 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var deleteAddress = appUserBc.DeleteUserAddress(userAddressId);
+                        var appUserService = new AppUserService(_context);
+                        var deleteAddress = appUserService.DeleteUserAddress(userAddressId);
                         if (deleteAddress)
                         {
                             response.Status = 0;
@@ -1972,7 +2005,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -1982,7 +2015,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public PaymentTypeResponse GetPaymentTypes()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new PaymentTypeResponse();
 
             try
@@ -1996,7 +2029,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2005,7 +2038,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var areaBc = new OrderBC(_context);
+                        var areaBc = new OrderService(_context);
                         var currentevents = areaBc.GetPaymentTypes();
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -2037,7 +2070,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2047,7 +2080,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public OrderResponse SaveOrder(OrderRequest orderRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new OrderResponse();
             using (var scope = new TransactionScope())
             {
@@ -2062,7 +2095,7 @@ namespace ChocolateDelivery.UI.Controllers
                     {
                         securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                         //Check session token
-                        bool isAuthorized = ValidateSecurityKey(securityKey);
+                        var isAuthorized = ValidateSecurityKey(securityKey);
 
                         if (isAuthorized == false)
                         {
@@ -2071,7 +2104,7 @@ namespace ChocolateDelivery.UI.Controllers
                         }
                         else
                         {
-                            globalCls.WriteToFile(_logPath,
+                            Helpers.WriteToFile(_logPath,
                                 "Order Request:" + JsonConvert.SerializeObject(orderRequest));
                             var lang = "E";
                             if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -2116,13 +2149,13 @@ namespace ChocolateDelivery.UI.Controllers
                                 return response;
                             }
 
-                            AppUserBC appUserBc = new AppUserBC(_context);
-                            var cartBc = new CartBC(_context);
-                            ProductBC productBc = new ProductBC(_context);
-                            RestaurantBC restaurantBc = new RestaurantBC(_context);
-                            OrderBC orderBc = new OrderBC(_context);
+                            var appUserService = new AppUserService(_context);
+                            var cartBc = new CartService(_context);
+                            var productService = new ProductService(_context);
+                            var restaurantService = new RestaurantService(_context);
+                            var orderService = new OrderService(_context);
 
-                            var firstprodDm = productBc.GetProduct(orderRequest.OrderDetails.FirstOrDefault().Prod_Id);
+                            var firstprodDm = productService.GetProduct(orderRequest.OrderDetails.FirstOrDefault().Prod_Id);
                             if (orderRequest.Delivery_Type == Delivery_Types.DELIVERY && firstprodDm.Is_Gift_Product &&
                                 string.IsNullOrEmpty(orderRequest.Pickup_Datetime))
                             {
@@ -2132,17 +2165,17 @@ namespace ChocolateDelivery.UI.Controllers
                             }
 
                             var rowId = new Guid(orderRequest.App_User_Id);
-                            var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                            var appUserDm = appUserService.GetAppUserByRowId(rowId);
                             if (appUserDm != null)
                             {
-                                short orderType = OrderTypes.NORMAL;
+                                var orderType = OrderTypes.NORMAL;
                                 var grossAmt = decimal.Zero;
                                 var deliveryCharge = decimal.Zero;
                                 var redeemAmt = orderRequest.Redeem_Amount ?? 0;
-                                SM_Restaurants restaurantDm = new SM_Restaurants();
+                                var restaurantDm = new SM_Restaurants();
                                 foreach (var detail in orderRequest.OrderDetails)
                                 {
-                                    var prodDm = productBc.GetProduct(detail.Prod_Id);
+                                    var prodDm = productService.GetProduct(detail.Prod_Id);
                                     if (prodDm == null)
                                     {
                                         response.Status = 101;
@@ -2151,7 +2184,7 @@ namespace ChocolateDelivery.UI.Controllers
                                     }
                                     else
                                     {
-                                        restaurantDm = restaurantBc.GetRestaurant(prodDm.Restaurant_Id);
+                                        restaurantDm = restaurantService.GetRestaurant(prodDm.Restaurant_Id);
                                         if (orderRequest.Delivery_Type == Delivery_Types.DELIVERY)
                                             deliveryCharge = restaurantDm.Delivery_Charge;
 
@@ -2167,7 +2200,7 @@ namespace ChocolateDelivery.UI.Controllers
 
                                         foreach (var addonId in detail.Product_AddOn_Ids)
                                         {
-                                            var addOnDm = productBc.GetProductAddOn(addonId);
+                                            var addOnDm = productService.GetProductAddOn(addonId);
                                             if (addOnDm == null)
                                             {
                                                 response.Status = 101;
@@ -2185,7 +2218,7 @@ namespace ChocolateDelivery.UI.Controllers
                                         foreach (var categoryProduct in detail.Catering_Products)
                                         {
                                             var cateringProductDm =
-                                                productBc.GetProductCateringProduct(categoryProduct
+                                                productService.GetProductCateringProduct(categoryProduct
                                                     .Catering_Product_Id);
                                             if (cateringProductDm == null)
                                             {
@@ -2210,8 +2243,10 @@ namespace ChocolateDelivery.UI.Controllers
 
                                 var netAmt = grossAmt + deliveryCharge - redeemAmt;
 
-                                var orderDm = new TXN_Orders();
-                                orderDm.Order_No = orderBc.GetNextOrderNo();
+                                var orderDm = new TXN_Orders
+                                {
+                                    Order_No = orderService.GetNextOrderNo()
+                                };
                                 orderDm.Order_Serial = "ORD_" + orderDm.Order_No.ToString("D6");
                                 orderDm.Order_Datetime = StaticMethods.GetKuwaitTime();
                                 orderDm.App_User_Id = appUserDm.App_User_Id;
@@ -2256,7 +2291,7 @@ namespace ChocolateDelivery.UI.Controllers
 
                                 if (!string.IsNullOrEmpty(orderRequest.Video_File))
                                 {
-                                    byte[] bytes = Convert.FromBase64String(orderRequest.Video_File);
+                                    var bytes = Convert.FromBase64String(orderRequest.Video_File);
                                     var videoPathDir = "assets/videos/";
                                     var fileName = StaticMethods.GetKuwaitTime().ToString("yyyyMMddHHmmssfff") + ".mp4";
                                     var path = Path.Combine(_webHostEnvironment.WebRootPath, videoPathDir);
@@ -2274,52 +2309,60 @@ namespace ChocolateDelivery.UI.Controllers
                                         "dd-MMM-yyyy hh:mm tt", CultureInfo.InvariantCulture);
                                 }
 
-                                orderBc.SaveOrder(orderDm);
+                                orderService.SaveOrder(orderDm);
 
                                 foreach (var detail in orderRequest.OrderDetails)
                                 {
-                                    var orderDetailDm = new TXN_Order_Details();
-                                    orderDetailDm.Order_Id = orderDm.Order_Id;
-                                    orderDetailDm.Product_Id = detail.Prod_Id;
-                                    orderDetailDm.Product_Name = detail.Prod_Name;
-                                    orderDetailDm.Qty = detail.Qty;
-                                    orderDetailDm.Rate = detail.Rate;
-                                    orderDetailDm.Amount = detail.Amount;
-                                    orderDetailDm.Gross_Amount = detail.Gross_Amount;
-                                    orderDetailDm.Discount_Amount = 0;
+                                    var orderDetailDm = new TXN_Order_Details
+                                    {
+                                        Order_Id = orderDm.Order_Id,
+                                        Product_Id = detail.Prod_Id,
+                                        Product_Name = detail.Prod_Name,
+                                        Qty = detail.Qty,
+                                        Rate = detail.Rate,
+                                        Amount = detail.Amount,
+                                        Gross_Amount = detail.Gross_Amount,
+                                        Discount_Amount = 0
+                                    };
                                     orderDetailDm.Net_Amount =
                                         orderDetailDm.Gross_Amount - orderDetailDm.Discount_Amount;
                                     orderDetailDm.Promo_Code = detail.Promo_Code;
                                     orderDetailDm.Comments = detail.Remarks;
-                                    orderBc.SaveOrderDetail(orderDetailDm);
+                                    orderService.SaveOrderDetail(orderDetailDm);
 
                                     foreach (var addonId in detail.Product_AddOn_Ids)
                                     {
-                                        var addOnDm = productBc.GetProductAddOn(addonId);
-                                        TXN_Order_Detail_AddOns addOns = new TXN_Order_Detail_AddOns();
-                                        addOns.Order_Detail_Id = orderDetailDm.Order_Detail_Id;
-                                        addOns.Product_AddOnId = addonId;
-                                        addOns.Price = addOnDm.Price;
-                                        orderBc.SaveOrderDetailAddon(addOns);
+                                        var addOnDm = productService.GetProductAddOn(addonId);
+                                        var addOns = new TXN_Order_Detail_AddOns
+                                            {
+                                                Order_Detail_Id = orderDetailDm.Order_Detail_Id,
+                                                Product_AddOnId = addonId,
+                                                Price = addOnDm.Price
+                                            };
+                                        orderService.SaveOrderDetailAddon(addOns);
                                     }
 
                                     foreach (var cateringProduct in detail.Catering_Products)
                                     {
-                                        TXN_Order_Detail_Catering_Products addOns =
-                                            new TXN_Order_Detail_Catering_Products();
-                                        addOns.Detail_Id = orderDetailDm.Order_Detail_Id;
-                                        addOns.Category_Product_Id = cateringProduct.Catering_Product_Id;
-                                        addOns.Qty = cateringProduct.Qty;
-                                        orderBc.SaveOrderDetailCateringProduct(addOns);
+                                        var addOns =
+                                            new TXN_Order_Detail_Catering_Products
+                                            {
+                                                Detail_Id = orderDetailDm.Order_Detail_Id,
+                                                Category_Product_Id = cateringProduct.Catering_Product_Id,
+                                                Qty = cateringProduct.Qty
+                                            };
+                                        orderService.SaveOrderDetailCateringProduct(addOns);
                                     }
                                 }
 
-                                TXN_Order_Logs log = new TXN_Order_Logs();
-                                log.Order_Id = orderDm.Order_Id;
-                                log.Status_Id = orderDm.Status_Id;
-                                log.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                log.Comments = "Order Placed with Order #" + orderDm.Order_Serial;
-                                orderBc.CreateOrderLog(log);
+                                var log = new TXN_Order_Logs
+                                {
+                                    Order_Id = orderDm.Order_Id,
+                                    Status_Id = orderDm.Status_Id,
+                                    Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                    Comments = "Order Placed with Order #" + orderDm.Order_Serial
+                                };
+                                orderService.CreateOrderLog(log);
 
 
                                 if (orderRequest.Payment_Type_Id == PaymentTypes.Cash)
@@ -2328,32 +2371,33 @@ namespace ChocolateDelivery.UI.Controllers
 
                                     #region clear cart after successful order
 
-                                    var removeCart = cartBc.RemoveCart(appUserDm.App_User_Id);
+                                    cartBc.RemoveCart(appUserDm.App_User_Id);
 
                                     #endregion
 
-                                    NotificationBC notificationBc = new NotificationBC(_context, _logPath);
-                                    notificationBc.SendNotificationToDriver(orderDm.Order_Serial);
+                                    var notificationService = new NotificationService(_context, _logPath);
+                                    notificationService.SendNotificationToDriver(orderDm.Order_Serial);
 
-                                    APP_PUSH_CAMPAIGN campaignDm = new APP_PUSH_CAMPAIGN();
-                                    campaignDm.Title_E = "Pick up Request";
-                                    campaignDm.Desc_E = "Please accept Order # " + orderDm.Order_Serial +
-                                                        " for delivery";
-                                    campaignDm.Title_A = "Pick up Request";
-                                    campaignDm.Desc_A = "Please accept Order # " + orderDm.Order_Serial +
-                                                        " for delivery";
-                                    campaignDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                    notificationBc.CreatePushCampaign(campaignDm);
+                                    var campaignDm = new APP_PUSH_CAMPAIGN
+                                    {
+                                        Title_E = "Pick up Request",
+                                        Desc_E = "Please accept Order # " + orderDm.Order_Serial +
+                                                 " for delivery",
+                                        Title_A = "Pick up Request",
+                                        Desc_A = "Please accept Order # " + orderDm.Order_Serial +
+                                                 " for delivery",
+                                        Created_Datetime = StaticMethods.GetKuwaitTime()
+                                    };
+                                    notificationService.CreatePushCampaign(campaignDm);
 
-                                    string connectionString =
+                                    var connectionString =
                                         _config.GetValue<string>("ConnectionStrings:DefaultConnection");
-                                    using (MySqlConnection con = new MySqlConnection(connectionString))
+                                    using (var con = new MySqlConnection(connectionString))
                                     {
                                         con.Open();
-                                        var time = con.ConnectionTimeout;
-                                        using (MySqlCommand cmd = new MySqlCommand("InsertNotifications", con))
+                                        using (var cmd = new MySqlCommand("InsertNotifications", con))
                                         {
-                                            using (var da = new MySqlDataAdapter(cmd))
+                                            using (new MySqlDataAdapter(cmd))
                                             {
                                                 cmd.CommandType = CommandType.StoredProcedure;
                                                 cmd.Parameters.AddWithValue("@Campaign_Id", campaignDm.Campaign_Id);
@@ -2371,18 +2415,22 @@ namespace ChocolateDelivery.UI.Controllers
                                         .Select(s => s.tap_payment_id)
                                         .First();
 
-                                    TapChargeRequest tapChargeRequest = new TapChargeRequest();
-                                    tapChargeRequest.amount = netAmt;
-                                    tapChargeRequest.currency = "KWD";
-                                    //tapChargeRequest.source = new Source { id = "src_kw.knet" };
-                                    tapChargeRequest.source = new Source { id = paymentId };
-                                    tapChargeRequest.reference = new Reference
-                                        { transaction = orderDm.Order_Serial, order = orderDm.Order_Id.ToString() };
-                                    tapChargeRequest.receipt = new Receipt { email = true, sms = true };
-                                    TapCustomer customer = new TapCustomer();
-                                    customer.first_name = orderDm.Cust_Name;
-                                    customer.email = orderDm.Email;
-                                    Phone phone = new Phone();
+                                    var tapChargeRequest = new TapChargeRequest
+                                    {
+                                        amount = netAmt,
+                                        currency = "KWD",
+                                        //tapChargeRequest.source = new Source { id = "src_kw.knet" };
+                                        source = new Source { id = paymentId },
+                                        reference = new Reference
+                                            { transaction = orderDm.Order_Serial, order = orderDm.Order_Id.ToString() },
+                                        receipt = new Receipt { email = true, sms = true }
+                                    };
+                                    var customer = new TapCustomer
+                                    {
+                                        first_name = orderDm.Cust_Name,
+                                        email = orderDm.Email
+                                    };
+                                    var phone = new Phone();
                                     if (orderDm.Mobile.Length == 12)
                                     {
                                         phone.country_code = Convert.ToInt32(orderDm.Mobile.Substring(1, 3));
@@ -2401,22 +2449,24 @@ namespace ChocolateDelivery.UI.Controllers
                                     var chargeResponse = TapPayment.CreateChargeRequest(tapChargeRequest, _config);
                                     if (chargeResponse != null)
                                     {
-                                        string redirectUrl = string.Empty;
+                                        var redirectUrl = string.Empty;
                                         if (chargeResponse.transaction != null &&
                                             !string.IsNullOrEmpty(chargeResponse.transaction.url))
                                             redirectUrl = chargeResponse.transaction.url;
 
                                         if (!string.IsNullOrEmpty(redirectUrl))
                                         {
-                                            PAYMENTS paymentDm = new PAYMENTS();
-                                            paymentDm.Order_Id = orderDm.Order_Id;
-                                            paymentDm.Amount = netAmt;
-                                            paymentDm.Track_Id = chargeResponse.id;
-                                            paymentDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                            paymentDm.Comments = "";
-                                            orderBc.CreatePayment(paymentDm);
+                                            var paymentDm = new PAYMENTS
+                                            {
+                                                Order_Id = orderDm.Order_Id,
+                                                Amount = netAmt,
+                                                Track_Id = chargeResponse.id,
+                                                Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                                Comments = ""
+                                            };
+                                            orderService.CreatePayment(paymentDm);
 
-                                            globalCls.WriteToFile(_logPath, "Redirecting to :" + redirectUrl, true);
+                                            Helpers.WriteToFile(_logPath, "Redirecting to :" + redirectUrl, true);
                                             response.Payment_Link = redirectUrl;
                                         }
                                     }
@@ -2442,7 +2492,7 @@ namespace ChocolateDelivery.UI.Controllers
                     scope.Dispose();
                     response.Status = 1;
                     response.Message = ServiceResponse.ServerError;
-                    globalCls.WriteToFile(_logPath, ex.ToString());
+                    Helpers.WriteToFile(_logPath, ex.ToString());
                 }
 
                 return response;
@@ -2453,7 +2503,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public OrderDetailResponse GetOrderDetail(int orderId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new OrderDetailResponse();
 
             try
@@ -2467,7 +2517,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2482,7 +2532,7 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var orderBc = new OrderBC(_context);
+                        var orderBc = new OrderService(_context);
                         var orderDm = orderBc.GetOrder(orderId);
 
                         if (orderDm != null)
@@ -2493,16 +2543,20 @@ namespace ChocolateDelivery.UI.Controllers
                             response.Mobile = orderDm.Mobile ?? "";
                             response.Email = orderDm.Email;
 
-                            var pickAddressDm = new AddressCoordinatesDTO();
-                            pickAddressDm.Address = orderDm.Branch_Address;
-                            pickAddressDm.Latitude = orderDm.Branch_Latitude;
-                            pickAddressDm.Longitude = orderDm.Branch_Longitude;
+                            var pickAddressDm = new AddressCoordinatesDTO
+                            {
+                                Address = orderDm.Branch_Address,
+                                Latitude = orderDm.Branch_Latitude,
+                                Longitude = orderDm.Branch_Longitude
+                            };
                             response.Pickup_Address = pickAddressDm;
 
-                            var deliveryAddressDm = new AddressCoordinatesDTO();
-                            deliveryAddressDm.Address = orderDm.Full_Address;
-                            deliveryAddressDm.Latitude = orderDm.User_Address_Latitude;
-                            deliveryAddressDm.Longitude = orderDm.User_Address_Longitude;
+                            var deliveryAddressDm = new AddressCoordinatesDTO
+                            {
+                                Address = orderDm.Full_Address,
+                                Latitude = orderDm.User_Address_Latitude,
+                                Longitude = orderDm.User_Address_Longitude
+                            };
                             response.Delivery_Address = deliveryAddressDm;
 
                             response.Payment_Type = orderDm.Payment_Type_Name;
@@ -2519,23 +2573,27 @@ namespace ChocolateDelivery.UI.Controllers
 
                             foreach (var detail in orderDm.TXN_Order_Details)
                             {
-                                var detailDm = new DriverOrderDetailDTO();
-                                detailDm.Order_Detail_Id = detail.Order_Detail_Id;
-                                detailDm.Prod_Name = detail.Full_Product_Name;
-                                detailDm.Qty = detail.Qty;
-                                detailDm.Rate = detail.Rate;
-                                detailDm.Gross_Amount = detail.Amount;
-                                detailDm.AddOn_Amount = detail.Gross_Amount - detail.Amount;
-                                detailDm.Net_Amount = detail.Gross_Amount;
-                                detailDm.Remarks = detail.Comments ?? "";
+                                var detailDm = new DriverOrderDetailDTO
+                                {
+                                    Order_Detail_Id = detail.Order_Detail_Id,
+                                    Prod_Name = detail.Full_Product_Name,
+                                    Qty = detail.Qty,
+                                    Rate = detail.Rate,
+                                    Gross_Amount = detail.Amount,
+                                    AddOn_Amount = detail.Gross_Amount - detail.Amount,
+                                    Net_Amount = detail.Gross_Amount,
+                                    Remarks = detail.Comments ?? ""
+                                };
                                 var cateringProducts =
                                     orderBc.GetOrderDetailCategoryProducts(detail.Order_Detail_Id, lang);
                                 foreach (var product in cateringProducts)
                                 {
-                                    CartCateringProductsDTO cateringProductsDto = new CartCateringProductsDTO();
-                                    cateringProductsDto.Catering_Product_Id = product.Category_Product_Id;
-                                    cateringProductsDto.Catering_Product = product.Product_Name;
-                                    cateringProductsDto.Qty = product.Qty;
+                                    var cateringProductsDto = new CartCateringProductsDTO
+                                        {
+                                            Catering_Product_Id = product.Category_Product_Id,
+                                            Catering_Product = product.Product_Name,
+                                            Qty = product.Qty
+                                        };
                                     detailDm.Catering_Products.Add(cateringProductsDto);
                                 }
 
@@ -2562,7 +2620,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2572,7 +2630,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public OrderPaymentResponse GetOrderPaymentDetail(int orderId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new OrderPaymentResponse();
 
             try
@@ -2586,7 +2644,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2601,7 +2659,7 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var orderBc = new OrderBC(_context);
+                        var orderBc = new OrderService(_context);
                         var orderDm = orderBc.GetPaymentByOrderId(orderId);
 
                         if (orderDm != null)
@@ -2634,7 +2692,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2644,7 +2702,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public TrackingResponse GetOrderTrackingDetail(int orderId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new TrackingResponse();
 
             try
@@ -2658,7 +2716,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2673,7 +2731,7 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var orderBc = new OrderBC(_context);
+                        var orderBc = new OrderService(_context);
                         var orderDm = orderBc.GetLatestTrackingDetail(orderId);
 
                         if (orderDm != null)
@@ -2697,7 +2755,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2707,7 +2765,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public SettingResponse GetSettings()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new SettingResponse();
 
             try
@@ -2721,7 +2779,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2730,7 +2788,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var areaBc = new CommonBC(_context, _logPath);
+                        var areaBc = new CommonService(_context, _logPath);
                         var currentevents = areaBc.GetSettings();
                         var lang = "E";
                         if (Request.Headers.ContainsKey("X-Cacaoo-Lang") && Request.Headers["X-Cacaoo-Lang"] == "A")
@@ -2740,10 +2798,12 @@ namespace ChocolateDelivery.UI.Controllers
 
                         foreach (var currentevent in currentevents)
                         {
-                            var eventsDto = new SettingDTO();
-                            eventsDto.Setting_Id = currentevent.SETTING_ID;
-                            eventsDto.Setting_Name = currentevent.SETTING_NAME;
-                            eventsDto.Setting_Value = currentevent.SETTING_VALUE;
+                            var eventsDto = new SettingDTO
+                            {
+                                Setting_Id = currentevent.SETTING_ID,
+                                Setting_Name = currentevent.SETTING_NAME,
+                                Setting_Value = currentevent.SETTING_VALUE
+                            };
                             response.Settings.Add(eventsDto);
                         }
 
@@ -2758,7 +2818,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2770,7 +2830,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse AddFavorite(FavoriteRequest favoriteRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -2784,7 +2844,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2800,20 +2860,22 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var commonBc = new CommonBC(_context, _logPath);
+                        var appUserService = new AppUserService(_context);
+                        var commonBc = new CommonService(_context, _logPath);
 
                         var rowId = new Guid(favoriteRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var isFavExist = commonBc.GetFavorite(appUserDm.App_User_Id, favoriteRequest.Product_Id);
                             if (isFavExist == null)
                             {
-                                TXN_Favorite favoriteDm = new TXN_Favorite();
-                                favoriteDm.Product_Id = favoriteRequest.Product_Id;
-                                favoriteDm.App_User_Id = appUserDm.App_User_Id;
-                                favoriteDm.Created_Datetime = StaticMethods.GetKuwaitTime();
+                                var favoriteDm = new TXN_Favorite
+                                {
+                                    Product_Id = favoriteRequest.Product_Id,
+                                    App_User_Id = appUserDm.App_User_Id,
+                                    Created_Datetime = StaticMethods.GetKuwaitTime()
+                                };
                                 commonBc.AddFavorite(favoriteDm);
 
                                 response.Status = 0;
@@ -2840,7 +2902,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2850,7 +2912,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public ProductsResponse GetFavoriteProducts(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new ProductsResponse();
 
             try
@@ -2864,7 +2926,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2886,32 +2948,34 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var commonBc = new CommonBC(_context, _logPath);
+                            var commonBc = new CommonService(_context, _logPath);
                             var posts = commonBc.GetFavoriteProducts(appUserDm.App_User_Id);
 
 
                             foreach (var currentevent in posts.Items)
                             {
-                                var eventsDto = new ProductDTO();
-                                eventsDto.Product_Id = currentevent.Product_Id;
-                                eventsDto.Product_Name = lang.ToUpper() == "E"
-                                    ? currentevent.Product_Name_E
-                                    : currentevent.Product_Name_A ?? "";
-                                eventsDto.Product_Desc = lang.ToUpper() == "E"
-                                    ? currentevent.Product_Desc_E ?? ""
-                                    : currentevent.Product_Desc_A ?? "";
-                                eventsDto.Price = currentevent.Price;
-                                eventsDto.Image_Url = currentevent.Image_URL ?? "";
-                                eventsDto.Brand_Name = lang.ToUpper() == "E"
-                                    ? currentevent.Brand_Name_E ?? ""
-                                    : currentevent.Brand_Name_A ?? "";
+                                var eventsDto = new ProductDTO
+                                {
+                                    Product_Id = currentevent.Product_Id,
+                                    Product_Name = lang.ToUpper() == "E"
+                                        ? currentevent.Product_Name_E
+                                        : currentevent.Product_Name_A ?? "",
+                                    Product_Desc = lang.ToUpper() == "E"
+                                        ? currentevent.Product_Desc_E ?? ""
+                                        : currentevent.Product_Desc_A ?? "",
+                                    Price = currentevent.Price,
+                                    Image_Url = currentevent.Image_URL ?? "",
+                                    Brand_Name = lang.ToUpper() == "E"
+                                        ? currentevent.Brand_Name_E ?? ""
+                                        : currentevent.Brand_Name_A ?? ""
+                                };
                                 response.Products.Add(eventsDto);
                             }
 
@@ -2933,7 +2997,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -2943,7 +3007,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse RemoveFavorite(FavoriteRequest favoriteRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -2957,7 +3021,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -2973,11 +3037,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var commonBc = new CommonBC(_context, _logPath);
+                        var appUserService = new AppUserService(_context);
+                        var commonBc = new CommonService(_context, _logPath);
 
                         var rowId = new Guid(favoriteRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var isFavExist = commonBc.GetFavorite(appUserDm.App_User_Id, favoriteRequest.Product_Id);
@@ -3017,7 +3081,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3031,7 +3095,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public DriverOrderResponse GetDriverPendingOrders(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new DriverOrderResponse();
 
             try
@@ -3045,7 +3109,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3067,23 +3131,25 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var areaBc = new OrderBC(_context);
+                            var areaBc = new OrderService(_context);
                             var currentevents = areaBc.GetPendingDriverOrders(lang, appUserDm.App_User_Id);
 
                             foreach (var currentevent in currentevents)
                             {
-                                var eventsDto = new DriverOrderDTO();
-                                eventsDto.Order_Id = currentevent.Order_Id;
-                                eventsDto.Order_No = currentevent.Order_Serial;
-                                eventsDto.Pickup_Address = currentevent.Branch_Address;
-                                eventsDto.Delivery_Address = currentevent.Full_Address;
+                                var eventsDto = new DriverOrderDTO
+                                {
+                                    Order_Id = currentevent.Order_Id,
+                                    Order_No = currentevent.Order_Serial,
+                                    Pickup_Address = currentevent.Branch_Address,
+                                    Delivery_Address = currentevent.Full_Address
+                                };
                                 response.Orders.Add(eventsDto);
                             }
 
@@ -3105,7 +3171,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3115,7 +3181,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse UpdateOrder(DriverOrderRequest driverOrderRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -3129,7 +3195,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3151,11 +3217,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var orderBc = new OrderBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var orderBc = new OrderService(_context);
 
                         var rowId = new Guid(driverOrderRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var orderDm = orderBc.GetOrder(driverOrderRequest.Order_Id);
@@ -3185,11 +3251,13 @@ namespace ChocolateDelivery.UI.Controllers
                                     if (driverOrderRequest.Status_Id == OrderStatus.ACCEPTED_BY_DRIVER ||
                                         driverOrderRequest.Status_Id == OrderStatus.DECLINED_BY_DRIVER)
                                     {
-                                        TXN_Order_Logs log = new TXN_Order_Logs();
-                                        log.Order_Id = orderDm.Order_Id;
-                                        log.Status_Id = orderDm.Status_Id;
-                                        log.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        log.Driver_Id = appUserDm.App_User_Id;
+                                        var log = new TXN_Order_Logs
+                                        {
+                                            Order_Id = orderDm.Order_Id,
+                                            Status_Id = orderDm.Status_Id,
+                                            Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                            Driver_Id = appUserDm.App_User_Id
+                                        };
                                         if (driverOrderRequest.Status_Id == OrderStatus.ACCEPTED_BY_DRIVER)
                                             log.Comments = "Order Accepted By Driver";
                                         else if (driverOrderRequest.Status_Id == OrderStatus.DECLINED_BY_DRIVER)
@@ -3228,7 +3296,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3238,7 +3306,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse PickupOrder(DriverOrderRequest driverOrderRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -3252,7 +3320,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3281,11 +3349,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var orderBc = new OrderBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var orderBc = new OrderService(_context);
 
                         var rowId = new Guid(driverOrderRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var orderDm = orderBc.GetOrder(driverOrderRequest.Order_Id);
@@ -3295,7 +3363,7 @@ namespace ChocolateDelivery.UI.Controllers
                                 {
                                     if (orderDm.Status_Id == OrderStatus.ACCEPTED_BY_DRIVER)
                                     {
-                                        byte[] bytes = Convert.FromBase64String(driverOrderRequest.Delivery_Image);
+                                        var bytes = Convert.FromBase64String(driverOrderRequest.Delivery_Image);
                                         var imagePathDir = "assets/images/delivery/";
                                         var fileName = StaticMethods.GetKuwaitTime().ToString("yyyyMMddHHmmssfff") +
                                                        ".png";
@@ -3307,12 +3375,14 @@ namespace ChocolateDelivery.UI.Controllers
                                         orderDm.Status_Id = OrderStatus.OUT_FOR_DELIVERY;
                                         orderBc.SaveOrder(orderDm);
 
-                                        TXN_Order_Logs log = new TXN_Order_Logs();
-                                        log.Order_Id = orderDm.Order_Id;
-                                        log.Status_Id = orderDm.Status_Id;
-                                        log.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        log.Driver_Id = appUserDm.App_User_Id;
-                                        log.Comments = "Order Picked up By Driver";
+                                        var log = new TXN_Order_Logs
+                                        {
+                                            Order_Id = orderDm.Order_Id,
+                                            Status_Id = orderDm.Status_Id,
+                                            Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                            Driver_Id = appUserDm.App_User_Id,
+                                            Comments = "Order Picked up By Driver"
+                                        };
                                         orderBc.CreateOrderLog(log);
 
                                         response.Status = 0;
@@ -3353,7 +3423,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3363,7 +3433,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse DeliverOrder(DriverOrderRequest driverOrderRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -3377,7 +3447,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3406,11 +3476,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var orderBc = new OrderBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var orderBc = new OrderService(_context);
 
                         var rowId = new Guid(driverOrderRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var orderDm = orderBc.GetOrder(driverOrderRequest.Order_Id);
@@ -3420,7 +3490,7 @@ namespace ChocolateDelivery.UI.Controllers
                                 {
                                     if (orderDm.Status_Id == OrderStatus.OUT_FOR_DELIVERY)
                                     {
-                                        byte[] bytes = Convert.FromBase64String(driverOrderRequest.Delivery_Image);
+                                        var bytes = Convert.FromBase64String(driverOrderRequest.Delivery_Image);
                                         var imagePathDir = "assets/images/delivery/";
                                         var fileName = StaticMethods.GetKuwaitTime().ToString("yyyyMMddHHmmssfff") +
                                                        ".png";
@@ -3432,34 +3502,27 @@ namespace ChocolateDelivery.UI.Controllers
                                         orderDm.Status_Id = OrderStatus.ORDER_DELIVERED;
                                         orderBc.SaveOrder(orderDm);
 
-                                        TXN_Order_Logs log = new TXN_Order_Logs();
-                                        log.Order_Id = orderDm.Order_Id;
-                                        log.Status_Id = orderDm.Status_Id;
-                                        log.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        log.Driver_Id = appUserDm.App_User_Id;
-                                        log.Comments = "Order Delivered By Driver";
+                                        var log = new TXN_Order_Logs
+                                        {
+                                            Order_Id = orderDm.Order_Id,
+                                            Status_Id = orderDm.Status_Id,
+                                            Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                            Driver_Id = appUserDm.App_User_Id,
+                                            Comments = "Order Delivered By Driver"
+                                        };
                                         orderBc.CreateOrderLog(log);
 
-                                        CommonBC commonBc = new CommonBC(_context, _logPath);
-                                        var pointsPerKd = commonBc.GetSettingValue<int>(SettingNames.Points_Per_KD);
+                                        var commonService = new CommonService(_context, _logPath);
+                                        var pointsPerKd = commonService.GetSettingValue<int>(SettingNames.Points_Per_KD);
 
-                                        LP_POINTS_TRANSACTION txnDm = new LP_POINTS_TRANSACTION();
-                                        txnDm.Type_Id = TXN_Point_Types.Add_Points_After_Payment;
-                                        txnDm.TXN_Date = StaticMethods.GetKuwaitTime().Date;
-                                        txnDm.App_User_Id = orderDm.App_User_Id;
-                                        txnDm.Order_Id = orderDm.Order_Id;
-                                        txnDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        txnDm.Points = orderDm.Net_Amount * pointsPerKd;
-
-                                        string connectionString =
+                                        var connectionString =
                                             _config.GetValue<string>("ConnectionStrings:DefaultConnection");
-                                        using (MySqlConnection con = new MySqlConnection(connectionString))
+                                        using (var con = new MySqlConnection(connectionString))
                                         {
                                             con.Open();
-                                            var time = con.ConnectionTimeout;
-                                            using (MySqlCommand cmd = new MySqlCommand("UpdateRedeemPoints", con))
+                                            using (var cmd = new MySqlCommand("UpdateRedeemPoints", con))
                                             {
-                                                using (var da = new MySqlDataAdapter(cmd))
+                                                using (new MySqlDataAdapter(cmd))
                                                 {
                                                     cmd.CommandType = CommandType.StoredProcedure;
                                                     cmd.Parameters.AddWithValue("@App_User_Id", orderDm.App_User_Id);
@@ -3506,7 +3569,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3516,7 +3579,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse NotDeliverOrder(DriverOrderRequest driverOrderRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -3530,7 +3593,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3559,11 +3622,11 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var orderBc = new OrderBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var orderBc = new OrderService(_context);
 
                         var rowId = new Guid(driverOrderRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
                             var orderDm = orderBc.GetOrder(driverOrderRequest.Order_Id);
@@ -3577,34 +3640,27 @@ namespace ChocolateDelivery.UI.Controllers
                                         orderDm.Status_Id = OrderStatus.NOT_DELIVERED;
                                         orderBc.SaveOrder(orderDm);
 
-                                        TXN_Order_Logs log = new TXN_Order_Logs();
-                                        log.Order_Id = orderDm.Order_Id;
-                                        log.Status_Id = orderDm.Status_Id;
-                                        log.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        log.Driver_Id = appUserDm.App_User_Id;
-                                        log.Comments = "Order Not Delivered (" + driverOrderRequest.Comments + ")";
+                                        var log = new TXN_Order_Logs
+                                        {
+                                            Order_Id = orderDm.Order_Id,
+                                            Status_Id = orderDm.Status_Id,
+                                            Created_Datetime = StaticMethods.GetKuwaitTime(),
+                                            Driver_Id = appUserDm.App_User_Id,
+                                            Comments = "Order Not Delivered (" + driverOrderRequest.Comments + ")"
+                                        };
                                         orderBc.CreateOrderLog(log);
 
-                                        CommonBC commonBc = new CommonBC(_context, _logPath);
-                                        var pointsPerKd = commonBc.GetSettingValue<int>(SettingNames.Points_Per_KD);
+                                        var commonService = new CommonService(_context, _logPath);
+                                        var pointsPerKd = commonService.GetSettingValue<int>(SettingNames.Points_Per_KD);
 
-                                        LP_POINTS_TRANSACTION txnDm = new LP_POINTS_TRANSACTION();
-                                        txnDm.Type_Id = TXN_Point_Types.Add_Points_After_Payment;
-                                        txnDm.TXN_Date = StaticMethods.GetKuwaitTime().Date;
-                                        txnDm.App_User_Id = orderDm.App_User_Id;
-                                        txnDm.Order_Id = orderDm.Order_Id;
-                                        txnDm.Created_Datetime = StaticMethods.GetKuwaitTime();
-                                        txnDm.Points = orderDm.Net_Amount * pointsPerKd;
-
-                                        string connectionString =
+                                        var connectionString =
                                             _config.GetValue<string>("ConnectionStrings:DefaultConnection");
-                                        using (MySqlConnection con = new MySqlConnection(connectionString))
+                                        using (var con = new MySqlConnection(connectionString))
                                         {
                                             con.Open();
-                                            var time = con.ConnectionTimeout;
-                                            using (MySqlCommand cmd = new MySqlCommand("UpdateRedeemPoints", con))
+                                            using (var cmd = new MySqlCommand("UpdateRedeemPoints", con))
                                             {
-                                                using (var da = new MySqlDataAdapter(cmd))
+                                                using (new MySqlDataAdapter(cmd))
                                                 {
                                                     cmd.CommandType = CommandType.StoredProcedure;
                                                     cmd.Parameters.AddWithValue("@App_User_Id", orderDm.App_User_Id);
@@ -3651,7 +3707,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3661,7 +3717,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public DriverOrderResponse GetDriverDeliveredOrders(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new DriverOrderResponse();
 
             try
@@ -3675,7 +3731,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3697,27 +3753,29 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var areaBc = new OrderBC(_context);
+                            var areaBc = new OrderService(_context);
                             var currentevents = areaBc.GetDeliveredDriverOrders(lang, appUserDm.App_User_Id);
 
                             foreach (var currentevent in currentevents)
                             {
-                                var eventsDto = new DriverOrderDTO();
-                                eventsDto.Order_Id = currentevent.Order_Id;
-                                eventsDto.Order_No = currentevent.Order_Serial;
-                                eventsDto.Pickup_Address = currentevent.Branch_Address;
-                                eventsDto.Delivery_Address = currentevent.Full_Address;
-                                eventsDto.Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt");
-                                eventsDto.Order_Amount = currentevent.Net_Amount;
-                                eventsDto.Order_Status = currentevent.Status_Name;
-                                eventsDto.Payment_Type = currentevent.Payment_Type_Name;
+                                var eventsDto = new DriverOrderDTO
+                                {
+                                    Order_Id = currentevent.Order_Id,
+                                    Order_No = currentevent.Order_Serial,
+                                    Pickup_Address = currentevent.Branch_Address,
+                                    Delivery_Address = currentevent.Full_Address,
+                                    Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt"),
+                                    Order_Amount = currentevent.Net_Amount,
+                                    Order_Status = currentevent.Status_Name,
+                                    Payment_Type = currentevent.Payment_Type_Name
+                                };
                                 response.Orders.Add(eventsDto);
                             }
 
@@ -3739,7 +3797,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3749,7 +3807,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public DriverOrderResponse GetFilterDriverDeliveredOrders(GetDriverOrdersRequest driverOrdersRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new DriverOrderResponse();
 
             try
@@ -3763,7 +3821,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3785,14 +3843,14 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(driverOrdersRequest.App_User_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var areaBc = new OrderBC(_context);
+                            var areaBc = new OrderService(_context);
                             var fromDate = DateTime.ParseExact(driverOrdersRequest.From_Date, "dd-MMM-yyyy",
                                 CultureInfo.InvariantCulture);
                             var toDate = DateTime.ParseExact(driverOrdersRequest.To_Date + " 23:59:59",
@@ -3805,15 +3863,17 @@ namespace ChocolateDelivery.UI.Controllers
                                 .Sum(x => x.Net_Amount);
                             foreach (var currentevent in currentevents)
                             {
-                                var eventsDto = new DriverOrderDTO();
-                                eventsDto.Order_Id = currentevent.Order_Id;
-                                eventsDto.Order_No = currentevent.Order_Serial;
-                                eventsDto.Pickup_Address = currentevent.Branch_Address;
-                                eventsDto.Delivery_Address = currentevent.Full_Address;
-                                eventsDto.Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt");
-                                eventsDto.Order_Amount = currentevent.Net_Amount;
-                                eventsDto.Order_Status = currentevent.Status_Name;
-                                eventsDto.Payment_Type = currentevent.Payment_Type_Name;
+                                var eventsDto = new DriverOrderDTO
+                                {
+                                    Order_Id = currentevent.Order_Id,
+                                    Order_No = currentevent.Order_Serial,
+                                    Pickup_Address = currentevent.Branch_Address,
+                                    Delivery_Address = currentevent.Full_Address,
+                                    Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt"),
+                                    Order_Amount = currentevent.Net_Amount,
+                                    Order_Status = currentevent.Status_Name,
+                                    Payment_Type = currentevent.Payment_Type_Name
+                                };
                                 response.Orders.Add(eventsDto);
                             }
 
@@ -3835,7 +3895,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3845,7 +3905,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public OrderDetailResponse GetDriverDeliveryOrderDetail(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new OrderDetailResponse();
 
             try
@@ -3859,7 +3919,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -3881,14 +3941,14 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var orderBc = new OrderBC(_context);
+                            var orderBc = new OrderService(_context);
                             var existingDeliveringOrder = orderBc.GetExistingDriverOrder(appUserDm.App_User_Id);
 
 
@@ -3902,16 +3962,20 @@ namespace ChocolateDelivery.UI.Controllers
                                 response.Mobile = orderDm.Mobile ?? "";
                                 response.Email = orderDm.Email;
 
-                                var pickAddressDm = new AddressCoordinatesDTO();
-                                pickAddressDm.Address = orderDm.Branch_Address;
-                                pickAddressDm.Latitude = orderDm.Branch_Latitude;
-                                pickAddressDm.Longitude = orderDm.Branch_Longitude;
+                                var pickAddressDm = new AddressCoordinatesDTO
+                                {
+                                    Address = orderDm.Branch_Address,
+                                    Latitude = orderDm.Branch_Latitude,
+                                    Longitude = orderDm.Branch_Longitude
+                                };
                                 response.Pickup_Address = pickAddressDm;
 
-                                var deliveryAddressDm = new AddressCoordinatesDTO();
-                                deliveryAddressDm.Address = orderDm.Full_Address;
-                                deliveryAddressDm.Latitude = orderDm.User_Address_Latitude;
-                                deliveryAddressDm.Longitude = orderDm.User_Address_Longitude;
+                                var deliveryAddressDm = new AddressCoordinatesDTO
+                                {
+                                    Address = orderDm.Full_Address,
+                                    Latitude = orderDm.User_Address_Latitude,
+                                    Longitude = orderDm.User_Address_Longitude
+                                };
                                 response.Delivery_Address = deliveryAddressDm;
 
                                 response.Payment_Type = orderDm.Payment_Type_Name;
@@ -3930,14 +3994,16 @@ namespace ChocolateDelivery.UI.Controllers
 
                                 foreach (var detail in orderDm.TXN_Order_Details)
                                 {
-                                    var detailDm = new DriverOrderDetailDTO();
-                                    detailDm.Prod_Name = detail.Full_Product_Name;
-                                    detailDm.Qty = detail.Qty;
-                                    detailDm.Rate = detail.Rate;
-                                    detailDm.Gross_Amount = detail.Amount;
-                                    detailDm.AddOn_Amount = detail.Gross_Amount - detail.Amount;
-                                    detailDm.Net_Amount = detail.Gross_Amount;
-                                    detailDm.Remarks = detail.Comments ?? "";
+                                    var detailDm = new DriverOrderDetailDTO
+                                    {
+                                        Prod_Name = detail.Full_Product_Name,
+                                        Qty = detail.Qty,
+                                        Rate = detail.Rate,
+                                        Gross_Amount = detail.Amount,
+                                        AddOn_Amount = detail.Gross_Amount - detail.Amount,
+                                        Net_Amount = detail.Gross_Amount,
+                                        Remarks = detail.Comments ?? ""
+                                    };
                                     response.OrderDetails.Add(detailDm);
                                 }
                                 //var addons = brandBC.GetProductAddOns(brandDM.Product_Id, lang);
@@ -3969,7 +4035,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -3979,7 +4045,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse TrackOrder(TrackingRequest trackingRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -3993,7 +4059,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -4015,20 +4081,22 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        var orderBc = new OrderBC(_context);
+                        var appUserService = new AppUserService(_context);
+                        var orderBc = new OrderService(_context);
 
                         var rowId = new Guid(trackingRequest.Driver_Id);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            TXN_Order_Tracking_Details trackingDm = new TXN_Order_Tracking_Details();
-                            trackingDm.Order_Id = trackingRequest.Order_Id;
-                            trackingDm.Status_Id = trackingRequest.Status_Id;
-                            trackingDm.Track_Datetime = StaticMethods.GetKuwaitTime();
-                            trackingDm.Driver_Id = appUserDm.App_User_Id;
-                            trackingDm.Latitude = trackingRequest.Latitude;
-                            trackingDm.Longitude = trackingRequest.Longitude;
+                            var trackingDm = new TXN_Order_Tracking_Details
+                            {
+                                Order_Id = trackingRequest.Order_Id,
+                                Status_Id = trackingRequest.Status_Id,
+                                Track_Datetime = StaticMethods.GetKuwaitTime(),
+                                Driver_Id = appUserDm.App_User_Id,
+                                Latitude = trackingRequest.Latitude,
+                                Longitude = trackingRequest.Longitude
+                            };
                             orderBc.CreateOrderTrackingDetail(trackingDm);
 
 
@@ -4050,7 +4118,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4062,7 +4130,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public CacaooMapResponse GetCacaooMaps()
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new CacaooMapResponse();
 
             try
@@ -4076,7 +4144,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -4091,20 +4159,22 @@ namespace ChocolateDelivery.UI.Controllers
                             lang = "A";
                         }
 
-                        var branchBc = new BranchBC(_context);
+                        var branchBc = new BranchService(_context);
                         var currentevents = branchBc.GetAllBranches();
                         foreach (var currentevent in currentevents)
                         {
-                            var eventsDto = new MapDTO();
-                            eventsDto.Branch_Name = lang == "A"
-                                ? currentevent.Branch_Name_A ?? currentevent.Branch_Name_E
-                                : currentevent.Branch_Name_E;
-                            eventsDto.Branch_Address = lang == "A"
-                                ? currentevent.Address_A ?? currentevent.Address_E ?? ""
-                                : currentevent.Address_E ?? "";
-                            eventsDto.Restaurant_Name = currentevent.Restaurant_Name;
-                            eventsDto.Latitude = currentevent.Latitude ?? 0;
-                            eventsDto.Longitude = currentevent.Longitude ?? 0;
+                            var eventsDto = new MapDTO
+                            {
+                                Branch_Name = lang == "A"
+                                    ? currentevent.Branch_Name_A ?? currentevent.Branch_Name_E
+                                    : currentevent.Branch_Name_E,
+                                Branch_Address = lang == "A"
+                                    ? currentevent.Address_A ?? currentevent.Address_E ?? ""
+                                    : currentevent.Address_E ?? "",
+                                Restaurant_Name = currentevent.Restaurant_Name,
+                                Latitude = currentevent.Latitude ?? 0,
+                                Longitude = currentevent.Longitude ?? 0
+                            };
                             response.Branches.Add(eventsDto);
                         }
 
@@ -4119,7 +4189,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4129,7 +4199,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public DriverOrderResponse GetCustomerOrders(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new DriverOrderResponse();
 
             try
@@ -4143,7 +4213,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -4165,26 +4235,28 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
+                        var appUserService = new AppUserService(_context);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var areaBc = new OrderBC(_context);
+                            var areaBc = new OrderService(_context);
                             var currentevents = areaBc.GetCustomerOrders(lang, appUserDm.App_User_Id);
 
                             foreach (var currentevent in currentevents)
                             {
-                                var eventsDto = new DriverOrderDTO();
-                                eventsDto.Order_Id = currentevent.Order_Id;
-                                eventsDto.Order_No = currentevent.Order_Serial;
-                                eventsDto.Pickup_Address = currentevent.Branch_Address;
-                                eventsDto.Delivery_Address = currentevent.Full_Address;
-                                eventsDto.Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt");
-                                eventsDto.Order_Amount = currentevent.Net_Amount;
-                                eventsDto.Order_Status = currentevent.Status_Name;
+                                var eventsDto = new DriverOrderDTO
+                                {
+                                    Order_Id = currentevent.Order_Id,
+                                    Order_No = currentevent.Order_Serial,
+                                    Pickup_Address = currentevent.Branch_Address,
+                                    Delivery_Address = currentevent.Full_Address,
+                                    Order_Date = currentevent.Order_Datetime.ToString("dd-MM-yyyy hh:mm tt"),
+                                    Order_Amount = currentevent.Net_Amount,
+                                    Order_Status = currentevent.Status_Name
+                                };
                                 response.Orders.Add(eventsDto);
                             }
 
@@ -4206,7 +4278,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4216,7 +4288,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpPost]
         public GeneralResponse RateProduct(RatingRequest ratingRequest)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new GeneralResponse();
 
             try
@@ -4230,7 +4302,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -4239,7 +4311,7 @@ namespace ChocolateDelivery.UI.Controllers
                     }
                     else
                     {
-                        var orderBc = new OrderBC(_context);
+                        var orderBc = new OrderService(_context);
 
                         var orderDetailDm = orderBc.GetOrderDetail(ratingRequest.Order_Detail_Id);
                         if (orderDetailDm != null)
@@ -4254,15 +4326,14 @@ namespace ChocolateDelivery.UI.Controllers
                                         orderDetailDm.Rating = ratingRequest.Rating;
                                         orderBc.SaveOrderDetail(orderDetailDm);
 
-                                        string connectionString =
+                                        var connectionString =
                                             _config.GetValue<string>("ConnectionStrings:DefaultConnection");
-                                        using (MySqlConnection con = new MySqlConnection(connectionString))
+                                        using (var con = new MySqlConnection(connectionString))
                                         {
                                             con.Open();
-                                            var time = con.ConnectionTimeout;
-                                            using (MySqlCommand cmd = new MySqlCommand("SetProductRating", con))
+                                            using (var cmd = new MySqlCommand("SetProductRating", con))
                                             {
-                                                using (var da = new MySqlDataAdapter(cmd))
+                                                using (new MySqlDataAdapter(cmd))
                                                 {
                                                     cmd.CommandType = CommandType.StoredProcedure;
                                                     cmd.Parameters.AddWithValue("@Prod_Id", orderDetailDm.Product_Id);
@@ -4310,7 +4381,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4320,7 +4391,7 @@ namespace ChocolateDelivery.UI.Controllers
         [HttpGet]
         public NotificationResponse GetNotifications(string appUserId)
         {
-            string securityKey = "";
+            var securityKey = "";
             var response = new NotificationResponse();
 
             try
@@ -4334,7 +4405,7 @@ namespace ChocolateDelivery.UI.Controllers
                 {
                     securityKey = Request.Headers["X-Cacaoo-SecurityToken"];
                     //Check session token
-                    bool isAuthorized = ValidateSecurityKey(securityKey);
+                    var isAuthorized = ValidateSecurityKey(securityKey);
 
                     if (isAuthorized == false)
                     {
@@ -4356,23 +4427,25 @@ namespace ChocolateDelivery.UI.Controllers
                             return response;
                         }
 
-                        AppUserBC appUserBc = new AppUserBC(_context);
-                        NotificationBC notificationBc = new NotificationBC(_context, _logPath);
+                        var appUserService = new AppUserService(_context);
+                        var notificationService = new NotificationService(_context, _logPath);
 
 
                         var rowId = new Guid(appUserId);
-                        var appUserDm = appUserBc.GetAppUserByRowId(rowId);
+                        var appUserDm = appUserService.GetAppUserByRowId(rowId);
                         if (appUserDm != null)
                         {
-                            var notifications = notificationBc.GetNotifications(appUserDm.App_User_Id, lang);
+                            var notifications = notificationService.GetNotifications(appUserDm.App_User_Id, lang);
                             foreach (var notification in notifications)
                             {
-                                var notificationDto = new NotificationDTO();
-                                notificationDto.Notification_Id = notification.Notification_Id;
-                                notificationDto.Title = notification.Title;
-                                notificationDto.Desc = notification.Desc;
-                                notificationDto.Time = "";
-                                TimeSpan span = StaticMethods.GetKuwaitTime().Subtract(notification.Created_Datetime);
+                                var notificationDto = new NotificationDTO
+                                {
+                                    Notification_Id = notification.Notification_Id,
+                                    Title = notification.Title,
+                                    Desc = notification.Desc,
+                                    Time = ""
+                                };
+                                var span = StaticMethods.GetKuwaitTime().Subtract(notification.Created_Datetime);
                                 if (span.TotalSeconds < 60)
                                 {
                                     notificationDto.Time = "Just Now";
@@ -4411,7 +4484,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4427,12 +4500,12 @@ namespace ChocolateDelivery.UI.Controllers
             var response = new List<SM_Restaurant_AddOns>();
             try
             {
-                RestaurantBC restaurantBc = new RestaurantBC(_context);
-                response = restaurantBc.GetAllRestaurantAddOns(restaurantId);
+                var restaurantService = new RestaurantService(_context);
+                response = restaurantService.GetAllRestaurantAddOns(restaurantId);
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(_logPath, ex.ToString(), true);
+                Helpers.WriteToFile(_logPath, ex.ToString(), true);
             }
 
             return response;
@@ -4446,7 +4519,7 @@ namespace ChocolateDelivery.UI.Controllers
 
             try
             {
-                var areaBc = new OrderBC(_context);
+                var areaBc = new OrderService(_context);
                 response.Orders = areaBc.GetDashboardOrders(dashboardOrderType);
                 response.Status = 0;
                 response.Message = ServiceResponse.Success;
@@ -4456,7 +4529,7 @@ namespace ChocolateDelivery.UI.Controllers
             {
                 response.Status = 1;
                 response.Message = ServiceResponse.ServerError;
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
             return response;
@@ -4469,12 +4542,12 @@ namespace ChocolateDelivery.UI.Controllers
         [NonAction]
         private bool ValidateSecurityKey(string securityKey)
         {
-            bool isAuthorisedUser = false;
+            var isAuthorisedUser = false;
             try
             {
-                var eisDal = new DeviceBC(_context, _logPath);
+                var eisDal = new DeviceService(_context);
                 _securityDto = eisDal.GetDeviceByClientKey(Base64Decode(securityKey));
-                // globalCls.WriteToFile(HttpContext.Current.Server.MapPath(Convert.ToString(ConfigurationManager.AppSettings["ErrorFilePath"])), "Client Key : " + securityDTO.Client_Key, true);
+                // Helpers.WriteToFile(HttpContext.Current.Server.MapPath(Convert.ToString(ConfigurationManager.AppSettings["ErrorFilePath"])), "Client Key : " + securityDTO.Client_Key, true);
 
                 if (_securityDto != null && !string.IsNullOrEmpty(_securityDto.Client_Key))
                 {
@@ -4489,7 +4562,7 @@ namespace ChocolateDelivery.UI.Controllers
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
                 isAuthorisedUser = false;
             }
 
@@ -4506,20 +4579,20 @@ namespace ChocolateDelivery.UI.Controllers
         [NonAction]
         public bool SendOrderEmail(long orderId)
         {
-            bool bSuccess = false;
+            var bSuccess = false;
             try
             {
-                var orderBc = new OrderBC(_context);
-                RestaurantBC restaurantBc = new RestaurantBC(_context);
-                decimal grossAmount = Decimal.Zero;
+                var orderBc = new OrderService(_context);
+                var restaurantService = new RestaurantService(_context);
+                var grossAmount = Decimal.Zero;
 
                 var order = orderBc.GetOrder(Convert.ToInt32(orderId));
-                var orderDetails = orderBc.GetOrderDetails(Convert.ToInt32(orderId));
+                orderBc.GetOrderDetails(Convert.ToInt32(orderId));
 
 
                 if (order != null)
                 {
-                    string bodyMessage = "";
+                    var bodyMessage = "";
 
                     var siteConfiguration = orderBc.GetSiteConfiguration(Email_Templates.COD_EMAIL_MESSAGE);
 
@@ -4539,21 +4612,21 @@ namespace ChocolateDelivery.UI.Controllers
 
                     bodyMessage = bodyMessage.Replace("[ADDRESS]", order.Full_Address);
 
-                    string substring = "";
+                    var substring = "";
 
                     foreach (var orderdetail in order.TXN_Order_Details)
                     {
-                        string col1 =
+                        var col1 =
                             " <td valign=top style='padding:5.0pt 0in 0in 0in'><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.5pt;color:#403F45'>" +
                             orderdetail.Full_Product_Name + "<o:p></o:p></span></p></td>";
-                        string col2 =
+                        var col2 =
                             " <td valign=top style='padding:5.0pt 0in 0in 0in'><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.5pt;color:#403F45'>" +
                             Convert.ToDecimal(orderdetail.Rate).ToString("N3") + "<o:p></o:p></span></p></td>";
 
-                        string col5 =
+                        var col5 =
                             " <td valign=top style='padding:5.0pt 0in 0in 0in'><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.5pt;color:#403F45'>" +
                             orderdetail.Qty.ToString() + "<o:p></o:p></span></p></td>";
-                        string col6 =
+                        var col6 =
                             " <td valign=top style='padding:5.0pt 0in 0in 0in'><p class=MsoNormal align=center style='text-align:center'><span style='font-size:10.5pt;color:#403F45'>" +
                             Convert.ToDecimal(orderdetail.Gross_Amount).ToString("N3") + "<o:p></o:p></span></p></td>";
                         substring += " <tr>" + col1 + col2 + /*col3 +*/ /*col4 +*/ col5 + col6 + "</tr> ";
@@ -4562,7 +4635,7 @@ namespace ChocolateDelivery.UI.Controllers
 
 
                     var netAmount = grossAmount;
-                    decimal deliveryCharge = decimal.Zero;
+                    var deliveryCharge = decimal.Zero;
 
 
                     deliveryCharge = order.Delivery_Charges;
@@ -4598,7 +4671,7 @@ namespace ChocolateDelivery.UI.Controllers
                     subject = subject.Replace("[CHANNEL]", channel);
 
 
-                    var restaurantDm = restaurantBc.GetRestaurant(order.Restaurant_Id);
+                    var restaurantDm = restaurantService.GetRestaurant(order.Restaurant_Id);
                     if (restaurantDm != null && !string.IsNullOrEmpty(restaurantDm.Email))
                     {
                         siteConfiguration.BCC_Email =
@@ -4618,12 +4691,12 @@ namespace ChocolateDelivery.UI.Controllers
                         emailMsg = "Email not sent successfully for Order Id:" + orderId;
                     }
 
-                    globalCls.WriteToFile(_logPath, emailMsg);
+                    Helpers.WriteToFile(_logPath, emailMsg);
                 }
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
             }
 
 
@@ -4640,12 +4713,12 @@ namespace ChocolateDelivery.UI.Controllers
                 var port = _config.GetValue<int>("MailSettings:Port");
                 var senderName = _config.GetValue<string>("MailSettings:SenderName");
 
-                using (MimeMessage emailMessage = new MimeMessage())
+                using (var emailMessage = new MimeMessage())
                 {
-                    MailboxAddress emailFrom = new MailboxAddress(senderName, fromEmail);
+                    var emailFrom = new MailboxAddress(senderName, fromEmail);
                     emailMessage.From.Add(emailFrom);
 
-                    MailboxAddress emailTo = new MailboxAddress(receiverName, to);
+                    var emailTo = new MailboxAddress(receiverName, to);
                     emailMessage.To.Add(emailTo);
 
                     if (!string.IsNullOrEmpty(cc))
@@ -4656,13 +4729,15 @@ namespace ChocolateDelivery.UI.Controllers
                     emailMessage.Subject = subject;
 
 
-                    BodyBuilder emailBodyBuilder = new BodyBuilder();
-                    emailBodyBuilder.HtmlBody = body;
-                    emailBodyBuilder.TextBody = "Plain Text goes here to avoid marked as spam for some email servers.";
+                    var emailBodyBuilder = new BodyBuilder
+                    {
+                        HtmlBody = body,
+                        TextBody = "Plain Text goes here to avoid marked as spam for some email servers."
+                    };
 
                     emailMessage.Body = emailBodyBuilder.ToMessageBody();
 
-                    using (SmtpClient mailClient = new SmtpClient())
+                    using (var mailClient = new SmtpClient())
                     {
                         mailClient.Connect(server, port, true);
                         mailClient.AuthenticationMechanisms.Remove("XOAUTH2");
@@ -4677,7 +4752,7 @@ namespace ChocolateDelivery.UI.Controllers
             catch (Exception ex)
             {
                 // Exception Details
-                globalCls.WriteToFile(_logPath, ex.ToString());
+                Helpers.WriteToFile(_logPath, ex.ToString());
                 return false;
             }
         }

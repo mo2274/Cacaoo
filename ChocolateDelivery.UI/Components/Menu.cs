@@ -6,10 +6,10 @@ namespace ChocolateDelivery.UI.Components
 {
     public class Menu : ViewComponent
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private string logPath = "";
-        public Menu(ChocolateDeliveryEntities cc, IConfiguration config)
+        public Menu(AppDbContext cc, IConfiguration config)
         {
             context = cc;
             _config = config;
@@ -17,7 +17,7 @@ namespace ChocolateDelivery.UI.Components
         }
         public IViewComponentResult Invoke()
         {
-            var userBC = new UserBC(context,logPath);
+            var userBC = new UserService(context,logPath);
             var user_cd =  HttpContext.Session.GetInt32("UserCd");
             var menuList = new List<SM_MENU>();
             if (user_cd != null) {

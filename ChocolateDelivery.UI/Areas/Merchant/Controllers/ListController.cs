@@ -10,54 +10,54 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
     [Area("Merchant")]
     public class ListController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        ListBC listBC;
-        CommonBC commonBC;
+        ListService _listService;
+        CommonService _commonService;
 
-        public ListController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public ListController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            listBC = new ListBC(context, logPath);
-            commonBC = new CommonBC(context, logPath);
+            _listService = new ListService(context, logPath);
+            _commonService = new CommonService(context, logPath);
         }
 
         public IActionResult Index(long Id)
         {
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
             try
             {
                 ViewBag.Id = Id;
                 ViewBag.Type = Request.Query["Type"];
-                var findDTO = listBC.GetList(Id);
-                var findParameters = listBC.GetListParameters(Id);
+                var findDTO = _listService.GetList(Id);
+                var findParameters = _listService.GetListParameters(Id);
                 ViewData["findParameters"] = findParameters;
                 string[] parameterValues = Array.Empty<string>();
                 ViewData["parameterValues"] = parameterValues;
-                var findDetails = listBC.GetListFields(Id);
+                var findDetails = _listService.GetListFields(Id);
                 if (findDTO != null)
                 {
                     var restaurant_id = HttpContext.Session.GetInt32("VendorId");
                     if (restaurant_id == null) {
-                        globalCls.WriteToFile(logPath, "Getting vendor id null for list :"+findDTO.List_Name_E, true);
+                        Helpers.WriteToFile(logPath, "Getting vendor id null for list :"+findDTO.List_Name_E, true);
                     }
                     ViewBag.Show_Add_New_URL = findDTO.Show_Add_New_URL;
                     ViewBag.Add_New_URL = findDTO.Add_New_URL + "?List_Id=" + Id + "&Type=" + Request.Query["Type"];
                     ViewBag.List_Name = findDTO.List_Name_E;
                     ViewBag.Update_URL = findDTO.Update_URL;
                     ViewData["ListDetails"] = findDetails;
-                    string connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
+                    var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
                     var sqlstmt = "";
                     var parameters = new List<string>();
-                    DateTime now = StaticMethods.GetKuwaitTime();
+                    var now = StaticMethods.GetKuwaitTime();
                     foreach (var par in findParameters)
                     {
-                        string value = "";
+                        var value = "";
 
                         if (par.Parameter_Type == Parameter_Types.TextBox)
                         {
@@ -69,9 +69,9 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                             }
                             if (par.Default_Value == Parameter_Default_Values.LastOfMonth)
                             {
-                                DateTime todate = now.Date;
+                                var todate = now.Date;
                                 //DateTime todate = DateTime.ParseExact(value, "dd-MMM-yyyy", CultureInfo.InvariantCulture);
-                                TimeSpan time = new TimeSpan(23, 59, 00);
+                                var time = new TimeSpan(23, 59, 00);
                                 todate = ((DateTime)todate).Add(time);
 
                                 value = todate.ToString(Date_Formats.MySqlDatetimeFormat);
@@ -122,7 +122,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                     var selectstmt = sqlstmt + "\n select ";
                     var isGroupBy = findDTO.Contain_Group_By_Clause ?? false;
                     var groupbyclause = new List<string>();
-                    int i = 0;
+                    var i = 0;
                     foreach (var findDetail in findDetails)
                     {
                         var field_name = (string.IsNullOrEmpty(findDetail.Table_Id) ? "" : findDetail.Table_Id + ".") + findDetail.Table_Field_Name;
@@ -180,15 +180,15 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
 
                         }
 
-                        //if (dt.Columns.Contains(listBC.getDataField(findDetail, findDTO.Is_StoredProcedure)))
+                        //if (dt.Columns.Contains(_listService.getDataField(findDetail, findDTO.Is_StoredProcedure)))
                         //{
                         //    if (findDetail.Field_Type == List_Fields_Types.ZDecimal)
                         //    {
-                        //        dt.Columns.Add(listBC.getDataField(findDetail, findDTO.Is_StoredProcedure) + "  ", typeof(System.Decimal));
+                        //        dt.Columns.Add(_listService.getDataField(findDetail, findDTO.Is_StoredProcedure) + "  ", typeof(System.Decimal));
                         //    }
                         //    else
                         //    {
-                        //        dt.Columns.Add(listBC.getDataField(findDetail, findDTO.Is_StoredProcedure) + "  ");
+                        //        dt.Columns.Add(_listService.getDataField(findDetail, findDTO.Is_StoredProcedure) + "  ");
                         //    }
 
                         //}
@@ -196,11 +196,11 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                         //{
                         //    if (findDetail.Field_Type == List_Fields_Types.ZDecimal)
                         //    {
-                        //        dt.Columns.Add(listBC.getDataField(findDetail, findDTO.Is_StoredProcedure), typeof(System.Decimal));
+                        //        dt.Columns.Add(_listService.getDataField(findDetail, findDTO.Is_StoredProcedure), typeof(System.Decimal));
                         //    }
                         //    else
                         //    {
-                        //        dt.Columns.Add(listBC.getDataField(findDetail, findDTO.Is_StoredProcedure));
+                        //        dt.Columns.Add(_listService.getDataField(findDetail, findDTO.Is_StoredProcedure));
                         //    }
 
                         //}
@@ -241,16 +241,15 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
 
                     if (findDTO.Write_SQL_Log == true)
                     {
-                        globalCls.WriteToFile(logPath, selectstmt, true);
+                        Helpers.WriteToFile(logPath, selectstmt, true);
 
                     }
                     if (findDTO.Is_StoredProcedure == true)
                     {
 
-                        using (MySqlConnection con = new MySqlConnection(connectionString))
+                        using (var con = new MySqlConnection(connectionString))
                         {
-                            var time = con.ConnectionTimeout;
-                            using (MySqlCommand cmd = new MySqlCommand(findDTO.StoredProcedure_Name, con))
+                            using (var cmd = new MySqlCommand(findDTO.StoredProcedure_Name, con))
                             {
                                 if (findDTO.Command_Timeout != null)
                                 {
@@ -279,12 +278,12 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                     }
                     else
                     {
-                        using (MySqlConnection con = new MySqlConnection(connectionString))
+                        using (var con = new MySqlConnection(connectionString))
                         {
-                            using (MySqlCommand cmd = new MySqlCommand(selectstmt))
+                            using (var cmd = new MySqlCommand(selectstmt))
                             {
                                 cmd.Connection = con;
-                                using (MySqlDataAdapter sda = new MySqlDataAdapter(cmd))
+                                using (var sda = new MySqlDataAdapter(cmd))
                                 {
                                     sda.Fill(dt);
                                 }
@@ -314,20 +313,20 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                                     var returnvalue = dataReader1.IsDBNull(j);
                                     //row[column.Table_Id + "_" + column.Field_Id] = column.Field_Type == "N" ?dataReader1.GetInt64(j).ToString():dataReader1.GetString(j);
                                     if (!returnvalue)
-                                        row[listBC.getDataField(column, findDTO.Is_StoredProcedure)] = dataReader1.GetValue(j).ToString();
+                                        row[_listService.getDataField(column, findDTO.Is_StoredProcedure)] = dataReader1.GetValue(j).ToString();
                                     else
                                     {
                                         if (column.Field_Type == List_Fields_Types.ZDecimal)
                                         {
-                                            row[listBC.getDataField(column, findDTO.Is_StoredProcedure)] = 0.000;
+                                            row[_listService.getDataField(column, findDTO.Is_StoredProcedure)] = 0.000;
                                         }
                                         else if (column.Field_Type == List_Fields_Types.ZInt)
                                         {
-                                            row[listBC.getDataField(column, findDTO.Is_StoredProcedure)] = 0;
+                                            row[_listService.getDataField(column, findDTO.Is_StoredProcedure)] = 0;
                                         }
                                         else
                                         {
-                                            row[listBC.getDataField(column, findDTO.Is_StoredProcedure)] = "";
+                                            row[_listService.getDataField(column, findDTO.Is_StoredProcedure)] = "";
                                         }
                                     }
                                     j++;
@@ -345,9 +344,9 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("name", "Due to some technical error, data cannot be fetched");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
             }
-            var rowsReturned = dt.Rows.Count;
+
             return View(dt);
         }
 
@@ -357,14 +356,14 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
         {
             var parameterValues = new List<string>();
 
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
             try
             {
                 var findid = Id;
                 //DataTable dt = new DataTable();
                 var sqlstmt = "";
-                var findDTO = listBC.GetList(findid);
-                var findDetails = listBC.GetListFields(findid);
+                var findDTO = _listService.GetList(findid);
+                var findDetails = _listService.GetListFields(findid);
                 findDetails = findDetails.OrderBy(x => x.Sequence).ToList();
                 ViewData["ListDetails"] = findDetails;
                 //ViewBag.List_Name = findDTO.List_Name_E;
@@ -376,7 +375,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                     ViewBag.Update_URL = findDTO.Update_URL;
                 }
 
-                var findParameters = listBC.GetListParameters(findid);
+                var findParameters = _listService.GetListParameters(findid);
                 ViewData["findParameters"] = findParameters;
                 if (findParameters == null || findParameters.Count == 0)
                 {
@@ -387,19 +386,19 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                     var p = 0;
                     foreach (var par in findParameters)
                     {
-                        string value = txtParameter[p];
+                        var value = txtParameter[p];
 
                         if (par.Parameter_Type == Parameter_Types.TextBox)
                         {
                             if (par.Default_Value == Parameter_Default_Values.FirstOfMonth)
                             {
-                                DateTime fromdate = DateTime.ParseExact(value, "dd-MMM-yyyy", CultureInfo.InvariantCulture);
+                                var fromdate = DateTime.ParseExact(value, "dd-MMM-yyyy", CultureInfo.InvariantCulture);
                                 value = fromdate.ToString(Date_Formats.MySqlDatetimeFormat);
                             }
                             if (par.Default_Value == Parameter_Default_Values.LastOfMonth)
                             {
-                                DateTime todate = DateTime.ParseExact(value, "dd-MMM-yyyy", CultureInfo.InvariantCulture);
-                                TimeSpan time = new TimeSpan(23, 59, 00);
+                                var todate = DateTime.ParseExact(value, "dd-MMM-yyyy", CultureInfo.InvariantCulture);
+                                var time = new TimeSpan(23, 59, 00);
                                 todate = ((DateTime)todate).Add(time);
 
                                 value = todate.ToString(Date_Formats.MySqlDatetimeFormat);
@@ -448,16 +447,14 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                     }
                 }
 
-                string connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
-                dt = commonBC.GetDataTable(findid, sqlstmt, parameterValues, connectionString);
+                var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
+                dt = _commonService.GetDataTable(findid, sqlstmt, parameterValues, connectionString);
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
             }
             ViewData["parameterValues"] = txtParameter;
-            var rowsReturned = dt.Rows.Count;
-            var columnsReturned = dt.Columns.Count;
             return View(dt);
         }
     }

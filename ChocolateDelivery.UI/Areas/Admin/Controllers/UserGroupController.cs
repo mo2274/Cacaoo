@@ -7,20 +7,20 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class UserGroupController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        UserBC userBC;
+        UserService _userService;
 
 
-        public UserGroupController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public UserGroupController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            userBC = new UserBC(context, logPath);
+            _userService = new UserService(context, logPath);
         }
         public IActionResult Create()
         {
@@ -28,7 +28,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             ViewBag.List_Id = list_id;
             var userGroup = new SM_USER_GROUPS();
             var userGroupRights = new List<SM_USER_GROUP_RIGHTS>();
-            var menus = userBC.GetAllMenus();
+            var menus = _userService.GetAllMenus();
 
             foreach (var smMenu in menus)
             {
@@ -63,14 +63,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                     {
                         group.Admin = false;
                         group.User_Date_Time = StaticMethods.GetKuwaitTime();
-                        group = userBC.CreateUserGroup(group);
+                        group = _userService.CreateUserGroup(group);
                         if (group.Group_Cd != 0)
                         {
                             foreach (var right in group.SM_USER_GROUP_RIGHTS)
                             {
                                 right.Group_Cd = group.Group_Cd;
                                 right.User_Date_Time = StaticMethods.GetKuwaitTime();
-                                userBC.CreateUserGroupRight(right);
+                                _userService.CreateUserGroupRight(right);
                             }
                         }
                         return Redirect("/List/" + list_id);
@@ -92,14 +92,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create", group);
             /*if (ModelState.IsValid)
             {
 
-                var userDM = userBC.isUserExist(user.User_Id.Trim());
+                var userDM = _userService.isUserExist(user.User_Id.Trim());
                 //go to dashboard page
                 return View("Thanks");
             }
@@ -115,10 +115,10 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = userBC.GetUserGroup(decryptedId);
+                var areaexist = _userService.GetUserGroup(decryptedId);
                 if (areaexist != null && areaexist.Group_Cd != 0)
                 {
-                    var userRights = userBC.GetGroupRights(decryptedId);
+                    var userRights = _userService.GetGroupRights(decryptedId);
                     var userGroupRights = new List<SM_USER_GROUP_RIGHTS>();
                     foreach (var smMenu in userRights)
                     {
@@ -147,7 +147,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -163,19 +163,19 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt16(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = userBC.GetUserGroup(decryptedId);
+                    var areaDM = _userService.GetUserGroup(decryptedId);
                     if (areaDM != null && areaDM.Group_Cd != 0)
                     {
                         group.User_Date_Time = StaticMethods.GetKuwaitTime();
                         group.Group_Cd = decryptedId;
-                        userBC.CreateUserGroup(group);
+                        _userService.CreateUserGroup(group);
                         if (group.Group_Cd != 0)
                         {
                             foreach (var right in group.SM_USER_GROUP_RIGHTS)
                             {
                                 right.Group_Cd = group.Group_Cd;
                                 right.User_Date_Time = StaticMethods.GetKuwaitTime();
-                                userBC.CreateUserGroupRight(right);
+                                _userService.CreateUserGroupRight(right);
                             }
                         }
                         return Redirect("/List/" + list_id);
@@ -199,7 +199,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create", group);

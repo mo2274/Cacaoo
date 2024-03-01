@@ -9,11 +9,11 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Route(nameof(Admin) + "/[controller]")]
     public class LoginController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        public LoginController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public LoginController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
@@ -43,8 +43,8 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                         ModelState.AddModelError("name", "Enter Password");
                         return View();
                     }
-                    var commonBC = new CommonBC(context,logPath);
-                    var userBC = new UserBC(context, logPath);
+                    var commonBC = new CommonService(context,logPath);
+                    var userBC = new UserService(context, logPath);
                     if (user.User_Id == "HSAdmin" && user.Password == "Test123")
                     {
                         HttpContext.Session.SetString("UserName", "Admin");
@@ -126,7 +126,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, cannot login");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();

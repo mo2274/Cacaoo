@@ -1,9 +1,7 @@
 ﻿using ChocolateDelivery.BLL;
-using ChocolateDelivery.DAL;
 using ChocolateDelivery.UI.Models;
 using Newtonsoft.Json;
 using System.Net;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace ChocolateDelivery.UI.CustomFilters
 {
@@ -60,7 +58,7 @@ namespace ChocolateDelivery.UI.CustomFilters
         public static TapChargeResponse? CreateChargeRequest(TapChargeRequest tapChargeRequest, IConfiguration _config)
         {
             var url = _config.GetValue<string>("TapPayment:APIURL") + "/charges";
-            string authorization = string.Format("Bearer {0}", _config.GetValue<string>("TapPayment:SecretKey"));
+            var authorization = string.Format("Bearer {0}", _config.GetValue<string>("TapPayment:SecretKey"));
             var postData = JsonConvert.SerializeObject(tapChargeRequest);
 
             //var client = new System.Net.WebClient();           
@@ -70,9 +68,9 @@ namespace ChocolateDelivery.UI.CustomFilters
             //var response = JsonConvert.DeserializeObject<InvoiceResponseISO>(JSON_Response);
             //return response;
             var logPath = _config.GetValue<string>("ErrorFilePath");
-            globalCls.WriteToFile(logPath, "API URL:"+url);
-            globalCls.WriteToFile(logPath, "Authorization:" + authorization);
-            globalCls.WriteToFile(logPath, "Body:" + postData);
+            Helpers.WriteToFile(logPath, "API URL:"+url);
+            Helpers.WriteToFile(logPath, "Authorization:" + authorization);
+            Helpers.WriteToFile(logPath, "Body:" + postData);
             var response = GetWebRequestResponse(url, "POST", "application/json", null, authorization, postData);
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
@@ -91,7 +89,7 @@ namespace ChocolateDelivery.UI.CustomFilters
         public static TapChargeResponse? GetChargeRequest(string charge_id, IConfiguration _config)
         {
             var url = _config.GetValue<string>("TapPayment:APIURL") + "/charges/" + charge_id; ;
-            string authorization = string.Format("Bearer {0}", _config.GetValue<string>("TapPayment:SecretKey"));
+            var authorization = string.Format("Bearer {0}", _config.GetValue<string>("TapPayment:SecretKey"));
 
 
             //var client = new System.Net.WebClient();           

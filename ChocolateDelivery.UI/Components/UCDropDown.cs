@@ -9,10 +9,10 @@ namespace ChocolateDelivery.UI.Components
 {
     public class UCDropDown : ViewComponent
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private string logPath = "";
-        public UCDropDown(ChocolateDeliveryEntities cc, IConfiguration config)
+        public UCDropDown(AppDbContext cc, IConfiguration config)
         {
             context = cc;
             _config = config;
@@ -21,7 +21,7 @@ namespace ChocolateDelivery.UI.Components
 
         public IViewComponentResult Invoke(UCProperties properties)
         {
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
             try
             {
                 ViewBag.Id = properties.Id;
@@ -38,7 +38,7 @@ namespace ChocolateDelivery.UI.Components
                 var lang = HttpContext.Session.GetString("Culture") ?? Language.English;
                 if (properties.Is_Required && properties.Error_Label_Id != null && properties.Error_Label_Id != 0)
                 {
-                    var commonBC = new CommonBC(context, logPath);
+                    var commonBC = new CommonService(context, logPath);
 
                     if (lang == Language.Arabic)
                     {
@@ -85,7 +85,7 @@ namespace ChocolateDelivery.UI.Components
 
                 if (properties.List_Id != null)
                 {
-                    var listBC = new ListBC(context, logPath);
+                    var listBC = new ListService(context, logPath);
                     var findDTO = listBC.GetList((long)properties.List_Id);
                     var findDetails = listBC.GetListFields((long)properties.List_Id);
                     if (lang == Language.Arabic)
@@ -109,12 +109,12 @@ namespace ChocolateDelivery.UI.Components
                         ViewBag.List_Name = findDTO.List_Name_E;
                         ViewBag.Update_URL = findDTO.Update_URL;
                         ViewData["ListDetails"] = findDetails;
-                        string connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
+                        var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
 
                         var selectstmt = "select ";
                         var isGroupBy = findDTO.Contain_Group_By_Clause ?? false;
                         var groupbyclause = new List<string>();
-                        int i = 0;
+                        var i = 0;
                         foreach (var findDetail in findDetails)
                         {
                             if (i == findDetails.Count - 1)
@@ -206,16 +206,15 @@ namespace ChocolateDelivery.UI.Components
 
                         if (findDTO.Write_SQL_Log == true)
                         {
-                            globalCls.WriteToFile(logPath, selectstmt, true);
+                            Helpers.WriteToFile(logPath, selectstmt, true);
 
                         }
                         if (findDTO.Is_StoredProcedure == true)
                         {
 
-                            using (MySqlConnection con = new MySqlConnection(connectionString))
+                            using (var con = new MySqlConnection(connectionString))
                             {
-                                var time = con.ConnectionTimeout;
-                                using (MySqlCommand cmd = new MySqlCommand(findDTO.StoredProcedure_Name, con))
+                                using (var cmd = new MySqlCommand(findDTO.StoredProcedure_Name, con))
                                 {
                                     if (findDTO.Command_Timeout != null)
                                     {
@@ -243,12 +242,12 @@ namespace ChocolateDelivery.UI.Components
                         }
                         else
                         {
-                            using (MySqlConnection con = new MySqlConnection(connectionString))
+                            using (var con = new MySqlConnection(connectionString))
                             {
-                                using (MySqlCommand cmd = new MySqlCommand(selectstmt))
+                                using (var cmd = new MySqlCommand(selectstmt))
                                 {
                                     cmd.Connection = con;
-                                    using (MySqlDataAdapter sda = new MySqlDataAdapter(cmd))
+                                    using (var sda = new MySqlDataAdapter(cmd))
                                     {
                                         sda.Fill(dt);
                                     }
@@ -262,8 +261,8 @@ namespace ChocolateDelivery.UI.Components
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, "error in uc dropdown for list id:" + properties.List_Id, true);
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, "error in uc dropdown for list id:" + properties.List_Id, true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
 

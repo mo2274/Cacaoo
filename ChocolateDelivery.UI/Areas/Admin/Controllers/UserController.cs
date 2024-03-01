@@ -7,20 +7,20 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class UserController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        UserBC userBC;
+        UserService _userService;
 
 
-        public UserController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public UserController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;           
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            userBC = new UserBC(context, logPath);
+            _userService = new UserService(context, logPath);
         }
         public IActionResult Create()
         {
@@ -39,7 +39,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 ViewBag.List_Id = list_id;
                 if (ModelState.IsValid)
                 {
-                    var areaexist = userBC.isUserExist(user.User_Id);
+                    var areaexist = _userService.isUserExist(user.User_Id);
                     if (areaexist == null)
                     {
                         var user_cd = HttpContext.Session.GetInt32("UserCd");
@@ -48,7 +48,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             var entity_id = Convert.ToInt32(HttpContext.Session.GetInt32("Entity_Id"));
                             user.Entity_Id = entity_id;
                             //user.User_Cd = Convert.ToInt16(user_cd);                            
-                            userBC.CreateUser(user);
+                            _userService.CreateUser(user);
                             return Redirect("/List/" + list_id);
                         }
                         else
@@ -71,14 +71,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View(user);
             /*if (ModelState.IsValid)
             {
 
-                var userDM = userBC.isUserExist(user.User_Id.Trim());
+                var userDM = _userService.isUserExist(user.User_Id.Trim());
                 //go to dashboard page
                 return View("Thanks");
             }
@@ -94,7 +94,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
                 var decryptedId = Convert.ToInt16(StaticMethods.GetDecrptedString(Id));
-                var areaexist = userBC.GetUser(decryptedId);
+                var areaexist = _userService.GetUser(decryptedId);
                 if (areaexist != null && areaexist.User_Cd != 0)
                 {
                     return View("Create", areaexist);
@@ -110,7 +110,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -126,14 +126,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt16(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = userBC.GetUser(decryptedId);
+                    var areaDM = _userService.GetUser(decryptedId);
                     if (areaDM != null && areaDM.User_Cd != 0)
                     {
-                        var areaexist = userBC.isUserExist(user.User_Id);
+                        var areaexist = _userService.isUserExist(user.User_Id);
                         if (areaexist == null || (areaexist != null && areaexist.User_Cd == decryptedId))
                         {
                             user.User_Cd = decryptedId;
-                            userBC.CreateUser(user);
+                            _userService.CreateUser(user);
                             return Redirect("/List/" + list_id);
                         }
                         else
@@ -161,7 +161,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create", user);

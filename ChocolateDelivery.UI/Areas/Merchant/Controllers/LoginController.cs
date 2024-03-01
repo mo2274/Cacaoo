@@ -9,11 +9,11 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
     [Route(nameof(Merchant) + "/[controller]")]
     public class LoginController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        public LoginController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public LoginController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
@@ -43,9 +43,9 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                         ModelState.AddModelError("name", "Enter Password");
                         return View();
                     }
-                    var commonBC = new CommonBC(context, logPath);
-                    var subCategoryBC = new SubCategoryBC(context);
-                    var userBC = new RestaurantBC(context);
+                    var commonBC = new CommonService(context, logPath);
+                    var subCategoryBC = new SubCategoryService(context);
+                    var userBC = new RestaurantService(context);
 
                     var userDMWeb = userBC.ValidateMerchant(user.Username, user.Password);
                     if (userDMWeb != null && userDMWeb.Restaurant_Id != 0)
@@ -87,7 +87,7 @@ namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, cannot login");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();

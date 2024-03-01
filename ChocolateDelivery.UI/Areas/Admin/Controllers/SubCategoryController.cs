@@ -7,20 +7,20 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class SubCategoryController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        SubCategoryBC subcategoryBC;
+        SubCategoryService _subcategoryService;
 
 
-        public SubCategoryController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public SubCategoryController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            subcategoryBC = new SubCategoryBC(context);
+            _subcategoryService = new SubCategoryService(context);
 
         }
         public IActionResult Create()
@@ -62,7 +62,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                         }
                         subcategory.Created_By = Convert.ToInt16(user_cd);
                         subcategory.Created_Datetime = StaticMethods.GetKuwaitTime();
-                        subcategoryBC.CreateSubCategory(subcategory);
+                        _subcategoryService.CreateSubCategory(subcategory);
                         return Redirect("/List/" + list_id);
                     }
                     else
@@ -82,7 +82,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();
@@ -105,7 +105,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = subcategoryBC.GetSubCategory(decryptedId);
+                var areaexist = _subcategoryService.GetSubCategory(decryptedId);
                 if (areaexist != null && areaexist.Sub_Category_Id != 0)
                 {
                     return View("Create", areaexist);
@@ -121,7 +121,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -137,7 +137,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = subcategoryBC.GetSubCategory(decryptedId);
+                    var areaDM = _subcategoryService.GetSubCategory(decryptedId);
                     if (areaDM != null && areaDM.Sub_Category_Id != 0)
                     {
 
@@ -162,7 +162,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             subcategory.Sub_Category_Id = decryptedId;
                             subcategory.Updated_By = Convert.ToInt16(user_cd);
                             subcategory.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            subcategoryBC.CreateSubCategory(subcategory);
+                            _subcategoryService.CreateSubCategory(subcategory);
                             return Redirect("/List/" + list_id);
                         }
                         else
@@ -189,7 +189,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");

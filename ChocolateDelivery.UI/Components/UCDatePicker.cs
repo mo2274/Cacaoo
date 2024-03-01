@@ -7,10 +7,10 @@ namespace ChocolateDelivery.UI.Components
 {
     public class UCDatePicker : ViewComponent
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private string logPath = "";
-        public UCDatePicker(ChocolateDeliveryEntities cc, IConfiguration config)
+        public UCDatePicker(AppDbContext cc, IConfiguration config)
         {
             context = cc;
             _config = config;
@@ -24,7 +24,7 @@ namespace ChocolateDelivery.UI.Components
 
                 if (properties.Is_Required && properties.Error_Label_Id != null && properties.Error_Label_Id != 0)
                 {
-                    var commonBC = new CommonBC(context, logPath);
+                    var commonBC = new CommonService(context, logPath);
                     var lang = HttpContext.Session.GetString("Culture") ?? Language.English;
                     if (lang == Language.Arabic)
                     {
@@ -70,8 +70,8 @@ namespace ChocolateDelivery.UI.Components
             }
             catch (Exception ex)
             {
-                globalCls.WriteToFile(logPath, "error in uc textbox for id:" + properties.Id, true);
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, "error in uc textbox for id:" + properties.Id, true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
 

@@ -7,10 +7,10 @@ namespace ChocolateDelivery.UI.Components
 {
     public class UCManualDropDown : ViewComponent
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private string logPath = "";
-        public UCManualDropDown(ChocolateDeliveryEntities cc, IConfiguration config)
+        public UCManualDropDown(AppDbContext cc, IConfiguration config)
         {
             context = cc;
             _config = config;
@@ -27,7 +27,7 @@ namespace ChocolateDelivery.UI.Components
             var lang = HttpContext.Session.GetString("Culture") ?? Language.English;
             if (properties.Is_Required && properties.Error_Label_Id != null && properties.Error_Label_Id != 0)
             {
-                var commonBC = new CommonBC(context, logPath);
+                var commonBC = new CommonService(context, logPath);
 
                 if (lang == Language.Arabic)
                 {

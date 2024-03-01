@@ -7,10 +7,10 @@ namespace ChocolateDelivery.UI.Components
 {
     public class UCLabel : ViewComponent
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private string logPath = "";
-        public UCLabel(ChocolateDeliveryEntities cc, IConfiguration config)
+        public UCLabel(AppDbContext cc, IConfiguration config)
         {
             context = cc;
             _config = config;
@@ -44,7 +44,7 @@ namespace ChocolateDelivery.UI.Components
             {
                 ViewBag.Id = id;
             }
-            var commonBC = new CommonBC(context, logPath);
+            var commonBC = new CommonService(context, logPath);
             var lang = HttpContext.Session.GetString("Culture") ?? Language.English;
             if (lang == Language.Arabic) {
                 //adding ar-labels class defined in site.css for arabic labels to customise fonts

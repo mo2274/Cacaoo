@@ -1,5 +1,4 @@
-﻿@using ChocolateDelivery.DAL.Models.Enums
-@model SM_Restaurants
+﻿@model SM_Restaurants
 
 @section CSS {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css"/>
@@ -220,9 +219,9 @@
                                     })
                                 </div>
                                 <br/>
-                                <label for="ResturantStatus" class="form-label">Resturant Status</label>
+                                <label for="RestaurantStatus" class="form-label">Restaurant Status</label>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.RestaurantStatus, Enum.GetValues(typeof(ResturantStatus)).Cast<ResturantStatus>().Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() }), "Select Status", new { @class = "form-control" })
+                                    @Html.DropDownListFor(model => model.RestaurantStatus, Enum.GetValues(typeof(RestaurantStatus)).Cast<RestaurantStatus>().Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() }), "Select Status", new { @class = "form-control" })
                                 </div>
 
 

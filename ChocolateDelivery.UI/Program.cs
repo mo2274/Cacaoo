@@ -9,10 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // connect to mysql with connection string from app settings
 // Add services to the container.
 
-ConfigurationManager configuration = builder.Configuration;
+var configuration = builder.Configuration;
 var rabbitMQSection = configuration.GetSection("ConnectionStrings");
 var connection_string = rabbitMQSection["DefaultConnection"];
-builder.Services.AddDbContext<ChocolateDeliveryEntities>(options => options.UseMySql(connection_string, ServerVersion.AutoDetect(connection_string)));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection_string, ServerVersion.AutoDetect(connection_string)));
 
 //Below code is used to check session globally
 builder.Services.AddControllers(config =>
@@ -27,7 +27,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDistributedMemoryCache();
 
-int session_expire_time = configuration.GetValue<int>("Session_Expires_Time");
+var session_expire_time = configuration.GetValue<int>("Session_Expires_Time");
 //Below two lines is used for using session across the app
 builder.Services.AddSession(options =>
 {

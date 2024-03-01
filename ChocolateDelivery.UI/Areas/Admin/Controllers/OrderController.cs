@@ -10,20 +10,20 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class OrderController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        OrderBC orderBC;
+        OrderService _orderService;
 
 
-        public OrderController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public OrderController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            orderBC = new OrderBC(context);
+            _orderService = new OrderService(context);
 
 
         }
@@ -35,7 +35,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 ViewBag.List_Id = list_id;
 
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = orderBC.GetOrder(decryptedId);
+                var areaexist = _orderService.GetOrder(decryptedId);
                 if (areaexist != null && areaexist.Order_Id != 0)
                 {
                     if (areaexist.Order_Type == OrderTypes.GIFT)
@@ -49,15 +49,15 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
 
                         if (!string.IsNullOrEmpty(qrText))
                         {
-                            QRCodeGenerator QrGenerator = new QRCodeGenerator();
-                            QRCodeData QrCodeInfo = QrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
-                            QRCode QrCode = new QRCode(QrCodeInfo);
-                            Bitmap QrBitmap = QrCode.GetGraphic(60);
+                            var QrGenerator = new QRCodeGenerator();
+                            var QrCodeInfo = QrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
+                            var QrCode = new QRCode(QrCodeInfo);
+                            var QrBitmap = QrCode.GetGraphic(60);
                             // use this when you want to show your logo in middle of QR Code and change color of qr code
                             //Bitmap logoImage = new Bitmap(@"wwwroot/assets/img/logo/cacaoo_favicon.png");
                             //var qrCodeAsBitmap = QrCode.GetGraphic(60, Color.Black, Color.White, logoImage);
-                            byte[] BitmapArray = BitmapToByteArray(QrBitmap);
-                            string QrUri = string.Format("data:image/png;base64,{0}", Convert.ToBase64String(BitmapArray));
+                            var BitmapArray = BitmapToByteArray(QrBitmap);
+                            var QrUri = string.Format("data:image/png;base64,{0}", Convert.ToBase64String(BitmapArray));
                             ViewBag.QrCodeUri = QrUri;
                         }
 
@@ -75,7 +75,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -91,7 +91,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = orderBC.GetOrder(decryptedId);
+                    var areaDM = _orderService.GetOrder(decryptedId);
                     if (areaDM != null && areaDM.Order_Id != 0)
                     {
                         var vendor_id = HttpContext.Session.GetInt32("VendorId");
@@ -99,8 +99,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                         {
                             foreach (var detail in order.TXN_Order_Details)
                             {
-                                var prod_id = detail.Product_Id;
-                                var prod_name = detail.Product_Name;
                             }
                             if (button == "accept_order")
                             {
@@ -116,12 +114,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             }
 
                             order.Order_Id = decryptedId;
-                            orderBC.SaveOrder(order);
+                            _orderService.SaveOrder(order);
 
-                            TXN_Order_Logs log = new TXN_Order_Logs();
-                            log.Order_Id = order.Order_Id;
-                            log.Status_Id = order.Status_Id;
-                            log.Created_Datetime = StaticMethods.GetKuwaitTime();
+                            var log = new TXN_Order_Logs
+                            {
+                                Order_Id = order.Order_Id,
+                                Status_Id = order.Status_Id,
+                                Created_Datetime = StaticMethods.GetKuwaitTime()
+                            };
 
                             if (button == "accept_order")
                             {
@@ -136,7 +136,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                                 log.Comments = "Order is delivered";
                             }
 
-                            orderBC.CreateOrderLog(log);
+                            _orderService.CreateOrderLog(log);
 
                             return Redirect("/Merchant/List/" + list_id);
                         }
@@ -164,14 +164,14 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
         }
         private byte[] BitmapToByteArray(Bitmap bitmap)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 bitmap.Save(ms, ImageFormat.Png);
                 return ms.ToArray();

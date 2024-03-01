@@ -7,20 +7,20 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
     [Area("Admin")]
     public class ProductTypeController : Controller
     {
-        private ChocolateDeliveryEntities context;
+        private AppDbContext context;
         private readonly IConfiguration _config;
         private IWebHostEnvironment iwebHostEnvironment;
         private string logPath = "";
-        ProductTypeBC productTypeBC;
+        ProductTypeService _productTypeService;
 
 
-        public ProductTypeController(ChocolateDeliveryEntities cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
+        public ProductTypeController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
         {
             context = cc;
             _config = config;
             this.iwebHostEnvironment = iwebHostEnvironment;
             logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            productTypeBC = new ProductTypeBC(context);
+            _productTypeService = new ProductTypeService(context);
 
         }
         public IActionResult Create()
@@ -38,7 +38,6 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
             {
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
-                var type_name = Request.Form["Type_Name_E"];
                 if (ModelState.IsValid)
                 {
 
@@ -49,7 +48,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
 
                         type.Created_By = Convert.ToInt16(user_cd);
                         type.Created_Datetime = StaticMethods.GetKuwaitTime();
-                        productTypeBC.CreateType(type);
+                        _productTypeService.CreateType(type);
                         return Redirect("/List/" + list_id);
                     }
                     else
@@ -69,7 +68,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View();
@@ -92,7 +91,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 var list_id = Request.Query["List_Id"];
                 ViewBag.List_Id = list_id;
                 var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = productTypeBC.GetType(decryptedId);
+                var areaexist = _productTypeService.GetType(decryptedId);
                 if (areaexist != null && areaexist.Type_Id != 0)
                 {
                     return View("Create", areaexist);
@@ -108,7 +107,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
@@ -124,7 +123,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 if (ModelState.IsValid)
                 {
                     var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = productTypeBC.GetType(decryptedId);
+                    var areaDM = _productTypeService.GetType(decryptedId);
                     if (areaDM != null && areaDM.Type_Id != 0)
                     {
 
@@ -134,7 +133,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             type.Type_Id = decryptedId;
                             type.Updated_By = Convert.ToInt16(user_cd);
                             type.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            productTypeBC.CreateType(type);
+                            _productTypeService.CreateType(type);
                             return Redirect("/List/" + list_id);
                         }
                         else
@@ -161,7 +160,7 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                 /* lblError.Visible = true;
                  lblError.Text = "Invalid username or password";*/
                 ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                globalCls.WriteToFile(logPath, ex.ToString(), true);
+                Helpers.WriteToFile(logPath, ex.ToString(), true);
 
             }
             return View("Create");
