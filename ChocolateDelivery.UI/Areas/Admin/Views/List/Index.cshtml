@@ -2,9 +2,9 @@
 @using System.Net
 @model DataTable
 @{
-    int i = 0;
-    int k = 0;
-    int pv = 0;
+    var i = 0;
+    var k = 0;
+    var pv = 0;
     List<SM_LIST_FIELDS> listDetails = new List<SM_LIST_FIELDS>();
     if (ViewData["ListDetails"] != null)
     {
@@ -57,14 +57,14 @@
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="row row-sm mb-3">
-                                                @foreach (SM_LIST_PARAMETERS par in findParameters)
+                                                @foreach (var par in findParameters)
                                                 {
                                                     <div class="@par.Control_Size">
 
                                                         @if (par.Parameter_Type == Parameter_Types.TextBox)
                                                         {
                                                             <label class="@par.Control_Label_Size">@par.Control_Label_E</label>
-                                                            DateTime now = StaticMethods.GetKuwaitTime();
+                                                            var now = StaticMethods.GetKuwaitTime();
                                                             if (par.Default_Value == Parameter_Default_Values.FirstOfMonth)
                                                             {
                                                                 var startDate = new DateTime(now.Year, now.Month, 1);

@@ -84,7 +84,7 @@
 
                                                         @if (Model != null)
                                                         {
-                                                            @for (int i = 0; i < Model.SM_USER_GROUP_RIGHTS.Count; i++)
+                                                            @for (var i = 0; i < Model.SM_USER_GROUP_RIGHTS.Count; i++)
                                                             {
                                                                 <tr>
                                                                     <td class="hidden">@Html.HiddenFor(x=>x.SM_USER_GROUP_RIGHTS[i].Right_Id)</td>

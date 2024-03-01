@@ -1,14 +1,14 @@
 ﻿@model SM_Chefs
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
-    string placeholder = "Enter Chef Name";
-    string placeholder_ar = "Enter Chef Name(Ar)";
+    var placeholder = "Enter Chef Name";
+    var placeholder_ar = "Enter Chef Name(Ar)";
     if (ViewBag.Type == Chef_Types.BOUTIQUE)
     {
         placeholder = "Enter Boutique Name";
         placeholder_ar = "Enter Boutique Name(Ar)";
     }
-    int user_cd = 0;
+    var user_cd = 0;
     if (HttpContextAccessor.HttpContext != null)
     {
         user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("UserCd") ?? 0;
@@ -177,7 +177,7 @@
                                                                         <tbody>
                                                                             @if (Model != null)
                                                                             {
-                                                                                for (int i = 0; i < Model.SM_Chef_Products.Count; i++)
+                                                                                for (var i = 0; i < Model.SM_Chef_Products.Count; i++)
                                                                                 {
                                                                                     var detail_id = "SM_Chef_Products[" + i + "].Id";
                                                                                     var id = "SM_Chef_Products[" + i + "].Product_Id";
@@ -254,8 +254,8 @@
         @if (Model != null)
         {
 
-            int product_line_add_on = 1;
-            foreach (SM_Chef_Products detail in Model.SM_Chef_Products)
+            var product_line_add_on = 1;
+            foreach (var detail in Model.SM_Chef_Products)
             {
                 <text>
 

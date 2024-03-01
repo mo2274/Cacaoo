@@ -3,7 +3,7 @@
 
 
 @{
-    int user_cd = 0;
+    var user_cd = 0;
     if (HttpContextAccessor.HttpContext != null)
     {
         user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("UserCd") ?? 0;
@@ -145,7 +145,7 @@
                                                     <tbody>
                                                         @if (Model != null)
                                                         {
-                                                            for (int i = 0; i < Model.SM_Home_Group_Details.Count; i++)
+                                                            for (var i = 0; i < Model.SM_Home_Group_Details.Count; i++)
                                                             {
                                                                 var detail_id = "SM_Home_Group_Details[" + i + "].Group_Detail_Id";
                                                                 var id = "SM_Home_Group_Details[" + i + "].Id";

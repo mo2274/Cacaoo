@@ -5,7 +5,7 @@
 {
     <select name="@ViewBag.Name" id="@Model.Id" class="form-control form-select select2" data-placeholder="@Model.Placeholder" data-val="true" data-val-required="@ViewBag.ErrorMessage">
         <option></option>
-        @foreach(UCManualDropdownModel dropdownData in Model.DropDownData){
+        @foreach(var dropdownData in Model.DropDownData){
              if (Model.Value == dropdownData.Value)
             {
                 <option value="@dropdownData.Value" selected>@dropdownData.Text</option>
@@ -24,7 +24,7 @@ else
     <select name="@Model.Name" id="@Model.Id" class="form-control form-select select2" data-placeholder="@Model.Placeholder">
         <option></option>
 
-       @foreach(UCManualDropdownModel dropdownData in Model.DropDownData){
+       @foreach(var dropdownData in Model.DropDownData){
              if (Model.Value == dropdownData.Value)
             {
                 <option value="@dropdownData.Value" selected>@dropdownData.Text</option>

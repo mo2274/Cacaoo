@@ -1,7 +1,7 @@
 ﻿@model SM_Products
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
-    int user_cd = 0;
+    var user_cd = 0;
     if (HttpContextAccessor.HttpContext != null)
     {
         user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("VendorId") ?? 0;
@@ -249,7 +249,7 @@
                                                                         <tbody>
                                                                             @if (Model != null)
                                                                             {
-                                                                                for (int i = 0; i < Model.SM_Product_AddOns.Count; i++)
+                                                                                for (var i = 0; i < Model.SM_Product_AddOns.Count; i++)
                                                                                 {
                                                                                     var detail_id = "SM_Product_AddOns[" + i + "].Product_AddOnId";
                                                                                     var id = "SM_Product_AddOns[" + i + "].AddOn_Id";
@@ -292,7 +292,7 @@
                                                                         <tbody>
                                                                             @if (Model != null)
                                                                             {
-                                                                                for (int i = 0; i < Model.SM_Product_Branches.Count; i++)
+                                                                                for (var i = 0; i < Model.SM_Product_Branches.Count; i++)
                                                                                 {
                                                                                     var detail_id = "SM_Product_Branches[" + i + "].Product_Branch_Id";
                                                                                     var branch_id = "SM_Product_Branches[" + i + "].Branch_Id";
@@ -308,7 +308,7 @@
                                                                             }
                                                                             else if (ViewBag.Branches != null)
                                                                             {
-                                                                                for (int i = 0; i < ViewBag.Branches.Count; i++)
+                                                                                for (var i = 0; i < ViewBag.Branches.Count; i++)
                                                                                 {
                                                                                     var detail_id = "SM_Product_Branches[" + i + "].Product_Branch_Id";
                                                                                     var branch_id = "SM_Product_Branches[" + i + "].Branch_Id";
@@ -361,7 +361,7 @@
                                                                         <tbody>
                                                                             @if (Model != null)
                                                                             {
-                                                                                for (int i = 0; i < Model.SM_Product_Catering_Products.Count; i++)
+                                                                                for (var i = 0; i < Model.SM_Product_Catering_Products.Count; i++)
                                                                                 {
                                                                                     var detail_id = "SM_Product_Catering_Products[" + i + "].Catering_Product_Id";
                                                                                     var cat_id = "SM_Product_Catering_Products[" + i + "].Category_Id";
@@ -507,8 +507,8 @@
                     starShape: 'rounded'
                 });
             </text>
-            int product_line_add_on = 1;
-            foreach (SM_Product_AddOns detail in Model.SM_Product_AddOns)
+            var product_line_add_on = 1;
+            foreach (var detail in Model.SM_Product_AddOns)
             {
                 <text>
 
@@ -526,8 +526,8 @@
                 </text>
                 product_line_add_on++;
             }
-            int line_no = 1;
-            foreach (SM_Product_Catering_Products detail in Model.SM_Product_Catering_Products)
+            var line_no = 1;
+            foreach (var detail in Model.SM_Product_Catering_Products)
             {
                 <text>
 

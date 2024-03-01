@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Reflection;
 
 namespace ChocolateDelivery.UI.CustomFilters
@@ -15,15 +13,14 @@ namespace ChocolateDelivery.UI.CustomFilters
             if (controllerActionDescriptor != null)
             {
                 var controllerType = controllerActionDescriptor.ControllerTypeInfo;
-                var areaAttribute = controllerType.GetCustomAttribute<AreaAttribute>();
+                controllerType.GetCustomAttribute<AreaAttribute>();
                 //if (areaAttribute != null && areaAttribute.RouteValue == "Admin")
                 {
                     if (context.Controller is Controller)
                     {
-                        Controller controller = (Controller)context.Controller;
+                        var controller = (Controller)context.Controller;
                         var controllerName = controller.ControllerContext.ActionDescriptor.ControllerName;
-                        var rd = context.RouteData;
-                        string? currentArea = context.ActionDescriptor.RouteValues["area"];
+                        var currentArea = context.ActionDescriptor.RouteValues["area"];
 
                         if (currentArea == "Admin")
                         {

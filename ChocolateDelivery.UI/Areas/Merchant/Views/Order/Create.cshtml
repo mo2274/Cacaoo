@@ -1,13 +1,13 @@
 ﻿@model TXN_Orders
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
-    int user_cd = 0;
+    var user_cd = 0;
     if (HttpContextAccessor.HttpContext != null)
     {
         user_cd = HttpContextAccessor.HttpContext.Session.GetInt32("VendorId") ?? 0;
 
     }
-    bool Is_Gift_Order = Model != null && Model.Order_Type == OrderTypes.GIFT;
+    var Is_Gift_Order = Model != null && Model.Order_Type == OrderTypes.GIFT;
 }
 @section CSS{
     <style type="text/css">
@@ -227,7 +227,7 @@
                                                                         <tbody>
                                                                             @if (Model != null)
                                                                             {
-                                                                                for (int i = 0; i < Model.TXN_Order_Details.Count; i++)
+                                                                                for (var i = 0; i < Model.TXN_Order_Details.Count; i++)
                                                                                 {
                                                                                     var current_line_no = i + 1;
                                                                                     <tr>
