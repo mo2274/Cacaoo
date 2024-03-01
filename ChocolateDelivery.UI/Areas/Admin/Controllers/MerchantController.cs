@@ -3,43 +3,140 @@ using ChocolateDelivery.DAL;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
-namespace ChocolateDelivery.UI.Areas.Admin.Controllers
+namespace ChocolateDelivery.UI.Areas.Admin.Controllers;
+
+[Area("Admin")]
+public class MerchantController : Controller
 {
-    [Area("Admin")]
-    public class MerchantController : Controller
+    private AppDbContext context;
+    private readonly IConfiguration _config;
+    private IWebHostEnvironment iwebHostEnvironment;
+    private string logPath = "";
+    RestaurantService _restaurantService;
+
+
+    public MerchantController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
     {
-        private AppDbContext context;
-        private readonly IConfiguration _config;
-        private IWebHostEnvironment iwebHostEnvironment;
-        private string logPath = "";
-        RestaurantService _restaurantService;
+        context = cc;
+        _config = config;
+        this.iwebHostEnvironment = iwebHostEnvironment;
+        logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
+        _restaurantService = new RestaurantService(context);
+    }
 
+    public IActionResult Create()
+    {
+        var list_id = Request.Query["List_Id"];
+        ViewBag.List_Id = list_id;
+        return View();
+    }
 
-        public MerchantController(AppDbContext cc, IConfiguration config, IWebHostEnvironment iwebHostEnvironment)
-        {
-            context = cc;
-            _config = config;
-            this.iwebHostEnvironment = iwebHostEnvironment;
-            logPath = Path.Combine(this.iwebHostEnvironment.WebRootPath, _config.GetValue<string>("ErrorFilePath")); // "Information"
-            _restaurantService = new RestaurantService(context);
-        }
-
-        public IActionResult Create()
+    // HTTP POST VERSION  
+    [HttpPost]
+    public IActionResult Create(SM_Restaurants restaurant)
+    {
+        try
         {
             var list_id = Request.Query["List_Id"];
             ViewBag.List_Id = list_id;
-            return View();
+            if (ModelState.IsValid)
+            {
+                var user_cd = HttpContext.Session.GetInt32("UserCd");
+                if (user_cd != null)
+                {
+                    if (restaurant.Image_File != null)
+                    {
+                        var image_path_dir = "assets/images/categories/";
+                        var fileName = Guid.NewGuid().ToString("N").Substring(0, 12) + "_" + restaurant.Image_File.FileName;
+                        var path = Path.Combine(this.iwebHostEnvironment.WebRootPath, image_path_dir);
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+
+                        var filePath = Path.Combine(path, fileName);
+                        var stream = new FileStream(filePath, FileMode.Create);
+                        restaurant.Image_File.CopyToAsync(stream);
+
+                        restaurant.Image_URL = image_path_dir + fileName;
+                    }
+
+                    restaurant.Closing_Time = (DateTime.Parse(restaurant.Closing_Time_String)).TimeOfDay;
+                    restaurant.Opening_Time = DateTime.Parse(restaurant.Opening_Time_String).TimeOfDay;
+                    restaurant.Row_Id = Guid.NewGuid();
+                    restaurant.Created_By = Convert.ToInt16(user_cd);
+                    restaurant.Created_Datetime = StaticMethods.GetKuwaitTime();
+                    _restaurantService.CreateRestaurant(restaurant);
+                    return Redirect("/List/" + list_id);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Login");
+                }
+            }
+            else
+                return View();
+        }
+        catch (Exception ex)
+        {
+            /* lblError.Visible = true;
+             lblError.Text = "Invalid username or password";*/
+            ModelState.AddModelError("name", "Due to some technical error, data not saved");
+            Helpers.WriteToFile(logPath, ex.ToString(), true);
         }
 
-        // HTTP POST VERSION  
-        [HttpPost]
-        public IActionResult Create(SM_Restaurants restaurant)
+        return View();
+        /*if (ModelState.IsValid)
         {
-            try
+
+            var userDM = userBC.isUserExist(user.User_Id.Trim());
+            //go to dashboard page
+            return View("Thanks");
+        }
+        else
+            return View();*/
+    }
+
+    public IActionResult Update(string Id)
+    {
+        try
+        {
+            var list_id = Request.Query["List_Id"];
+            ViewBag.List_Id = list_id;
+            var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
+            var areaexist = _restaurantService.GetRestaurant(decryptedId);
+            if (areaexist != null && areaexist.Restaurant_Id != 0)
             {
-                var list_id = Request.Query["List_Id"];
-                ViewBag.List_Id = list_id;
-                if (ModelState.IsValid)
+                return View("Create", areaexist);
+            }
+            else
+            {
+                ModelState.AddModelError("name", "Restaurant not exist");
+            }
+        }
+        catch (Exception ex)
+        {
+            /* lblError.Visible = true;
+             lblError.Text = "Invalid username or password";*/
+            ModelState.AddModelError("name", "Due to some technical error, data not saved");
+            Helpers.WriteToFile(logPath, ex.ToString(), true);
+        }
+
+        return View("Create");
+    }
+
+    [HttpPost]
+    public IActionResult Update(SM_Restaurants restaurant, string Id)
+    {
+        try
+        {
+            var list_id = Request.Query["List_Id"];
+            ViewBag.List_Id = list_id;
+            if (ModelState.IsValid)
+            {
+                var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
+                var areaDM = _restaurantService.GetRestaurant(decryptedId);
+                if (areaDM != null && areaDM.Restaurant_Id != 0)
                 {
                     var user_cd = HttpContext.Session.GetInt32("UserCd");
                     if (user_cd != null)
@@ -61,11 +158,19 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                             restaurant.Image_URL = image_path_dir + fileName;
                         }
 
-                        restaurant.Closing_Time = (DateTime.Parse(restaurant.Closing_Time_String)).TimeOfDay;
-                        restaurant.Opening_Time = DateTime.Parse(restaurant.Opening_Time_String).TimeOfDay;
-                        restaurant.Row_Id = Guid.NewGuid();
-                        restaurant.Created_By = Convert.ToInt16(user_cd);
-                        restaurant.Created_Datetime = StaticMethods.GetKuwaitTime();
+                        if (!string.IsNullOrEmpty(restaurant.Opening_Time_String))
+                        {
+                            restaurant.Opening_Time = DateTime.ParseExact(restaurant.Opening_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                        }
+
+                        if (!string.IsNullOrEmpty(restaurant.Closing_Time_String))
+                        {
+                            restaurant.Closing_Time = DateTime.ParseExact(restaurant.Closing_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
+                        }
+
+                        restaurant.Restaurant_Id = decryptedId;
+                        restaurant.Updated_By = Convert.ToInt16(user_cd);
+                        restaurant.Updated_Datetime = StaticMethods.GetKuwaitTime();
                         _restaurantService.CreateRestaurant(restaurant);
                         return Redirect("/List/" + list_id);
                     }
@@ -75,135 +180,29 @@ namespace ChocolateDelivery.UI.Areas.Admin.Controllers
                     }
                 }
                 else
-                    return View();
-            }
-            catch (Exception ex)
-            {
-                /* lblError.Visible = true;
-                 lblError.Text = "Invalid username or password";*/
-                ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                Helpers.WriteToFile(logPath, ex.ToString(), true);
-            }
-
-            return View();
-            /*if (ModelState.IsValid)
-            {
-
-                var userDM = userBC.isUserExist(user.User_Id.Trim());
-                //go to dashboard page
-                return View("Thanks");
-            }
-            else
-                return View();*/
-        }
-
-        public IActionResult Update(string Id)
-        {
-            try
-            {
-                var list_id = Request.Query["List_Id"];
-                ViewBag.List_Id = list_id;
-                var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                var areaexist = _restaurantService.GetRestaurant(decryptedId);
-                if (areaexist != null && areaexist.Restaurant_Id != 0)
                 {
-                    return View("Create", areaexist);
-                }
-                else
-                {
-                    ModelState.AddModelError("name", "Restaurant not exist");
-                }
-            }
-            catch (Exception ex)
-            {
-                /* lblError.Visible = true;
-                 lblError.Text = "Invalid username or password";*/
-                ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                Helpers.WriteToFile(logPath, ex.ToString(), true);
-            }
-
-            return View("Create");
-        }
-
-        [HttpPost]
-        public IActionResult Update(SM_Restaurants restaurant, string Id)
-        {
-            try
-            {
-                var list_id = Request.Query["List_Id"];
-                ViewBag.List_Id = list_id;
-                if (ModelState.IsValid)
-                {
-                    var decryptedId = Convert.ToInt32(StaticMethods.GetDecrptedString(Id));
-                    var areaDM = _restaurantService.GetRestaurant(decryptedId);
-                    if (areaDM != null && areaDM.Restaurant_Id != 0)
-                    {
-                        var user_cd = HttpContext.Session.GetInt32("UserCd");
-                        if (user_cd != null)
-                        {
-                            if (restaurant.Image_File != null)
-                            {
-                                var image_path_dir = "assets/images/categories/";
-                                var fileName = Guid.NewGuid().ToString("N").Substring(0, 12) + "_" + restaurant.Image_File.FileName;
-                                var path = Path.Combine(this.iwebHostEnvironment.WebRootPath, image_path_dir);
-                                if (!Directory.Exists(path))
-                                {
-                                    Directory.CreateDirectory(path);
-                                }
-
-                                var filePath = Path.Combine(path, fileName);
-                                var stream = new FileStream(filePath, FileMode.Create);
-                                restaurant.Image_File.CopyToAsync(stream);
-
-                                restaurant.Image_URL = image_path_dir + fileName;
-                            }
-
-                            if (!string.IsNullOrEmpty(restaurant.Opening_Time_String))
-                            {
-                                restaurant.Opening_Time = DateTime.ParseExact(restaurant.Opening_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
-                            }
-
-                            if (!string.IsNullOrEmpty(restaurant.Closing_Time_String))
-                            {
-                                restaurant.Closing_Time = DateTime.ParseExact(restaurant.Closing_Time_String, "hh:mm tt", CultureInfo.InvariantCulture).TimeOfDay;
-                            }
-
-                            restaurant.Restaurant_Id = decryptedId;
-                            restaurant.Updated_By = Convert.ToInt16(user_cd);
-                            restaurant.Updated_Datetime = StaticMethods.GetKuwaitTime();
-                            _restaurantService.CreateRestaurant(restaurant);
-                            return Redirect("/List/" + list_id);
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Login");
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Restaurant not exist");
-                        return View("Create", restaurant);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Model State is not valid");
-                    var message = string.Join(" | ", ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage));
-                    Helpers.WriteToFile(logPath, "Model state invalid in invoice for field:" + message, true);
+                    ModelState.AddModelError("", "Restaurant not exist");
                     return View("Create", restaurant);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                /* lblError.Visible = true;
-                 lblError.Text = "Invalid username or password";*/
-                ModelState.AddModelError("name", "Due to some technical error, data not saved");
-                Helpers.WriteToFile(logPath, ex.ToString(), true);
+                ModelState.AddModelError("", "Model State is not valid");
+                var message = string.Join(" | ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                Helpers.WriteToFile(logPath, "Model state invalid in invoice for field:" + message, true);
+                return View("Create", restaurant);
             }
-
-            return View("Create");
         }
+        catch (Exception ex)
+        {
+            /* lblError.Visible = true;
+             lblError.Text = "Invalid username or password";*/
+            ModelState.AddModelError("name", "Due to some technical error, data not saved");
+            Helpers.WriteToFile(logPath, ex.ToString(), true);
+        }
+
+        return View("Create");
     }
 }

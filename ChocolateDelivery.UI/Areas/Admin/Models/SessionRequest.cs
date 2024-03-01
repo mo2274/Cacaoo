@@ -1,7 +1,6 @@
-﻿namespace ChocolateDelivery.UI.Areas.Admin.Models
+﻿namespace ChocolateDelivery.UI.Areas.Admin.Models;
+
+public class SessionRequest
 {
-    public class SessionRequest
-    {
-        public string? lang { get; set; }
-    }
+    public string? lang { get; set; }
 }

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ChocolateDelivery.UI.Areas.Merchant.Controllers
+namespace ChocolateDelivery.UI.Areas.Merchant.Controllers;
+
+[Area("Merchant")]
+public class HomeController : Controller
 {
-    [Area("Merchant")]
-    public class HomeController : Controller
+    public IActionResult Index()
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View();
     }
 }
